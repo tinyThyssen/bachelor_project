@@ -1,0 +1,18 @@
+# Compiled files
+*.o
+*.out
+*.exe
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Python cache (if relevant)
+__pycache__/
+*.pyc
+
+# Data / simulation outputs
+data/
+results/
