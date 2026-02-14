@@ -6,8 +6,10 @@ SRC = \
   src/main.c \
   src/vec3.c \
   src/rng.c \
-  src/source_disk.c
-
+  src/source_disk.c \
+  src/source_div.c \
+  src/monitor_sphere.c \
+  src/monitor_flat.c
 OUT = disk_source
 
 all:

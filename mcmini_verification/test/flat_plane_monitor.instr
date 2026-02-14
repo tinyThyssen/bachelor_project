@@ -1,0 +1,64 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: test (rename also the example and DEFINE lines below)
+*
+* %Identification
+* Written by: Your name (email)
+* Date: Current Date
+* Origin: Your institution
+* %INSTRUMENT_SITE: Templates
+*
+* Instrument short description
+*
+* %Description
+* Instrument longer description (type, elements, usage...)
+*
+* Example: mcrun test.instr <parameters=values>
+*
+* once your instrument is written and functional:
+* - replace INSTRUMENT_SITE entry above with your Institution name as a single word
+* - rename the instrument name after DEFINE INSTRUMENT below
+* - update the parameter help in the following Parameters section
+* - update the instrument description, and better add a usage example with a
+*     sensible parameter set.
+*
+* %Parameters
+*
+* %Link
+* A reference/HTML link for more information
+*
+* %End
+*******************************************************************************/
+DEFINE INSTRUMENT src_check(lambda=4.0, dlambda=0.1)
+
+TRACE
+
+// Global origin & progress
+COMPONENT Origin = Progress_bar()
+  AT (0,0,0) ABSOLUTE
+
+// Simple source, focused onto a plane 1.5 m downstream (your dist)
+COMPONENT src = Source_simple(
+  radius   = 0.2,
+  dist     = 1.5,
+  focus_xw = 0.04,
+  focus_yh = 0.10,
+  lambda0  = lambda,
+  dlambda  = dlambda
+)
+AT (0,0,0) RELATIVE Origin
+
+// Flat 2D detector plane right after the source
+COMPONENT plane_monitor = PSD_monitor(
+  filename = "mcstas_flat_hits.dat",
+  xwidth   = 0.20,      // choose something that actually catches the beam
+  yheight  = 0.20,
+  restore_neutron = 1   // monitor doesn't absorb; keeps neutron for downstream (if any)
+)
+AT (0,0,0.01) RELATIVE src   // 1 cm after the source
+ROTATED (0,0,0) RELATIVE src
+
+END
+
+

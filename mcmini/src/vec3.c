@@ -10,6 +10,10 @@ Vec3 v_add(Vec3 vec_a, Vec3 vec_b) {
     return vec3(vec_a.x + vec_b.x, vec_a.y + vec_b.y, vec_a.z + vec_b.z);
 }
 
+Vec3 v_sub(Vec3 vec_a, Vec3 vec_b) {
+    return vec3(vec_a.x - vec_b.x, vec_a.y - vec_b.y, vec_a.z - vec_b.z);
+}
+
 Vec3 v_scale(Vec3 vec_a, double scalar) {
     return vec3(vec_a.x * scalar, vec_a.y * scalar, vec_a.z * scalar);
 }
