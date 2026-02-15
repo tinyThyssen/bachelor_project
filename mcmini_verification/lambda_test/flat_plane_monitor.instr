@@ -59,6 +59,13 @@ COMPONENT mon = PSD_monitor(
 )
 AT (0,0,1.5) RELATIVE src
 
+COMPONENT lambda_mon = L_monitor(
+    nL = 200,
+    filename = "lambda.dat",
+    Lmin = lambda - dlambda,
+    Lmax = lambda + dlambda
+)
+AT (0,0,1.5) RELATIVE src
 
 
 END

@@ -6,14 +6,15 @@
 
 typedef struct {
     Vec3 center;
-    double radius;
+    double xwidth;     // m
+    double yheight;    // m
 
-    double focus_xw;
-    double focus_yh;
-    double dist;
+    double focus_aw;   // deg (horizontal divergence width)
+    double focus_ah;   // deg (vertical divergence width)
+    int gauss;         // 0 uniform, 1 Gaussian (FWHM)
 
-    double lambda0;
-    double dlambda;
+    double lambda0;    // Ang
+    double dlambda;    // Ang (half spread in McStas docs, see below)
 } SourceDiv;
 
 Particle source_div_emit(const SourceDiv *src, RNG *rng);

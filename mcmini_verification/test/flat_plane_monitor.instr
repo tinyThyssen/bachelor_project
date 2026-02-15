@@ -30,35 +30,38 @@
 *
 * %End
 *******************************************************************************/
-DEFINE INSTRUMENT src_check(lambda=4.0, dlambda=0.1)
+DEFINE INSTRUMENT beam_validate(lambda=5.0, dlambda=0.5)
 
 TRACE
-
-// Global origin & progress
 COMPONENT Origin = Progress_bar()
-  AT (0,0,0) ABSOLUTE
+AT (0,0,0) ABSOLUTE
 
-// Simple source, focused onto a plane 1.5 m downstream (your dist)
-COMPONENT src = Source_simple(
-  radius   = 0.2,
-  dist     = 1.5,
-  focus_xw = 0.04,
-  focus_yh = 0.10,
+// Explicit, reproducible beam definition
+COMPONENT src = Source_div(
+  xwidth   = 0.4,      // full width of source rectangle (choose to mimic your disk)
+  yheight  = 0.4,      // full height of source rectangle
+  focus_aw = 0.04,
+  focus_ah = 0.10,
   lambda0  = lambda,
-  dlambda  = dlambda
+  dlambda  = dlambda,
+  flux     = 1
 )
 AT (0,0,0) RELATIVE Origin
 
-// Flat 2D detector plane right after the source
-COMPONENT plane_monitor = PSD_monitor(
-  filename = "mcstas_flat_hits.dat",
-  xwidth   = 0.20,      // choose something that actually catches the beam
-  yheight  = 0.20,
-  restore_neutron = 1   // monitor doesn't absorb; keeps neutron for downstream (if any)
+// Flat monitor very close to source (or pick your chosen z)
+COMPONENT mon = PSD_monitor(
+  filename = "flat_hits.dat",
+  xwidth = 0.25,
+  yheight = 0.25,
+  nx = 200,
+  ny = 200,
+  restore_neutron = 1
 )
-AT (0,0,0.01) RELATIVE src   // 1 cm after the source
-ROTATED (0,0,0) RELATIVE src
+AT (0,0,1.5) RELATIVE src
+
+
 
 END
+
 
 

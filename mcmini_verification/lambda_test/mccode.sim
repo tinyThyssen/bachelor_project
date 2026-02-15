@@ -1,9 +1,9 @@
 mcstas simulation description file for beam_validate.
-Date:    Sun Feb 15 20:19:34 2026
+Date:    Sun Feb 15 20:18:15 2026
 Program:  3.5.32, git
 
 begin instrument: beam_validate
-  File: test/mccode
+  File: lambda_test/mccode
   Source: flat_plane_monitor.instr
   Parameters:  lambda(double) dlambda(double)
   Trace_enabled: yes
@@ -11,7 +11,7 @@ begin instrument: beam_validate
   Embedded_runtime: yes
 end instrument
 
-begin simulation: test
+begin simulation: lambda_test
   Format: McCode with text headers
   URL: http://www.mccode.org
   Creator:  3.5.32, git
@@ -19,14 +19,14 @@ begin simulation: test
   Ncount: 1000000
   Trace: no
   Gravitation: no
-  Seed: 1771183173457307
-  Directory: test
+  Seed: 1771183094359953
+  Directory: lambda_test
   Param: lambda=5
   Param: dlambda=0.5
 end simulation
 
 begin data
-  Date: Sun Feb 15 20:19:34 2026 (1771183174)
+  Date: Sun Feb 15 20:18:15 2026 (1771183095)
   type: array_2d(200, 200)
   Source: beam_validate (flat_plane_monitor.instr)
   component: mon
@@ -34,9 +34,9 @@ begin data
   title: PSD monitor
   Ncount: 1000000
   filename: flat_hits.dat
-  statistics: X0=-0.0135882; dX=7.2159; Y0=-0.00449145; dY=7.2291;
-  signal: Min=0; Max=4.87388e-08; Mean=1.89948e-08;
-  values: 0.000759793 1.21707e-06 389727
+  statistics: X0=-0.00932499; dX=7.2237; Y0=0.0103346; dY=7.21755;
+  signal: Min=1.94955e-09; Max=5.06883e-08; Mean=1.90261e-08;
+  values: 0.000761044 1.21807e-06 390369
   xvar: X 
   yvar: Y 
   xlabel: X position [cm]
@@ -45,4 +45,24 @@ begin data
   zlabel: Signal per bin
   xylimits: -12.5 12.5 -12.5 12.5
   variables: I I_err N
+end data
+
+begin data
+  Date: Sun Feb 15 20:18:15 2026 (1771183095)
+  type: array_1d(200)
+  Source: beam_validate (flat_plane_monitor.instr)
+  component: lambda_mon
+  position: 0 0 1.5
+  title: Wavelength monitor
+  Ncount: 1000000
+  filename: lambda.dat
+  statistics: X0=4.99912; dX=0.289148;
+  signal: Min=5.2053e-07; Max=7.21334e-07; Mean=6.0866e-07;
+  values: 0.000121732 4.87158e-07 62441
+  xvar: L
+  yvar: (I,I_err)
+  xlabel: Wavelength [AA]
+  ylabel: Intensity
+  xlimits: 4.5 5.5
+  variables: L I I_err N
 end data

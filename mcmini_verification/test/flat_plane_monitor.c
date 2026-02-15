@@ -1,8 +1,8 @@
 /* Automatically generated file. Do not edit. 
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
- * Instrument: flat_plane_monitor.instr (src_check)
- * Date:       Thu Feb 12 14:09:38 2026
+ * Instrument: flat_plane_monitor.instr (beam_validate)
+ * Date:       Sun Feb 15 20:19:32 2026
  * File:       ./flat_plane_monitor.c
  * CFLAGS=
  */
@@ -6909,7 +6909,7 @@ int plane_intersect(double *t, double x, double y, double z,
 
 
 /* *****************************************************************************
-* Start of instrument 'src_check' generated code
+* Start of instrument 'beam_validate' generated code
 ***************************************************************************** */
 
 #ifdef MC_TRACE_ENABLED
@@ -6919,15 +6919,15 @@ int traceenabled = 0;
 #endif
 #define MCSTAS "/opt/homebrew/Caskroom/miniconda/base/envs/mcstas/share/mcstas/resources/"
 int   defaultmain         = 1;
-char  instrument_name[]   = "src_check";
+char  instrument_name[]   = "beam_validate";
 char  instrument_source[] = "flat_plane_monitor.instr";
 char *instrument_exe      = NULL; /* will be set to argv[0] in main */
-char  instrument_code[]   = "Instrument src_check source code flat_plane_monitor.instr is not embedded in this executable.\n  Use --source option when running mcstas.\n";
+char  instrument_code[]   = "Instrument beam_validate source code flat_plane_monitor.instr is not embedded in this executable.\n  Use --source option when running mcstas.\n";
 
 int main(int argc, char *argv[]){return mccode_main(argc, argv);}
 
 /* *****************************************************************************
-* instrument 'src_check' and components DECLARE
+* instrument 'beam_validate' and components DECLARE
 ***************************************************************************** */
 
 /* Instrument parameters: structure and a table for the initialisation
@@ -6940,7 +6940,7 @@ struct _struct_instrument_parameters {
 typedef struct _struct_instrument_parameters _class_instrument_parameters;
 
 struct _instrument_struct {
-  char   _name[256]; /* the name of this instrument e.g. 'src_check' */
+  char   _name[256]; /* the name of this instrument e.g. 'beam_validate' */
 /* Counters per component instance */
   double counter_AbsorbProp[5]; /* absorbed events in PROP routines */
   double counter_N[5], counter_P[5], counter_P2[5]; /* event counters after each component instance */
@@ -6956,8 +6956,8 @@ struct _instrument_struct *instrument = & _instrument_var;
 
 int numipar = 2;
 struct mcinputtable_struct mcinputtable[] = {
-  "lambda", &(_instrument_var._parameters.lambda), instr_type_double, "4.0", "",
-  "dlambda", &(_instrument_var._parameters.dlambda), instr_type_double, "0.1", "",
+  "lambda", &(_instrument_var._parameters.lambda), instr_type_double, "5.0", "",
+  "dlambda", &(_instrument_var._parameters.dlambda), instr_type_double, "0.5", "",
   NULL, NULL, instr_type_double, ""
 };
 
@@ -7002,37 +7002,34 @@ typedef struct _struct_Progress_bar _class_Progress_bar;
 _class_Progress_bar _Origin_var;
 #pragma acc declare create ( _Origin_var )
 
-/* component src=Source_simple() [2] DECLARE */
-/* Parameter definition for component type 'Source_simple' */
-struct _struct_Source_simple_parameters {
-  /* Component type 'Source_simple' setting parameters */
-  MCNUM radius;
-  MCNUM yheight;
+/* component src=Source_div() [2] DECLARE */
+/* Parameter definition for component type 'Source_div' */
+struct _struct_Source_div_parameters {
+  /* Component type 'Source_div' setting parameters */
   MCNUM xwidth;
-  MCNUM dist;
-  MCNUM focus_xw;
-  MCNUM focus_yh;
+  MCNUM yheight;
+  MCNUM focus_aw;
+  MCNUM focus_ah;
   MCNUM E0;
   MCNUM dE;
   MCNUM lambda0;
   MCNUM dlambda;
-  MCNUM flux;
   MCNUM gauss;
-  int target_index;
-  /* Component type 'Source_simple' private parameters */
-  double  pmul;
-  double  srcArea;
-  int  square;
-  double  tx;
-  double  ty;
-  double  tz;
-}; /* _struct_Source_simple_parameters */
-typedef struct _struct_Source_simple_parameters _class_Source_simple_parameters;
+  MCNUM flux;
+  /* Component type 'Source_div' private parameters */
+  double  sigmah;
+  double  sigmav;
+  double  p_init;
+  double  dist;
+  double  focus_xw;
+  double  focus_yh;
+}; /* _struct_Source_div_parameters */
+typedef struct _struct_Source_div_parameters _class_Source_div_parameters;
 
-/* Parameters for component type 'Source_simple' */
-struct _struct_Source_simple {
+/* Parameters for component type 'Source_div' */
+struct _struct_Source_div {
   char     _name[256]; /* e.g. src */
-  char     _type[256]; /* Source_simple */
+  char     _type[256]; /* Source_div */
   long     _index; /* e.g. 2 index in TRACE list */
   Coords   _position_absolute;
   Coords   _position_relative; /* wrt PREVIOUS */
@@ -7040,13 +7037,13 @@ struct _struct_Source_simple {
   Rotation _rotation_relative; /* wrt PREVIOUS */
   int      _rotation_is_identity;
   int      _position_relative_is_zero;
-  _class_Source_simple_parameters _parameters;
+  _class_Source_div_parameters _parameters;
 };
-typedef struct _struct_Source_simple _class_Source_simple;
-_class_Source_simple _src_var;
+typedef struct _struct_Source_div _class_Source_div;
+_class_Source_div _src_var;
 #pragma acc declare create ( _src_var )
 
-/* component plane_monitor=PSD_monitor() [3] DECLARE */
+/* component mon=PSD_monitor() [3] DECLARE */
 /* Parameter definition for component type 'PSD_monitor' */
 struct _struct_PSD_monitor_parameters {
   /* Component type 'PSD_monitor' setting parameters */
@@ -7070,7 +7067,7 @@ typedef struct _struct_PSD_monitor_parameters _class_PSD_monitor_parameters;
 
 /* Parameters for component type 'PSD_monitor' */
 struct _struct_PSD_monitor {
-  char     _name[256]; /* e.g. plane_monitor */
+  char     _name[256]; /* e.g. mon */
   char     _type[256]; /* PSD_monitor */
   long     _index; /* e.g. 2 index in TRACE list */
   Coords   _position_absolute;
@@ -7082,8 +7079,8 @@ struct _struct_PSD_monitor {
   _class_PSD_monitor_parameters _parameters;
 };
 typedef struct _struct_PSD_monitor _class_PSD_monitor;
-_class_PSD_monitor _plane_monitor_var;
-#pragma acc declare create ( _plane_monitor_var )
+_class_PSD_monitor _mon_var;
+#pragma acc declare create ( _mon_var )
 
 int mcNUMCOMP = 3;
 
@@ -7092,10 +7089,10 @@ int mcNUMCOMP = 3;
 #undef compcurname
 #undef compcurtype
 #undef compcurindex
-/* end of instrument 'src_check' and components DECLARE */
+/* end of instrument 'beam_validate' and components DECLARE */
 
 /* *****************************************************************************
-* instrument 'src_check' and components INITIALISE
+* instrument 'beam_validate' and components INITIALISE
 ***************************************************************************** */
 
 double index_getdistance(int first_index, int second_index)
@@ -7182,30 +7179,27 @@ int _Origin_setpos(void)
   return(0);
 } /* _Origin_setpos */
 
-/* component src=Source_simple() SETTING, POSITION/ROTATION */
+/* component src=Source_div() SETTING, POSITION/ROTATION */
 int _src_setpos(void)
 { /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_src_setpos] component src=Source_simple() SETTING [Source_simple:0]");
+  SIG_MESSAGE("[_src_setpos] component src=Source_div() SETTING [Source_div:0]");
   stracpy(_src_var._name, "src", 16384);
-  stracpy(_src_var._type, "Source_simple", 16384);
+  stracpy(_src_var._type, "Source_div", 16384);
   _src_var._index=2;
   int current_setpos_index = 2;
-  _src_var._parameters.radius = 0.2;
-  _src_var._parameters.yheight = 0;
-  _src_var._parameters.xwidth = 0;
-  _src_var._parameters.dist = 1.5;
-  _src_var._parameters.focus_xw = 0.04;
-  _src_var._parameters.focus_yh = 0.10;
-  _src_var._parameters.E0 = 0;
-  _src_var._parameters.dE = 0;
+  _src_var._parameters.xwidth = 0.4;
+  _src_var._parameters.yheight = 0.4;
+  _src_var._parameters.focus_aw = 0.04;
+  _src_var._parameters.focus_ah = 0.10;
+  _src_var._parameters.E0 = 0.0;
+  _src_var._parameters.dE = 0.0;
   _src_var._parameters.lambda0 = _instrument_var._parameters.lambda;
   _src_var._parameters.dlambda = _instrument_var._parameters.dlambda;
-  _src_var._parameters.flux = 1;
   _src_var._parameters.gauss = 0;
-  _src_var._parameters.target_index = + 1;
+  _src_var._parameters.flux = 1;
 
 
-  /* component src=Source_simple() AT ROTATED */
+  /* component src=Source_div() AT ROTATED */
   {
     Coords tc1, tc2;
     tc1 = coords_set(0,0,0);
@@ -7225,7 +7219,7 @@ int _src_setpos(void)
     _src_var._position_absolute = coords_add(_Origin_var._position_absolute, tc2);
     tc1 = coords_sub(_Origin_var._position_absolute, _src_var._position_absolute);
     _src_var._position_relative = rot_apply(_src_var._rotation_absolute, tc1);
-  } /* src=Source_simple() AT ROTATED */
+  } /* src=Source_div() AT ROTATED */
   DEBUG_COMPONENT("src", _src_var._position_absolute, _src_var._rotation_absolute);
   instrument->_position_absolute[2] = _src_var._position_absolute;
   instrument->_position_relative[2] = _src_var._position_relative;
@@ -7236,20 +7230,17 @@ int _src_setpos(void)
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0001_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_simple");
-        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "0.2","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "yheight", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "xwidth", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dist", "0", "1.5","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_xw", ".045", "0.04","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", ".12", "0.10","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "E0", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dE", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "_instrument_var._parameters.lambda","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0", "_instrument_var._parameters.dlambda","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "flux", "1", "1","MCNUM");
+        mccomp_placement_type_nexus(nxhandle,"0001_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_div");
+        mccomp_param_nexus(nxhandle,"0001_src", "xwidth", "NONE", "0.4","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "yheight", "NONE", "0.4","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "focus_aw", "NONE", "0.04","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "focus_ah", "NONE", "0.10","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "E0", "0.0", "0.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "dE", "0.0", "0.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0.0", "_instrument_var._parameters.lambda","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0.0", "_instrument_var._parameters.dlambda","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "gauss", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "target_index", "+ 1", "+ 1","int");
+        mccomp_param_nexus(nxhandle,"0001_src", "flux", "1", "1","MCNUM");
       );
     }
   } else {
@@ -7259,31 +7250,31 @@ int _src_setpos(void)
   return(0);
 } /* _src_setpos */
 
-/* component plane_monitor=PSD_monitor() SETTING, POSITION/ROTATION */
-int _plane_monitor_setpos(void)
+/* component mon=PSD_monitor() SETTING, POSITION/ROTATION */
+int _mon_setpos(void)
 { /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_plane_monitor_setpos] component plane_monitor=PSD_monitor() SETTING [PSD_monitor:0]");
-  stracpy(_plane_monitor_var._name, "plane_monitor", 16384);
-  stracpy(_plane_monitor_var._type, "PSD_monitor", 16384);
-  _plane_monitor_var._index=3;
+  SIG_MESSAGE("[_mon_setpos] component mon=PSD_monitor() SETTING [PSD_monitor:0]");
+  stracpy(_mon_var._name, "mon", 16384);
+  stracpy(_mon_var._type, "PSD_monitor", 16384);
+  _mon_var._index=3;
   int current_setpos_index = 3;
-  _plane_monitor_var._parameters.nx = 90;
-  _plane_monitor_var._parameters.ny = 90;
-  if("mcstas_flat_hits.dat" && strlen("mcstas_flat_hits.dat"))
-    stracpy(_plane_monitor_var._parameters.filename, "mcstas_flat_hits.dat" ? "mcstas_flat_hits.dat" : "", 16384);
+  _mon_var._parameters.nx = 200;
+  _mon_var._parameters.ny = 200;
+  if("flat_hits.dat" && strlen("flat_hits.dat"))
+    stracpy(_mon_var._parameters.filename, "flat_hits.dat" ? "flat_hits.dat" : "", 16384);
   else 
-  _plane_monitor_var._parameters.filename[0]='\0';
-  _plane_monitor_var._parameters.xmin = -0.05;
-  _plane_monitor_var._parameters.xmax = 0.05;
-  _plane_monitor_var._parameters.ymin = -0.05;
-  _plane_monitor_var._parameters.ymax = 0.05;
-  _plane_monitor_var._parameters.xwidth = 0.20;
-  _plane_monitor_var._parameters.yheight = 0.20;
-  _plane_monitor_var._parameters.restore_neutron = 1;
-  _plane_monitor_var._parameters.nowritefile = 0;
+  _mon_var._parameters.filename[0]='\0';
+  _mon_var._parameters.xmin = -0.05;
+  _mon_var._parameters.xmax = 0.05;
+  _mon_var._parameters.ymin = -0.05;
+  _mon_var._parameters.ymax = 0.05;
+  _mon_var._parameters.xwidth = 0.25;
+  _mon_var._parameters.yheight = 0.25;
+  _mon_var._parameters.restore_neutron = 1;
+  _mon_var._parameters.nowritefile = 0;
 
 
-  /* component plane_monitor=PSD_monitor() AT ROTATED */
+  /* component mon=PSD_monitor() AT ROTATED */
   {
     Coords tc1, tc2;
     tc1 = coords_set(0,0,0);
@@ -7291,41 +7282,41 @@ int _plane_monitor_setpos(void)
     Rotation tr1;
     rot_set_rotation(tr1,0,0,0);
     rot_set_rotation(tr1,
-      (0)*DEG2RAD, (0)*DEG2RAD, (0)*DEG2RAD);
-    rot_mul(tr1, _src_var._rotation_absolute, _plane_monitor_var._rotation_absolute);
+      (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
+    rot_mul(tr1, _src_var._rotation_absolute, _mon_var._rotation_absolute);
     rot_transpose(_src_var._rotation_absolute, tr1);
-    rot_mul(_plane_monitor_var._rotation_absolute, tr1, _plane_monitor_var._rotation_relative);
-    _plane_monitor_var._rotation_is_identity =  rot_test_identity(_plane_monitor_var._rotation_relative);
+    rot_mul(_mon_var._rotation_absolute, tr1, _mon_var._rotation_relative);
+    _mon_var._rotation_is_identity =  rot_test_identity(_mon_var._rotation_relative);
     tc1 = coords_set(
-      0, 0, 0.01);
+      0, 0, 1.5);
     rot_transpose(_src_var._rotation_absolute, tr1);
     tc2 = rot_apply(tr1, tc1);
-    _plane_monitor_var._position_absolute = coords_add(_src_var._position_absolute, tc2);
-    tc1 = coords_sub(_src_var._position_absolute, _plane_monitor_var._position_absolute);
-    _plane_monitor_var._position_relative = rot_apply(_plane_monitor_var._rotation_absolute, tc1);
-  } /* plane_monitor=PSD_monitor() AT ROTATED */
-  DEBUG_COMPONENT("plane_monitor", _plane_monitor_var._position_absolute, _plane_monitor_var._rotation_absolute);
-  instrument->_position_absolute[3] = _plane_monitor_var._position_absolute;
-  instrument->_position_relative[3] = _plane_monitor_var._position_relative;
-    _plane_monitor_var._position_relative_is_zero =  coords_test_zero(_plane_monitor_var._position_relative);
+    _mon_var._position_absolute = coords_add(_src_var._position_absolute, tc2);
+    tc1 = coords_sub(_src_var._position_absolute, _mon_var._position_absolute);
+    _mon_var._position_relative = rot_apply(_mon_var._rotation_absolute, tc1);
+  } /* mon=PSD_monitor() AT ROTATED */
+  DEBUG_COMPONENT("mon", _mon_var._position_absolute, _mon_var._rotation_absolute);
+  instrument->_position_absolute[3] = _mon_var._position_absolute;
+  instrument->_position_relative[3] = _mon_var._position_relative;
+    _mon_var._position_relative_is_zero =  coords_test_zero(_mon_var._position_relative);
   instrument->counter_N[3]  = instrument->counter_P[3] = instrument->counter_P2[3] = 0;
   instrument->counter_AbsorbProp[3]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0002_plane_monitor", _plane_monitor_var._position_absolute, _plane_monitor_var._rotation_absolute, "PSD_monitor");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "nx", "90", "90","int");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "ny", "90", "90","int");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "filename", 0, "mcstas_flat_hits.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "xmin", "-0.05", "-0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "xmax", "0.05", "0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "ymin", "-0.05", "-0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "ymax", "0.05", "0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "xwidth", "0", "0.20","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "yheight", "0", "0.20","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "restore_neutron", "0", "1","int");
-        mccomp_param_nexus(nxhandle,"0002_plane_monitor", "nowritefile", "0", "0","int");
+        mccomp_placement_type_nexus(nxhandle,"0002_mon", _mon_var._position_absolute, _mon_var._rotation_absolute, "PSD_monitor");
+        mccomp_param_nexus(nxhandle,"0002_mon", "nx", "90", "200","int");
+        mccomp_param_nexus(nxhandle,"0002_mon", "ny", "90", "200","int");
+        mccomp_param_nexus(nxhandle,"0002_mon", "filename", 0, "flat_hits.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0002_mon", "xmin", "-0.05", "-0.05","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "xmax", "0.05", "0.05","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "ymin", "-0.05", "-0.05","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "ymax", "0.05", "0.05","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "xwidth", "0", "0.25","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "yheight", "0", "0.25","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "restore_neutron", "0", "1","int");
+        mccomp_param_nexus(nxhandle,"0002_mon", "nowritefile", "0", "0","int");
       );
     }
   } else {
@@ -7333,7 +7324,7 @@ int _plane_monitor_setpos(void)
   }
   #endif
   return(0);
-} /* _plane_monitor_setpos */
+} /* _mon_setpos */
 
 _class_Progress_bar *class_Progress_bar_init(_class_Progress_bar *_comp
 ) {
@@ -7379,106 +7370,87 @@ fprintf(stdout, "[%s] Initialize\n", instrument_name);
   return(_comp);
 } /* class_Progress_bar_init */
 
-_class_Source_simple *class_Source_simple_init(_class_Source_simple *_comp
+_class_Source_div *class_Source_div_init(_class_Source_div *_comp
 ) {
-  #define radius (_comp->_parameters.radius)
-  #define yheight (_comp->_parameters.yheight)
   #define xwidth (_comp->_parameters.xwidth)
-  #define dist (_comp->_parameters.dist)
-  #define focus_xw (_comp->_parameters.focus_xw)
-  #define focus_yh (_comp->_parameters.focus_yh)
+  #define yheight (_comp->_parameters.yheight)
+  #define focus_aw (_comp->_parameters.focus_aw)
+  #define focus_ah (_comp->_parameters.focus_ah)
   #define E0 (_comp->_parameters.E0)
   #define dE (_comp->_parameters.dE)
   #define lambda0 (_comp->_parameters.lambda0)
   #define dlambda (_comp->_parameters.dlambda)
-  #define flux (_comp->_parameters.flux)
   #define gauss (_comp->_parameters.gauss)
-  #define target_index (_comp->_parameters.target_index)
-  #define pmul (_comp->_parameters.pmul)
-  #define srcArea (_comp->_parameters.srcArea)
-  #define square (_comp->_parameters.square)
-  #define tx (_comp->_parameters.tx)
-  #define ty (_comp->_parameters.ty)
-  #define tz (_comp->_parameters.tz)
-  SIG_MESSAGE("[_src_init] component src=Source_simple() INITIALISE [Source_simple:0]");
+  #define flux (_comp->_parameters.flux)
+  #define sigmah (_comp->_parameters.sigmah)
+  #define sigmav (_comp->_parameters.sigmav)
+  #define p_init (_comp->_parameters.p_init)
+  #define dist (_comp->_parameters.dist)
+  #define focus_xw (_comp->_parameters.focus_xw)
+  #define focus_yh (_comp->_parameters.focus_yh)
+  SIG_MESSAGE("[_src_init] component src=Source_div() INITIALISE [Source_div:0]");
 
-square = 0;
-/* Determine source area */
-if (radius && !yheight && !xwidth ) {
-    square = 0;
-    srcArea = PI*radius*radius;
-  } else if(yheight && xwidth) {
-    square = 1;
-    srcArea = xwidth * yheight;
-  }
+sigmah = DEG2RAD*focus_aw/(sqrt(8.0*log(2.0)));
+  sigmav = DEG2RAD*focus_ah/(sqrt(8.0*log(2.0)));
 
-  if (flux) {
-    pmul=flux*1e4*srcArea/mcget_ncount();
-    if (dlambda)
-      pmul *= 2*dlambda;
-    else if (dE)
-      pmul *= 2*dE;
-  } else {
-    gauss = 0;
-    pmul=1.0/(mcget_ncount()*4*PI);
-  }
-
-  if (target_index && !dist)
-  {
-    Coords ToTarget;
-    ToTarget = coords_sub(POS_A_COMP_INDEX(INDEX_CURRENT_COMP+target_index),POS_A_CURRENT_COMP);
-    ToTarget = rot_apply(ROT_A_CURRENT_COMP, ToTarget);
-    coords_get(ToTarget, &tx, &ty, &tz);
-    dist=sqrt(tx*tx+ty*ty+tz*tz);
-  } else if (dist) {
-    tx = 0;
-    ty = 0;
-    tz = dist;
-  }
-
-  if (srcArea <= 0) {
-    printf("Source_simple: %s: Source area is <= 0 !\n ERROR - Exiting\n",
+  if (xwidth < 0 || yheight < 0 || focus_aw < 0 || focus_ah < 0) {
+      printf("Source_div: %s: Error in input parameter values!\n"
+             "ERROR       Exiting\n",
            NAME_CURRENT_COMP);
-    exit(0);
+      exit(0);
   }
-  if (dist <= 0 || focus_xw <= 0 || focus_yh <= 0) {
-    printf("Source_simple: %s: Target area unmeaningful! (negative dist / focus_xw / focus_yh)\n ERROR - Exiting\n",
-           NAME_CURRENT_COMP);
-    exit(0);
-  }
-
   if ((!lambda0 && !E0 && !dE && !dlambda)) {
-    printf("Source_simple: %s: You must specify either a wavelength or energy range!\n ERROR - Exiting\n",
+    printf("Source_div: %s: You must specify either a wavelength or energy range!\n ERROR - Exiting\n",
            NAME_CURRENT_COMP);
     exit(0);
   }
   if ((!lambda0 && !dlambda && (E0 <= 0 || dE < 0 || E0-dE <= 0))
     || (!E0 && !dE && (lambda0 <= 0 || dlambda < 0 || lambda0-dlambda <= 0))) {
-    printf("Source_simple: %s: Unmeaningful definition of wavelength or energy range!\n ERROR - Exiting\n",
+    printf("Source_div: %s: Unmeaningful definition of wavelength or energy range!\n ERROR - Exiting\n",
            NAME_CURRENT_COMP);
       exit(0);
   }
-  #undef radius
-  #undef yheight
+  /* compute distance to next component */
+  Coords ToTarget;
+  double tx,ty,tz;
+  ToTarget = coords_sub(POS_A_COMP_INDEX(INDEX_CURRENT_COMP+1),POS_A_CURRENT_COMP);
+  ToTarget = rot_apply(ROT_A_CURRENT_COMP, ToTarget);
+  coords_get(ToTarget, &tx, &ty, &tz);
+  dist=sqrt(tx*tx+ty*ty+tz*tz);
+  /* compute target area */
+  if (dist) {
+    focus_xw=dist*tan(focus_aw*DEG2RAD);
+    focus_yh=dist*tan(focus_ah*DEG2RAD);
+  }
+
+  p_init  = flux*1e4*xwidth*yheight/mcget_ncount();
+  if (!focus_aw || !focus_ah)
+    exit(printf("Source_div: %s: Zero divergence defined. \n"
+                "ERROR       Use non zero values for focus_aw and focus_ah.\n",
+           NAME_CURRENT_COMP));
+  p_init *= 2*fabs(DEG2RAD*focus_aw*sin(DEG2RAD*focus_ah/2));  /* solid angle */
+  if (dlambda)
+    p_init *= 2*dlambda;
+  else if (dE)
+    p_init *= 2*dE;
   #undef xwidth
-  #undef dist
-  #undef focus_xw
-  #undef focus_yh
+  #undef yheight
+  #undef focus_aw
+  #undef focus_ah
   #undef E0
   #undef dE
   #undef lambda0
   #undef dlambda
-  #undef flux
   #undef gauss
-  #undef target_index
-  #undef pmul
-  #undef srcArea
-  #undef square
-  #undef tx
-  #undef ty
-  #undef tz
+  #undef flux
+  #undef sigmah
+  #undef sigmav
+  #undef p_init
+  #undef dist
+  #undef focus_xw
+  #undef focus_yh
   return(_comp);
-} /* class_Source_simple_init */
+} /* class_Source_div_init */
 
 _class_PSD_monitor *class_PSD_monitor_init(_class_PSD_monitor *_comp
 ) {
@@ -7496,7 +7468,7 @@ _class_PSD_monitor *class_PSD_monitor_init(_class_PSD_monitor *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_plane_monitor_init] component plane_monitor=PSD_monitor() INITIALISE [PSD_monitor:0]");
+  SIG_MESSAGE("[_mon_init] component mon=PSD_monitor() INITIALISE [PSD_monitor:0]");
 
   if (xwidth  > 0) { xmax = xwidth/2;  xmin = -xmax; }
   if (yheight > 0) { ymax = yheight/2; ymin = -ymax; }
@@ -7533,22 +7505,22 @@ _class_PSD_monitor *class_PSD_monitor_init(_class_PSD_monitor *_comp
 
 
 
-int init(void) { /* called by mccode_main for src_check:INITIALISE */
+int init(void) { /* called by mccode_main for beam_validate:INITIALISE */
   DEBUG_INSTR();
 
   /* code_main/parseoptions/readparams sets instrument parameters value */
-  stracpy(instrument->_name, "src_check", 256);
+  stracpy(instrument->_name, "beam_validate", 256);
 
   _Origin_setpos(); /* type Progress_bar */
-  _src_setpos(); /* type Source_simple */
-  _plane_monitor_setpos(); /* type PSD_monitor */
+  _src_setpos(); /* type Source_div */
+  _mon_setpos(); /* type PSD_monitor */
 
   /* call iteratively all components INITIALISE */
   class_Progress_bar_init(&_Origin_var);
 
-  class_Source_simple_init(&_src_var);
+  class_Source_div_init(&_src_var);
 
-  class_PSD_monitor_init(&_plane_monitor_var);
+  class_PSD_monitor_init(&_mon_var);
 
   if (mcdotrace) display();
   DEBUG_INSTR_END();
@@ -7557,7 +7529,7 @@ int init(void) { /* called by mccode_main for src_check:INITIALISE */
 #include <openacc.h>
 #pragma acc update device(_Origin_var)
 #pragma acc update device(_src_var)
-#pragma acc update device(_plane_monitor_var)
+#pragma acc update device(_mon_var)
 #pragma acc update device(_instrument_var)
 #endif
 
@@ -7693,72 +7665,70 @@ void class_Progress_bar_trace(_class_Progress_bar *_comp
 } /* class_Progress_bar_trace */
 
 #pragma acc routine
-void class_Source_simple_trace(_class_Source_simple *_comp
+void class_Source_div_trace(_class_Source_div *_comp
   , _class_particle *_particle) {
   ABSORBED=SCATTERED=RESTORE=0;
-  #define radius (_comp->_parameters.radius)
-  #define yheight (_comp->_parameters.yheight)
   #define xwidth (_comp->_parameters.xwidth)
-  #define dist (_comp->_parameters.dist)
-  #define focus_xw (_comp->_parameters.focus_xw)
-  #define focus_yh (_comp->_parameters.focus_yh)
+  #define yheight (_comp->_parameters.yheight)
+  #define focus_aw (_comp->_parameters.focus_aw)
+  #define focus_ah (_comp->_parameters.focus_ah)
   #define E0 (_comp->_parameters.E0)
   #define dE (_comp->_parameters.dE)
   #define lambda0 (_comp->_parameters.lambda0)
   #define dlambda (_comp->_parameters.dlambda)
-  #define flux (_comp->_parameters.flux)
   #define gauss (_comp->_parameters.gauss)
-  #define target_index (_comp->_parameters.target_index)
-  #define pmul (_comp->_parameters.pmul)
-  #define srcArea (_comp->_parameters.srcArea)
-  #define square (_comp->_parameters.square)
-  #define tx (_comp->_parameters.tx)
-  #define ty (_comp->_parameters.ty)
-  #define tz (_comp->_parameters.tz)
-  SIG_MESSAGE("[_src_trace] component src=Source_simple() TRACE [Source_simple:0]");
+  #define flux (_comp->_parameters.flux)
+  #define sigmah (_comp->_parameters.sigmah)
+  #define sigmav (_comp->_parameters.sigmav)
+  #define p_init (_comp->_parameters.p_init)
+  #define dist (_comp->_parameters.dist)
+  #define focus_xw (_comp->_parameters.focus_xw)
+  #define focus_yh (_comp->_parameters.focus_yh)
+  SIG_MESSAGE("[_src_trace] component src=Source_div() TRACE [Source_div:0]");
 
- double chi,E,lambda,v,r, xf, yf, rf, dx, dy, pdir;
+  double E,lambda,v;
+  double tan_h;
+  double tan_v;
+  double thetah;
+  double thetav;
 
- t=0;
- z=0;
+  p=p_init;
+  z=0;
+  t=0;
 
- if (square == 1) {
-   x = xwidth * (rand01() - 0.5);
-   y = yheight * (rand01() - 0.5);
- } else {
-   chi=2*PI*rand01();                          /* Choose point on source */
-   r=sqrt(rand01())*radius;                    /* with uniform distribution. */
-   x=r*cos(chi);
-   y=r*sin(chi);
- }
- randvec_target_rect_real(&xf, &yf, &rf, &pdir,
-			  tx, ty, tz, focus_xw, focus_yh, ROT_A_CURRENT_COMP, x, y, z, 2);
+  x=randpm1()*xwidth/2.0;
+  y=randpm1()*yheight/2.0;
+  if(lambda0==0) {
+    if (!gauss) {
+      E=E0+dE*randpm1();              /*  Choose from uniform distribution */
+    } else {
+      E=E0+randnorm()*dE;
+    }
+    v=sqrt(E)*SE2V;
+  } else {
+    if (!gauss) {
+      lambda=lambda0+dlambda*randpm1();
+    } else {
+      lambda=lambda0+randnorm()*dlambda;
+    }
+    v = K2V*(2*PI/lambda);
+  }
 
- dx = xf-x;
- dy = yf-y;
- rf = sqrt(dx*dx+dy*dy+rf*rf);
+  if (gauss==1) {
+    thetah = randnorm()*sigmah;
+    thetav = randnorm()*sigmav;
+  } else {
+    thetah = randpm1()*focus_aw*DEG2RAD/2;
+    thetav = randpm1()*focus_ah*DEG2RAD/2;
+  }
 
- p = pdir*pmul;
+  tan_h = tan(thetah);
+  tan_v = tan(thetav);
 
- if(lambda0==0) {
-   if (!gauss) {
-     E=E0+dE*randpm1();              /*  Choose from uniform distribution */
-   } else {
-     E=E0+randnorm()*dE;
-   }
-   v=sqrt(E)*SE2V;
- } else {
-   if (!gauss) {
-     lambda=lambda0+dlambda*randpm1();
-   } else {
-     lambda=lambda0+randnorm()*dlambda;
-   }
-   v = K2V*(2*PI/lambda);
- }
-
- vz=v*dist/rf;
- vy=v*dy/rf;
- vx=v*dx/rf;
+  /* Perform the correct treatment - no small angle approx. here! */
+  vz = v / sqrt(1 + tan_v*tan_v + tan_h*tan_h);
+  vy = tan_v * vz;
+  vx = tan_h * vz;
 #ifndef NOABSORB_INF_NAN
   /* Check for nan or inf particle parms */ 
   if(isnan(p + t + vx + vy + vz + x + y + z)) ABSORB;
@@ -7773,27 +7743,24 @@ void class_Source_simple_trace(_class_Source_simple *_comp
   if(isnan(y)  ||  isinf(y)) printf("NAN or INF found in y,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
   if(isnan(z)  ||  isinf(z)) printf("NAN or INF found in z,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
 #endif
-  #undef radius
-  #undef yheight
   #undef xwidth
-  #undef dist
-  #undef focus_xw
-  #undef focus_yh
+  #undef yheight
+  #undef focus_aw
+  #undef focus_ah
   #undef E0
   #undef dE
   #undef lambda0
   #undef dlambda
-  #undef flux
   #undef gauss
-  #undef target_index
-  #undef pmul
-  #undef srcArea
-  #undef square
-  #undef tx
-  #undef ty
-  #undef tz
+  #undef flux
+  #undef sigmah
+  #undef sigmav
+  #undef p_init
+  #undef dist
+  #undef focus_xw
+  #undef focus_yh
   return;
-} /* class_Source_simple_trace */
+} /* class_Source_div_trace */
 
 #pragma acc routine
 void class_PSD_monitor_trace(_class_PSD_monitor *_comp
@@ -7813,7 +7780,7 @@ void class_PSD_monitor_trace(_class_PSD_monitor *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_plane_monitor_trace] component plane_monitor=PSD_monitor() TRACE [PSD_monitor:0]");
+  SIG_MESSAGE("[_mon_trace] component mon=PSD_monitor() TRACE [PSD_monitor:0]");
 
   PROP_Z0;
   if (x>xmin && x<xmax && y>ymin && y<ymax){
@@ -7867,12 +7834,12 @@ void class_PSD_monitor_trace(_class_PSD_monitor *_comp
 } /* class_PSD_monitor_trace */
 
 /* *****************************************************************************
-* instrument 'src_check' TRACE
+* instrument 'beam_validate' TRACE
 ***************************************************************************** */
 
 #ifndef FUNNEL
 #pragma acc routine
-int raytrace(_class_particle* _particle) { /* single event propagation, called by mccode_main for src_check:TRACE */
+int raytrace(_class_particle* _particle) { /* single event propagation, called by mccode_main for beam_validate:TRACE */
 
   /* init variables and counters for TRACE */
   #undef ABSORB0
@@ -7907,7 +7874,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
     } /* end component Origin [1] */
-    /* begin component src=Source_simple() [2] */
+    /* begin component src=Source_div() [2] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_src_var._rotation_is_identity) {
         if(!_src_var._position_relative_is_zero) {
@@ -7922,33 +7889,33 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle_save = *_particle;
       DEBUG_COMP(_src_var._name);
       DEBUG_STATE();
-      class_Source_simple_trace(&_src_var, _particle);
+      class_Source_div_trace(&_src_var, _particle);
       if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
     } /* end component src [2] */
-    /* begin component plane_monitor=PSD_monitor() [3] */
+    /* begin component mon=PSD_monitor() [3] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
-      if (_plane_monitor_var._rotation_is_identity) {
-        if(!_plane_monitor_var._position_relative_is_zero) {
-          coords_get(coords_add(coords_set(x,y,z), _plane_monitor_var._position_relative),&x, &y, &z);
+      if (_mon_var._rotation_is_identity) {
+        if(!_mon_var._position_relative_is_zero) {
+          coords_get(coords_add(coords_set(x,y,z), _mon_var._position_relative),&x, &y, &z);
         }
       } else {
-          mccoordschange(_plane_monitor_var._position_relative, _plane_monitor_var._rotation_relative, _particle);
+          mccoordschange(_mon_var._position_relative, _mon_var._rotation_relative, _particle);
       }
     }
     if (!ABSORBED && _particle->_index == 3) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
-      DEBUG_COMP(_plane_monitor_var._name);
+      DEBUG_COMP(_mon_var._name);
       DEBUG_STATE();
-      class_PSD_monitor_trace(&_plane_monitor_var, _particle);
+      class_PSD_monitor_trace(&_mon_var, _particle);
       if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component plane_monitor [3] */
+    } /* end component mon [3] */
     if (_particle->_index > 3)
       ABSORBED++; /* absorbed when passed all components */
   } /* while !ABSORBED */
@@ -8124,22 +8091,22 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
 #endif
           mccoordschange(_src_var._position_relative, _src_var._rotation_relative, _particle);
         _particle_save = *_particle;
-        class_Source_simple_trace(&_src_var, _particle);
+        class_Source_div_trace(&_src_var, _particle);
         if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
         _particle->_index++;
       }
 
-      // plane_monitor
+      // mon
     if (!ABSORBED && _particle->_index == 3) {
 #ifndef MULTICORE
-        if (_plane_monitor_var._rotation_is_identity)
-          coords_get(coords_add(coords_set(x,y,z), _plane_monitor_var._position_relative),&x, &y, &z);
+        if (_mon_var._rotation_is_identity)
+          coords_get(coords_add(coords_set(x,y,z), _mon_var._position_relative),&x, &y, &z);
         else
 #endif
-          mccoordschange(_plane_monitor_var._position_relative, _plane_monitor_var._rotation_relative, _particle);
+          mccoordschange(_mon_var._position_relative, _mon_var._rotation_relative, _particle);
         _particle_save = *_particle;
-        class_PSD_monitor_trace(&_plane_monitor_var, _particle);
+        class_PSD_monitor_trace(&_mon_var, _particle);
         if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
         _particle->_index++;
@@ -8191,7 +8158,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
 #undef ABSORB
 #undef ABSORB0
 /* *****************************************************************************
-* instrument 'src_check' and components SAVE
+* instrument 'beam_validate' and components SAVE
 ***************************************************************************** */
 
 _class_Progress_bar *class_Progress_bar_save(_class_Progress_bar *_comp
@@ -8249,7 +8216,7 @@ _class_PSD_monitor *class_PSD_monitor_save(_class_PSD_monitor *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_plane_monitor_save] component plane_monitor=PSD_monitor() SAVE [PSD_monitor:0]");
+  SIG_MESSAGE("[_mon_save] component mon=PSD_monitor() SAVE [PSD_monitor:0]");
 
     if (!nowritefile) {
       DETECTOR_OUT_2D(
@@ -8280,14 +8247,14 @@ _class_PSD_monitor *class_PSD_monitor_save(_class_PSD_monitor *_comp
 
 
 
-int save(FILE *handle) { /* called by mccode_main for src_check:SAVE */
+int save(FILE *handle) { /* called by mccode_main for beam_validate:SAVE */
   if (!handle) siminfo_init(NULL);
 
   /* call iteratively all components SAVE */
   class_Progress_bar_save(&_Origin_var);
 
 
-  class_PSD_monitor_save(&_plane_monitor_var);
+  class_PSD_monitor_save(&_mon_var);
 
   if (!handle) siminfo_close(); 
 
@@ -8295,7 +8262,7 @@ int save(FILE *handle) { /* called by mccode_main for src_check:SAVE */
 } /* save */
 
 /* *****************************************************************************
-* instrument 'src_check' and components FINALLY
+* instrument 'beam_validate' and components FINALLY
 ***************************************************************************** */
 
 _class_Progress_bar *class_Progress_bar_finally(_class_Progress_bar *_comp
@@ -8349,7 +8316,7 @@ _class_PSD_monitor *class_PSD_monitor_finally(_class_PSD_monitor *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_plane_monitor_finally] component plane_monitor=PSD_monitor() FINALLY [PSD_monitor:0]");
+  SIG_MESSAGE("[_mon_finally] component mon=PSD_monitor() FINALLY [PSD_monitor:0]");
 
   destroy_darr2d(PSD_N);
   destroy_darr2d(PSD_p);
@@ -8373,10 +8340,10 @@ _class_PSD_monitor *class_PSD_monitor_finally(_class_PSD_monitor *_comp
 
 
 
-int finally(void) { /* called by mccode_main for src_check:FINALLY */
+int finally(void) { /* called by mccode_main for beam_validate:FINALLY */
 #pragma acc update host(_Origin_var)
 #pragma acc update host(_src_var)
-#pragma acc update host(_plane_monitor_var)
+#pragma acc update host(_mon_var)
 #pragma acc update host(_instrument_var)
 
   siminfo_init(NULL);
@@ -8386,7 +8353,7 @@ int finally(void) { /* called by mccode_main for src_check:FINALLY */
   class_Progress_bar_finally(&_Origin_var);
 
 
-  class_PSD_monitor_finally(&_plane_monitor_var);
+  class_PSD_monitor_finally(&_mon_var);
 
   siminfo_close(); 
 
@@ -8394,7 +8361,7 @@ int finally(void) { /* called by mccode_main for src_check:FINALLY */
 } /* finally */
 
 /* *****************************************************************************
-* instrument 'src_check' and components DISPLAY
+* instrument 'beam_validate' and components DISPLAY
 ***************************************************************************** */
 
   #define magnify     mcdis_magnify
@@ -8436,64 +8403,57 @@ _class_Progress_bar *class_Progress_bar_display(_class_Progress_bar *_comp
   return(_comp);
 } /* class_Progress_bar_display */
 
-_class_Source_simple *class_Source_simple_display(_class_Source_simple *_comp
+_class_Source_div *class_Source_div_display(_class_Source_div *_comp
 ) {
-  #define radius (_comp->_parameters.radius)
-  #define yheight (_comp->_parameters.yheight)
   #define xwidth (_comp->_parameters.xwidth)
-  #define dist (_comp->_parameters.dist)
-  #define focus_xw (_comp->_parameters.focus_xw)
-  #define focus_yh (_comp->_parameters.focus_yh)
+  #define yheight (_comp->_parameters.yheight)
+  #define focus_aw (_comp->_parameters.focus_aw)
+  #define focus_ah (_comp->_parameters.focus_ah)
   #define E0 (_comp->_parameters.E0)
   #define dE (_comp->_parameters.dE)
   #define lambda0 (_comp->_parameters.lambda0)
   #define dlambda (_comp->_parameters.dlambda)
-  #define flux (_comp->_parameters.flux)
   #define gauss (_comp->_parameters.gauss)
-  #define target_index (_comp->_parameters.target_index)
-  #define pmul (_comp->_parameters.pmul)
-  #define srcArea (_comp->_parameters.srcArea)
-  #define square (_comp->_parameters.square)
-  #define tx (_comp->_parameters.tx)
-  #define ty (_comp->_parameters.ty)
-  #define tz (_comp->_parameters.tz)
-  SIG_MESSAGE("[_src_display] component src=Source_simple() DISPLAY [Source_simple:0]");
+  #define flux (_comp->_parameters.flux)
+  #define sigmah (_comp->_parameters.sigmah)
+  #define sigmav (_comp->_parameters.sigmav)
+  #define p_init (_comp->_parameters.p_init)
+  #define dist (_comp->_parameters.dist)
+  #define focus_xw (_comp->_parameters.focus_xw)
+  #define focus_yh (_comp->_parameters.focus_yh)
+  SIG_MESSAGE("[_src_display] component src=Source_div() DISPLAY [Source_div:0]");
 
   printf("MCDISPLAY: component %s\n", _comp->_name);
-  if (square == 1) {
-    
-    rectangle("xy",0,0,0,xwidth,yheight);
-  } else {
-    
-    circle("xy",0,0,0,radius);
-  }
+  
+  multiline(5, -xwidth/2.0, -yheight/2.0, 0.0,
+                xwidth/2.0, -yheight/2.0, 0.0,
+                xwidth/2.0,  yheight/2.0, 0.0,
+               -xwidth/2.0,  yheight/2.0, 0.0,
+               -xwidth/2.0, -yheight/2.0, 0.0);
   if (dist) {
-    dashed_line(0,0,0, -focus_xw/2+tx,-focus_yh/2+ty,tz, 4);
-    dashed_line(0,0,0,  focus_xw/2+tx,-focus_yh/2+ty,tz, 4);
-    dashed_line(0,0,0,  focus_xw/2+tx, focus_yh/2+ty,tz, 4);
-    dashed_line(0,0,0, -focus_xw/2+tx, focus_yh/2+ty,tz, 4);
+    dashed_line(0,0,0, -focus_xw/2,-focus_yh/2,dist, 4);
+    dashed_line(0,0,0,  focus_xw/2,-focus_yh/2,dist, 4);
+    dashed_line(0,0,0,  focus_xw/2, focus_yh/2,dist, 4);
+    dashed_line(0,0,0, -focus_xw/2, focus_yh/2,dist, 4);
   }
-  #undef radius
-  #undef yheight
   #undef xwidth
-  #undef dist
-  #undef focus_xw
-  #undef focus_yh
+  #undef yheight
+  #undef focus_aw
+  #undef focus_ah
   #undef E0
   #undef dE
   #undef lambda0
   #undef dlambda
-  #undef flux
   #undef gauss
-  #undef target_index
-  #undef pmul
-  #undef srcArea
-  #undef square
-  #undef tx
-  #undef ty
-  #undef tz
+  #undef flux
+  #undef sigmah
+  #undef sigmav
+  #undef p_init
+  #undef dist
+  #undef focus_xw
+  #undef focus_yh
   return(_comp);
-} /* class_Source_simple_display */
+} /* class_Source_div_display */
 
 _class_PSD_monitor *class_PSD_monitor_display(_class_PSD_monitor *_comp
 ) {
@@ -8511,7 +8471,7 @@ _class_PSD_monitor *class_PSD_monitor_display(_class_PSD_monitor *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_plane_monitor_display] component plane_monitor=PSD_monitor() DISPLAY [PSD_monitor:0]");
+  SIG_MESSAGE("[_mon_display] component mon=PSD_monitor() DISPLAY [PSD_monitor:0]");
 
   printf("MCDISPLAY: component %s\n", _comp->_name);
   
@@ -8548,15 +8508,15 @@ _class_PSD_monitor *class_PSD_monitor_display(_class_PSD_monitor *_comp
   #undef cylinder
   #undef sphere
 
-int display(void) { /* called by mccode_main for src_check:DISPLAY */
+int display(void) { /* called by mccode_main for beam_validate:DISPLAY */
   printf("MCDISPLAY: start\n");
 
   /* call iteratively all components DISPLAY */
   class_Progress_bar_display(&_Origin_var);
 
-  class_Source_simple_display(&_src_var);
+  class_Source_div_display(&_src_var);
 
-  class_PSD_monitor_display(&_plane_monitor_var);
+  class_PSD_monitor_display(&_mon_var);
 
   printf("MCDISPLAY: end\n");
 
@@ -8571,7 +8531,7 @@ void* _getvar_parameters(char* compname)
   #endif
   if (!strcmp(compname, "Origin")) return (void *) &(_Origin_var._parameters);
   if (!strcmp(compname, "src")) return (void *) &(_src_var._parameters);
-  if (!strcmp(compname, "plane_monitor")) return (void *) &(_plane_monitor_var._parameters);
+  if (!strcmp(compname, "mon")) return (void *) &(_mon_var._parameters);
   return 0;
 }
 
@@ -8587,7 +8547,7 @@ int _getcomp_index(char* compname)
 {
   if (!strcmp(compname, "Origin")) return 1;
   if (!strcmp(compname, "src")) return 2;
-  if (!strcmp(compname, "plane_monitor")) return 3;
+  if (!strcmp(compname, "mon")) return 3;
   return -1;
 }
 

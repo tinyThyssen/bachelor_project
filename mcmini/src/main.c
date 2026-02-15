@@ -1,28 +1,32 @@
 #include <stdio.h>
 #include "rng.h"
-#include "source_disk.h"
 #include "source_div.h"
-#include "monitor_sphere.h"
 #include "monitor_flat.h"
+#include "vec3.h"
 #include <math.h>
 
 int main(void) {
     RNG rng;
     rng_seed(&rng, 42, 54);
 
+    // Match McStas Source_div settings exactly
     SourceDiv src = {
         .center   = vec3(0.0, 0.0, 0.0),
-        .radius   = 0.2,
-        .dist     = 1.5,
-        .focus_xw = 0.04,
-        .focus_yh = 0.10,
-        .lambda0  = 5.0,
-        .dlambda  = 0.5
+
+        .xwidth   = 0.4,     // m
+        .yheight  = 0.4,     // m
+
+        .focus_aw = 0.04,    // deg (horizontal divergence width)
+        .focus_ah = 0.10,    // deg (vertical divergence width)
+        .gauss    = 0,       // 0=uniform, 1=gaussian (McStas default is 0)
+
+        .lambda0  = 5.0,     // Angstrom
+        .dlambda  = 0.5      // Angstrom half-spread (=> [4.5, 5.5])
     };
 
-
+    // Match McStas PSD_monitor placement and size
     MonitorFlat mon;
-    if (!monitor_flat_open(&mon, "flat_hits.csv", vec3(0,0,0.01), 0.25, 0.25)) {
+    if (!monitor_flat_open(&mon, "flat_hits.csv", vec3(0.0, 0.0, 1.5), 0.25, 0.25)) {
         printf("Failed to open monitor output\n");
         return 1;
     }
@@ -33,7 +37,5 @@ int main(void) {
     }
 
     monitor_flat_close(&mon);
-
-
     return 0;
 }
