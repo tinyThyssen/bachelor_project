@@ -51,8 +51,8 @@ AT (0,0,0) RELATIVE Origin
 // Flat monitor very close to source (or pick your chosen z)
 COMPONENT mon = PSD_monitor(
   filename = "flat_hits.dat",
-  xwidth = 0.25,
-  yheight = 0.25,
+  xwidth = 0.5,
+  yheight = 0.5,
   nx = 200,
   ny = 200,
   restore_neutron = 1

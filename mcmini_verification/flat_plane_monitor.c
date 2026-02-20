@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: flat_plane_monitor.instr (beam_validate)
- * Date:       Sun Feb 15 20:19:32 2026
+ * Date:       Tue Feb 17 11:13:55 2026
  * File:       ./flat_plane_monitor.c
  * CFLAGS=
  */
@@ -7268,8 +7268,8 @@ int _mon_setpos(void)
   _mon_var._parameters.xmax = 0.05;
   _mon_var._parameters.ymin = -0.05;
   _mon_var._parameters.ymax = 0.05;
-  _mon_var._parameters.xwidth = 0.25;
-  _mon_var._parameters.yheight = 0.25;
+  _mon_var._parameters.xwidth = 0.5;
+  _mon_var._parameters.yheight = 0.5;
   _mon_var._parameters.restore_neutron = 1;
   _mon_var._parameters.nowritefile = 0;
 
@@ -7313,8 +7313,8 @@ int _mon_setpos(void)
         mccomp_param_nexus(nxhandle,"0002_mon", "xmax", "0.05", "0.05","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon", "ymin", "-0.05", "-0.05","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon", "ymax", "0.05", "0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon", "xwidth", "0", "0.25","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon", "yheight", "0", "0.25","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "xwidth", "0", "0.5","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "yheight", "0", "0.5","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon", "restore_neutron", "0", "1","int");
         mccomp_param_nexus(nxhandle,"0002_mon", "nowritefile", "0", "0","int");
       );
