@@ -1,6 +1,7 @@
 #include "vec3.h"
 #include <math.h>
 
+
 Vec3 vec3(double x, double y, double z) {
     Vec3 vec = {x, y, z};
     return vec;

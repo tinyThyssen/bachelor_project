@@ -8,8 +8,10 @@ SRC = \
   src/rng.c \
   src/source_disk.c \
   src/source_div.c \
+  src/source_simple.c \
   src/monitor_sphere.c \
-  src/monitor_flat.c
+  src/monitor_flat.c \
+  src/scatterer_sphere.c
 OUT = disk_source
 
 all:
