@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: solid_cylinder.instr (solid_cylinder_validation)
- * Date:       Fri Feb 27 13:24:43 2026
+ * Date:       Fri Feb 27 12:53:35 2026
  * File:       ./solid_cylinder.c
  * CFLAGS= -DFUNNEL 
  */
@@ -6946,6 +6946,8 @@ struct _struct_instrument_parameters {
   MCNUM unit_cell_volume;
   MCNUM sigma_inc;
   MCNUM sigma_abs;
+  MCNUM p_interact;
+  MCNUM target_index;
 };
 typedef struct _struct_instrument_parameters _class_instrument_parameters;
 
@@ -6964,7 +6966,7 @@ struct _instrument_struct *instrument = & _instrument_var;
 #pragma acc declare create ( _instrument_var )
 #pragma acc declare create ( instrument )
 
-int numipar = 12;
+int numipar = 14;
 struct mcinputtable_struct mcinputtable[] = {
   "lambda", &(_instrument_var._parameters.lambda), instr_type_double, "5.0", "",
   "dlambda", &(_instrument_var._parameters.dlambda), instr_type_double, "0.5", "",
@@ -6974,10 +6976,12 @@ struct mcinputtable_struct mcinputtable[] = {
   "source_dist", &(_instrument_var._parameters.source_dist), instr_type_double, "1.0", "",
   "focus_xw", &(_instrument_var._parameters.focus_xw), instr_type_double, "0.04", "",
   "focus_yh", &(_instrument_var._parameters.focus_yh), instr_type_double, "0.08", "",
-  "packing_factor", &(_instrument_var._parameters.packing_factor), instr_type_double, "1.0", "",
+  "packing_factor", &(_instrument_var._parameters.packing_factor), instr_type_double, "0.6", "",
   "unit_cell_volume", &(_instrument_var._parameters.unit_cell_volume), instr_type_double, "13.827", "",
   "sigma_inc", &(_instrument_var._parameters.sigma_inc), instr_type_double, "5.08", "",
   "sigma_abs", &(_instrument_var._parameters.sigma_abs), instr_type_double, "5.08", "",
+  "p_interact", &(_instrument_var._parameters.p_interact), instr_type_double, "0.0", "",
+  "target_index", &(_instrument_var._parameters.target_index), instr_type_double, "0", "",
   NULL, NULL, instr_type_double, ""
 };
 
@@ -16631,7 +16635,7 @@ int _sample_mat_setpos(void)
     stracpy(_sample_mat_var._parameters.process_string, "sample_inc" ? "sample_inc" : "", 16384);
   else 
   _sample_mat_var._parameters.process_string[0]='\0';
-  _sample_mat_var._parameters.my_absorption = _instrument_var._parameters.sigma_abs * 1e2 / 13.827;
+  _sample_mat_var._parameters.my_absorption = 5.08 * 1e2 / 13.827;
   _sample_mat_var._parameters.absorber = 0;
   if("init" && strlen("init"))
     stracpy(_sample_mat_var._parameters.init, "init" ? "init" : "", 16384);
@@ -16668,7 +16672,7 @@ int _sample_mat_setpos(void)
     MPI_MASTER(
         mccomp_placement_type_nexus(nxhandle,"0004_sample_mat", _sample_mat_var._position_absolute, _sample_mat_var._rotation_absolute, "Union_make_material");
         mccomp_param_nexus(nxhandle,"0004_sample_mat", "process_string", "NULL", "sample_inc", "char*");
-        mccomp_param_nexus(nxhandle,"0004_sample_mat", "my_absorption", "NONE", "_instrument_var._parameters.sigma_abs * 1e2 / 13.827","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_sample_mat", "my_absorption", "NONE", "5.08 * 1e2 / 13.827","MCNUM");
         mccomp_param_nexus(nxhandle,"0004_sample_mat", "absorber", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0004_sample_mat", "init", "init", "init", "char*");
       );
@@ -16696,7 +16700,7 @@ int _solid_cylinder_setpos(void)
   _solid_cylinder_var._parameters.radius = _instrument_var._parameters.cylinder_radius;
   _solid_cylinder_var._parameters.yheight = _instrument_var._parameters.cylinder_height;
   _solid_cylinder_var._parameters.visualize = 1;
-  _solid_cylinder_var._parameters.target_index = 0;
+  _solid_cylinder_var._parameters.target_index = _instrument_var._parameters.target_index;
   _solid_cylinder_var._parameters.target_x = 0;
   _solid_cylinder_var._parameters.target_y = 0;
   _solid_cylinder_var._parameters.target_z = 0;
@@ -16705,7 +16709,7 @@ int _solid_cylinder_setpos(void)
   _solid_cylinder_var._parameters.focus_xw = 0;
   _solid_cylinder_var._parameters.focus_xh = 0;
   _solid_cylinder_var._parameters.focus_r = 0;
-  _solid_cylinder_var._parameters.p_interact = 0;
+  _solid_cylinder_var._parameters.p_interact = _instrument_var._parameters.p_interact;
   _solid_cylinder_var._parameters.mask_string[0]='\0';
   _solid_cylinder_var._parameters.mask_setting[0]='\0';
   _solid_cylinder_var._parameters.number_of_activations = 1;
@@ -16752,7 +16756,7 @@ int _solid_cylinder_setpos(void)
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "radius", "NONE", "_instrument_var._parameters.cylinder_radius","MCNUM");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "yheight", "NONE", "_instrument_var._parameters.cylinder_height","MCNUM");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "visualize", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "target_index", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "target_index", "0", "_instrument_var._parameters.target_index","int");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "target_x", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "target_y", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "target_z", "0", "0","MCNUM");
@@ -16761,7 +16765,7 @@ int _solid_cylinder_setpos(void)
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "focus_xw", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "focus_xh", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "focus_r", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "p_interact", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "p_interact", "0", "_instrument_var._parameters.p_interact","MCNUM");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "mask_string", 0, 0, "char*");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "mask_setting", 0, 0, "char*");
         mccomp_param_nexus(nxhandle,"0005_solid_cylinder", "number_of_activations", "1", "1","MCNUM");

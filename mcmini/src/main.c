@@ -62,6 +62,9 @@ int main(void) {
     cyl.radius = 0.015; // m
     cyl.height = 0.1; // m
     cyl.VcA3 = 13.827; // match McStas unit_cell_volume
+    cyl.sigma_abs = 5.08; // barn at 2200 m/s (vanadium)
+    cyl.sigma_inc = 5.08; // barn (vanadium is mostly incoherent scatterer)
+    cyl.pack = 1.0; // typical packing factor for powder sample
     // Match McStas my_absorption = 5.08*100/13.827 (which omits packing_factor):
     // MCmini uses Sigma_abs = sigma_abs*100*pack/VcA3, so compensate by dividing by pack.
     cyl.sigma_abs = 5.08 / cyl.pack;

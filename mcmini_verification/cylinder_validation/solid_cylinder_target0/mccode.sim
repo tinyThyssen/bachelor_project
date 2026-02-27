@@ -1,17 +1,17 @@
 mcstas simulation description file for solid_cylinder_validation.
-Date:    Fri Feb 27 13:24:50 2026
+Date:    Fri Feb 27 12:53:42 2026
 Program:  3.5.32, git
 
 begin instrument: solid_cylinder_validation
-  File: solid_cylinder/mccode
+  File: solid_cylinder_target0/mccode
   Source: solid_cylinder.instr
-  Parameters:  lambda(double) dlambda(double) cylinder_radius(double) cylinder_height(double) source_radius(double) source_dist(double) focus_xw(double) focus_yh(double) packing_factor(double) unit_cell_volume(double) sigma_inc(double) sigma_abs(double)
+  Parameters:  lambda(double) dlambda(double) cylinder_radius(double) cylinder_height(double) source_radius(double) source_dist(double) focus_xw(double) focus_yh(double) packing_factor(double) unit_cell_volume(double) sigma_inc(double) sigma_abs(double) p_interact(double) target_index(double)
   Trace_enabled: yes
   Default_main: yes
   Embedded_runtime: yes
 end instrument
 
-begin simulation: solid_cylinder
+begin simulation: solid_cylinder_target0
   Format: McCode with text headers
   URL: http://www.mccode.org
   Creator:  3.5.32, git
@@ -19,8 +19,8 @@ begin simulation: solid_cylinder
   Ncount: 10000000
   Trace: no
   Gravitation: no
-  Seed: 1772195088455304
-  Directory: solid_cylinder
+  Seed: 1772193220162607
+  Directory: solid_cylinder_target0
   Param: lambda=5
   Param: dlambda=0.5
   Param: cylinder_radius=0.015
@@ -29,14 +29,16 @@ begin simulation: solid_cylinder
   Param: source_dist=1
   Param: focus_xw=0.04
   Param: focus_yh=0.08
-  Param: packing_factor=1
+  Param: packing_factor=0.6
   Param: unit_cell_volume=13.827
   Param: sigma_inc=5.08
   Param: sigma_abs=5.08
+  Param: p_interact=0
+  Param: target_index=0
 end simulation
 
 begin data
-  Date: Fri Feb 27 13:24:57 2026 (1772195097)
+  Date: Fri Feb 27 12:53:49 2026 (1772193229)
   type: array_2d(360, 180)
   Source: solid_cylinder_validation (solid_cylinder.instr)
   component: mon_4pi
@@ -44,9 +46,9 @@ begin data
   title: 4PI PSD monitor
   Ncount: 10000000
   filename: solid_cylinder_multiple_scatter.dat
-  statistics: X0=-0.0324067; dX=120.63; Y0=0.505826; dY=34.569;
-  signal: Min=0; Max=5.70778e-07; Mean=1.36532e-07;
-  values: 0.00884729 7.16153e-06 3.88518e+06
+  statistics: X0=0.00406982; dX=119.001; Y0=0.496371; dY=34.657;
+  signal: Min=0; Max=3.58266e-07; Mean=8.9486e-08;
+  values: 0.0057987 4.84948e-06 3.8147e+06
   xvar: Lo
   yvar: La
   xlabel: Longitude [deg]

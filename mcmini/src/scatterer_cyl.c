@@ -145,6 +145,11 @@ ScattererEvent scatterer_cyl_interact(const ScattererCyl *s, Particle *p, RNG *r
     }
 
     double Sig_abs  = (s->enable_absorption ? macro_sigma_per_m(s->sigma_abs, s->pack, s->VcA3) : 0.0);
+    if (Sig_abs > 0.0 && p->lambda > 0.0) {
+        // McStas-like absorption scaling: my_a*(2200/v), v [m/s] = 3956/lambda[Angstrom]
+        double v = 3956.0 / p->lambda;
+        Sig_abs *= (2200.0 / v);
+    }
     double Sig_scat = (s->enable_scattering ? macro_sigma_per_m(s->sigma_inc, s->pack, s->VcA3) : 0.0);
     double Sig_t    = Sig_abs + Sig_scat;
 

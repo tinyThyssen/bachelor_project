@@ -11,10 +11,12 @@ DEFINE INSTRUMENT solid_cylinder_validation(
   source_dist = 1.0,
   focus_xw = 0.04,
   focus_yh = 0.08,
-  packing_factor = 1.0,
+  packing_factor = 0.6,
   unit_cell_volume = 13.827,
   sigma_inc = 5.08,
-  sigma_abs = 5.08
+  sigma_abs = 5.08,
+  p_interact = 0.0,
+  target_index = 0
 )
 
 TRACE
@@ -49,7 +51,7 @@ AT (0,0,0) ABSOLUTE
 /* Match MCmini sigma_abs=0.4 barn -> macro abs = sigma*100*pack/Vc */
 COMPONENT sample_mat = Union_make_material(
   process_string = "sample_inc",
-  my_absorption =  sigma_abs * 1e2 / 13.827 
+  my_absorption =  5.08 * 1e2 / 13.827 //set to zero for zero absorption, otherwise set to ~25
 )
 AT (0,0,0) ABSOLUTE
 
@@ -57,7 +59,9 @@ COMPONENT solid_cylinder = Union_cylinder(
     priority = 10,
     radius = cylinder_radius,
     yheight = cylinder_height,
-    material_string = "sample_mat"
+    material_string = "sample_mat",
+    p_interact = p_interact,
+    target_index = target_index
 )
 AT (0,0,0) RELATIVE PREVIOUS
 
@@ -68,12 +72,10 @@ AT (0,0,0) ABSOLUTE
 COMPONENT stop = Union_stop()
 AT (0,0,0) ABSOLUTE
 
-
 COMPONENT beamstop = Beamstop(
   radius = 0.08
 ) 
 AT (0,0, 1.0) RELATIVE Origin
-
 
 COMPONENT mon_4pi = PSD_monitor_4PI(
   nx = 360,
