@@ -13,207 +13,162 @@
 #ifndef INFINITY
 #define INFINITY (1.0/0.0)
 #endif
-
-
-
-
-// Initialize scatterer struct with default parameters (vanadium-like)
-void scatterer_cyl_init(ScattererCyl *s) {
-    s->center = vec3(0.0, 0.0, 0.0);
-
-    s->R_out = 0.1; // m
-    s->R_in = 0.0; // m (0 => solid)
-    s->H_out = 0.02; // m
-    s->H_in = 0.0; // m (0 => same as outer, but usually H_out-2*thickness)
-
-    s->sigma_abs = 0.4; // barn at 2200 m/s
-    s->sigma_inc = 5.0; // barn
-    s->Vc = 10.0; // Å^3
-    s->pack = 0.6; // packing factor [0..1]
-
-    s->p_interact = 1.0; // probability to force interaction (variance reduction), typical 1.0
-    s->order = 1; // 1 => single scattering only (recommended for "simple")
-    s->enable_absorption = 1; // enable absorption
-    s->enable_scattering = 1; // enable scattering
-
-
-}
-
-
-// Interact a particle with the cylinder.
-// - Computes intersection with hollow cylinder geometry
-static int solid_cyl_interval_y(
-    Vec3 r0, Vec3 vec, Vec3 cen,
-    double R, double H,
-    double *tin, double *tout)
+// --- helpers ---
+static double macro_sigma_per_m(double sigma_barn, double pack, double Vc_A3)
 {
-    // radial interval
-    double dx = r0.x - cen.x;
-    double dz = r0.z - cen.z;
+    // n = pack / Vc  with Vc in m^3
+    double n = pack / (Vc_A3 * 1e-30);  // number density in 1/m^3
+    double sigma = sigma_barn * 1e-28;    // cross section in m^2
+    return n * sigma;                     // macroscopic cross section in 1/m
+}
 
-    double a = vec.x*vec.x + vec.z*vec.z;
-    double b = 2.0*(dx*vec.x + dz*vec.z);
-    double cc = dx*dx + dz*dz - R*R;
+static double sample_free_flight(RNG *rng, double Sigma_t) // total macroscopic cross section in 1/m
+{
+    double u = rng_uniform01(rng); // random number in [0,1)
+    if (u < 1e-15) u = 1e-15; // simple safeguard against log(0)
+    return -log(u) / Sigma_t; // free path length sampled from exponential distribution
+}
 
-    double t_r_in = -INFINITY, t_r_out = INFINITY;
+static Vec3 sample_isotropic_dir(RNG *rng) // returns a random unit vector sampled isotropically over the sphere
+{
+    double u = rng_uniform01(rng);
+    double v = rng_uniform01(rng);
 
-    if (fabs(a) < 1e-15) {
-        // Ray parallel to y-axis: radius constant
-        if (cc > 0.0) return 0; // outside cylinder forever
-        // else: inside infinite cylinder for all t
+    double cosT = 2.0*u - 1.0;
+    double sinT = sqrt(fmax(0.0, 1.0 - cosT*cosT));
+    double phi  = 2.0*M_PI*v;
+
+    return vec3(sinT*cos(phi), cosT, sinT*sin(phi));
+}
+
+
+static int ray_cyl_intersect(
+    Vec3 r0, Vec3 dir, Vec3 center, double radius, double height,
+    double *t_entry, double *t_exit)
+{
+    const double eps = 1e-12;
+    Vec3 oc = v_sub(r0, center);
+
+    // Interval from radial condition x^2+z^2 <= R^2 for infinite cylinder.
+    double a = dir.x*dir.x + dir.z*dir.z;
+    double b = 2.0*(oc.x*dir.x + oc.z*dir.z);
+    double c = oc.x*oc.x + oc.z*oc.z - radius*radius;
+
+    double t_side_min = -INFINITY;
+    double t_side_max =  INFINITY;
+
+    if (fabs(a) < eps) {
+        // Ray parallel to cylinder axis: either always inside side wall or never enters.
+        if (c > 0.0) return 0;
     } else {
-        double disc = b*b - 4.0*a*cc;
+        double disc = b*b - 4.0*a*c;
         if (disc < 0.0) return 0;
-        double s = sqrt(disc);
-        double t1 = (-b - s)/(2.0*a);
-        double t2 = (-b + s)/(2.0*a);
-        if (t1 > t2) { double tmp=t1; t1=t2; t2=tmp; }
-        t_r_in = t1; t_r_out = t2;
+        double sdisc = sqrt(disc);
+        double t1 = (-b - sdisc) / (2.0*a);
+        double t2 = (-b + sdisc) / (2.0*a);
+        if (t1 > t2) {
+            double tmp = t1;
+            t1 = t2;
+            t2 = tmp;
+        }
+        t_side_min = t1;
+        t_side_max = t2;
     }
 
-    // height slab interval
-    double y_min = cen.y - H*0.5;
-    double y_max = cen.y + H*0.5;
+    // Interval from y slab condition ymin <= y <= ymax.
+    double ymin = center.y - 0.5*height;
+    double ymax = center.y + 0.5*height;
+    double t_y_min = -INFINITY;
+    double t_y_max =  INFINITY;
 
-    double t_y_in = -INFINITY, t_y_out = INFINITY;
-
-    if (fabs(vec.y) < 1e-15) {
-        if (r0.y < y_min || r0.y > y_max) return 0; // never enters slab
+    if (fabs(dir.y) < eps) {
+        if (r0.y < ymin || r0.y > ymax) return 0;
     } else {
-        double ty1 = (y_min - r0.y)/vec.y;
-        double ty2 = (y_max - r0.y)/vec.y;
-        if (ty1 > ty2) { double tmp=ty1; ty1=ty2; ty2=tmp; }
-        t_y_in = ty1; t_y_out = ty2;
+        double ty1 = (ymin - r0.y) / dir.y;
+        double ty2 = (ymax - r0.y) / dir.y;
+        if (ty1 > ty2) {
+            double tmp = ty1;
+            ty1 = ty2;
+            ty2 = tmp;
+        }
+        t_y_min = ty1;
+        t_y_max = ty2;
     }
 
-    // --- overlap ---
-    double t_in  = fmax(t_r_in,  t_y_in);
-    double t_out = fmin(t_r_out, t_y_out);
+    // Intersect both intervals.
+    double tin = fmax(t_side_min, t_y_min);
+    double tout = fmin(t_side_max, t_y_max);
 
-    if (t_out < t_in) return 0;
-    *tin = t_in;
-    *tout = t_out;
+    if (tout <= 0.0) return 0;
+    if (tout <= tin) return 0;
+
+    *t_entry = tin;
+    *t_exit = tout;
     return 1;
 }
 
-// for debugging: records the intersections in csv file
-static FILE *cyl_record_fpt = NULL;
-int cyl_record_open(ScattererCyl *m, const char *path, Vec3 center, double radius) {
-    m->center = center;
-    m->R_out = radius;
-    cyl_record_fpt = fopen(path, "w");
-    if (!cyl_record_fpt) return 0;
-    fprintf(cyl_record_fpt, "hit_x,hit_y,hit_z,dir_x,dir_y,dir_z,lambda\n");
-    return 1;
+
+void scatterer_cyl_init(ScattererCyl *s)
+{
+    s->center = vec3(0.0, 0.0, 0.0);
+    s->radius = 0.01; // m. standard CAMEA analyzer radius is 0.01 m
+    s->height = 0.06; // m. standard CAMEA analyzer height is 0.06 m
+
+    s->sigma_abs = 5.08; // barn at 2200 m/s (vanadium)
+    s->sigma_inc = 5.08; // barn (vanadium is mostly incoherent scatterer)
+    s->VcA3 = 13.827; // Å^3 (vanadium unit cell volume)
+    s->pack = 0.6; // typical packing factor for powder sample
+
+    s->enable_absorption = 1;
+    s->enable_scattering = 1;
+    s->max_scat = 1000; // default max scatters to prevent infinite
 }
 
-void cyl_record_close(ScattererCyl *m) {
-    m->center = vec3(0.0, 0.0, 0.0);
-    m->R_out = 0.1;
-    if (cyl_record_fpt) {
-        fclose(cyl_record_fpt);
-        cyl_record_fpt = NULL;
+ScattererEvent scatterer_cyl_interact(const ScattererCyl *s, Particle *p, RNG *rng)
+{
+    if (!p->alive) return CYLINDER_ABSORB;
+
+    p->vec = v_normalize(p->vec);
+
+    double t_entry, t_exit;
+    int hit = ray_cyl_intersect(p->r, p->vec, s->center, s->radius, s->height, &t_entry, &t_exit);
+    if (!hit) return CYLINDER_NO_HIT;
+
+    if (t_exit <= 0.0) return CYLINDER_NO_HIT;
+    if (t_entry < 0.0) t_entry = 0.0;
+
+    double seg_len = t_exit - t_entry;
+    if (seg_len <= 0.0) return CYLINDER_NO_HIT;
+
+    if (t_entry > 0.0) {
+        p->r = v_add(p->r, v_scale(p->vec, t_entry));
     }
-}
 
-int cyl_record_hit(ScattererCyl *m, const Particle *p) {
-    m->center = vec3(0.0, 0.0, 0.0);
-    if (cyl_record_fpt) {
-        fprintf(cyl_record_fpt, "%g,%g,%g,%g,%g,%g,%g\n",
-                p->r.x, p->r.y, p->r.z,
-                p->vec.x, p->vec.y, p->vec.z,
-                p->lambda);
+    double Sig_abs  = (s->enable_absorption ? macro_sigma_per_m(s->sigma_abs, s->pack, s->VcA3) : 0.0);
+    double Sig_scat = (s->enable_scattering ? macro_sigma_per_m(s->sigma_inc, s->pack, s->VcA3) : 0.0);
+    double Sig_t    = Sig_abs + Sig_scat;
+
+    if (Sig_t <= 0.0) {
+        p->r = v_add(p->r, v_scale(p->vec, seg_len));
+        return CYLINDER_TRANSMIT;
     }
-        return 1;
+
+    double s_free = sample_free_flight(rng, Sig_t);
+    if (s_free >= seg_len) {
+        p->r = v_add(p->r, v_scale(p->vec, seg_len));
+        return CYLINDER_TRANSMIT;
+    }
+
+    p->r = v_add(p->r, v_scale(p->vec, s_free));
+
+    double p_scat = Sig_scat / Sig_t;
+    double u = rng_uniform01(rng);
+
+    if (u > p_scat) {
+        p->alive = 0;
+        return CYLINDER_ABSORB;
+    }
+
+    p->vec = sample_isotropic_dir(rng);
+    return CYLINDER_SCATTER;
 }
-
-
-
-
-// ScattererEvent scatterer_cyl_interact(const ScattererCyl *s, Particle *p, RNG *rng) {
-//     // cylinder parameters for convenience
-//     Vec3 center = s->center;
-//     double R_out = s->R_out;
-//     double R_in = s->R_in;
-//     double H_out = s->H_out;
-//     double H_in = s->H_in;
-//     Vec3 r0 = p->r; // ray origin
-//     Vec3 dir = p->vec; // ray direction (unit vector)
-
-
-//     // find material segments;
-//     double o_in, o_out, i_in, i_out;
-//     int hit_outer = solid_cyl_interval_y(r0, dir, center, R_out, H_out, &o_in, &o_out);
-//     int hit_inner = (R_in > 0 && H_in > 0) ? solid_cyl_interval_y(r0, dir, center, R_in, H_in, &i_in, &i_out) : 0;
-
-
-//     // if none → return NO_HIT;
-//     if (!hit_outer || o_out < 0.0) {
-//         return (ScattererEvent)0; // NO_HIT
-//     }
-
-//     // clamp entry to forward direction
-//     if (o_in < 0.0) o_in = 0.0;
-
-//     // segments: [o_in, o_out] is outer cylinder, [i_in, i_out] is inner cylinder (if hit_inner)
-//     // material segment is outer minus inner, which can be 1 or 2 segments depending on whether inner is hit and how it overlaps with outer. We can compute the length of these segments
-//     double seg1_len = 0.0, seg2_len = 0.0;
-//     if (hit_inner) {
-//         if (i_in > o_in) {
-//             seg1_len = i_in - o_in; // first segment from o_in to in
-//         }
-//         if (i_out < o_out) {
-//             seg2_len = o_out - i_out; // second segment from out to i_out
-//         }
-//     } else {
-//         seg1_len = o_out - o_in; // single segment from o_in to o_out
-//     }
-    
-
-
-//     // compute mu_s, mu_a, mu_t;
-//     double sigma_inc = s->sigma_inc; // barn
-//     double sigma_abs = s->sigma_abs; // barn
-//     double Vc = s->Vc; // Å^3
-//     double pack = s->pack; // packing factor [0..1]
-//     double v = 3956 / p->lambda; // m/s, neutron velocity from wavelength (lambda in Angstrom)
-
-//     double mu_s = (pack * sigma_inc / Vc) * 100.0; // 1/m
-//     double mu_a_2200 = (pack * sigma_abs / Vc) * 100.0; // 1/m at 2200 m/s
-//     double mu_a = mu_a_2200 * (2200.0 / v);
-//     double mu_t = mu_s + mu_a;
-
-//     int scatter_count = 0;
-
-//     // for each segment {
-//     double seg_len = seg1_len;
-
-//     //     double L = segment_length;
-
-//     //     while (L > 0) {
-
-//     //         sample free path;
-
-//     //         if no interaction:
-//     //             break;
-
-//     //         move particle;
-
-//     //         if absorption:
-//     //             p->alive = 0;
-//     //             return ABSORB;
-
-//     //         scatter:
-//     //             sample new direction;
-//     //             scatter_count++;
-
-//     //             if order reached:
-//     //                 return SCATTER;
-
-//             // recompute remaining segments from new position;
-//     //     }
-//     // }
-
-//     // return TRANSMIT;
-//     return (ScattererEvent)1; // TRANSMIT
-// }

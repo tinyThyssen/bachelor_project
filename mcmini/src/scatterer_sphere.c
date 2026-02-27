@@ -153,7 +153,7 @@ int transport_sphere(ScattererSphere *s, Particle *p, RNG *rng)
     return nscat;
 }
 
-
+// 
 void scatterer_sphere_init(ScattererSphere *s)
 {
     s->center = vec3(0.0, 0.0, 0.0);
@@ -161,7 +161,7 @@ void scatterer_sphere_init(ScattererSphere *s)
 
     s->sigma_abs = 0.4; // barn at 2200 m/s
     s->sigma_inc = 5.0; // barn
-    s->VcA3 = 10.0; // Angstrom^3
+    s->VcA3 = 13.827; // Angstrom^3
     s->pack = 0.6; // packing factor [0..1]
 
     s->enable_absorption = 1;
@@ -217,83 +217,6 @@ ScattererEvent scatterer_sphere_interact(const ScattererSphere *s, Particle *p, 
     p->vec = sample_isotropic_dir(rng);
     return SPHERE_SCATTER;
 }
-
-
-
-
-
-
-// // Initialize scatterer struct with default parameters (vanadium-like)
-// void scatterer_sphere_init(ScattererSphere *s) {
-//     s->center = vec3(0.0, 0.0, 0.0);
-//     s->radius = 0.1; // m
-
-//     s->sigma_abs = 0.4; // barn at 2200 m/s
-//     s->sigma_inc = 5.0; // barn
-//     s->VcA3 = 10.0; // Å^3
-//     s->pack = 0.6; // packing factor [0..1]
-
-//     // s->p_interact = 1.0; // probability to force interaction (variance reduction), typical 1.0
-//     // s->order = 1; // 1 => single scattering only (recommended for "simple")
-//     s->enable_absorption = 1; // enable absorption
-//     s->enable_scattering = 1; // enable scattering
-// }
-
-// // Interact a particle with the sphere.
-// // - Computes intersection with hollow sphere geometry
-// // - Samples free path + decides scatter vs absorption vs transmit
-// // - Updates particle in-place (position, direction, weight, alive, etc.)
-// // - Returns event type
-// ScattererEvent scatterer_sphere_interact(const ScattererSphere *s, Particle *p, RNG *rng) {
-//     double t_entry, t_exit;
-//     int hit = ray_sphere_intersect(p->r, p->vec, s->center, s->radius, &t_entry, &t_exit);
-//     if (!hit) return SCATTERER_NO_HIT;
-
-//     double seg_len = t_exit - t_entry; // length of path inside sphere
-//     if (seg_len <= 0.0) return SCATTERER_NO_HIT; // should not happen, but guard against numerical issues
-
-//     // compute interaction probabilities based on material properties and segment length
-//     double sigma_inc = s->sigma_inc; // barn
-//     double sigma_abs = s->sigma_abs; // barn
-//     double Vc = s->VcA3; // Å^3
-//     double pack = s->pack; // packing factor [0..1]
-//     double v = 3956 / p->lambda; // m/s, neutron velocity from wavelength (lambda in Angstrom)
-//     double mu_s = macro_sigma_per_m(sigma_inc, pack, Vc); // 1/m
-//     double mu_a_2200 = macro_sigma_per_m(sigma_abs, pack, Vc); // 1/m at 2200 m/s
-//     double mu_a = mu_a_2200 * (2200.0 / v);
-//     double mu_t = mu_s + mu_a;
-//     double p_s = mu_s / mu_t; // probability of scattering vs absorption
-//     double p_a = mu_a / mu_t;
-
-//     // sample interaction type
-//     double xi = rng_uniform(rng); // random number in [0,1)
-//     if (xi < p_a) {
-//         // absorption
-//         if (s->enable_absorption) {
-//             p->alive = 0; // kill particle
-//             return SCATTERER_ABSORB;
-//         } else {
-//             return SCATTERER_TRANSMIT; // treat as transmitted if absorption disabled
-//         }
-//     } else {
-//         // scattering
-//         if (s->enable_scattering) {
-//             // sample new direction isotropically
-//             double phi = 2.0 * M_PI * rng_uniform(rng); // azimuthal angle
-//             double costheta = 2.0 * rng_uniform(rng) - 1.0; // cos(theta) uniformly in [-1,1]
-//             double sintheta = sqrt(1.0 - costheta*costheta);
-//             Vec3 new_dir = vec3(sintheta * cos(phi), sintheta * sin(phi), costheta); // new direction
-//             p->vec = new_dir; // update particle direction
-//             return SCATTERER_SCATTER;
-//         } else {
-//             return SCATTERER_TRANSMIT; // treat as transmitted if scattering disabled
-//         }
-//     }
-// }
-
-
-
-
 
 
 

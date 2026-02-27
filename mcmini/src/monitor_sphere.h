@@ -26,6 +26,11 @@ typedef struct {
     double phi_min, phi_max; // [-180, 180) degrees
     double theta_min, theta_max;   // [-90, 90] degrees
     double *I;               // size nx*ny
+
+    // beamstop settings
+    int beamstop_enabled;
+    double beamstop_radius;
+    Vec3 beamstop_center;
 } MonitorSphere;
 
 

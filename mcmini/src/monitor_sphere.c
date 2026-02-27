@@ -7,6 +7,23 @@
 #define RAD2DEG (180.0/M_PI)
 #endif
 
+// Beamstop modeled like McStas Beamstop: disk in a plane normal to +z.
+// beamstop_center defines disk center (including z-plane), beamstop_radius its radius.
+static int beamstop_blocks_ray(const MonitorSphere *m, Vec3 r0, Vec3 dir) {
+    if (!m->beamstop_enabled || m->beamstop_radius <= 0.0) return 0;
+
+    // Intersect ray with plane z = beamstop_center.z.
+    if (fabs(dir.z) < 1e-15) return 0; // parallel to plane
+    double t = (m->beamstop_center.z - r0.z) / dir.z;
+    if (t <= 0.0) return 0; // behind/neutron moving away
+
+    Vec3 hit = v_add(r0, v_scale(dir, t));
+    double dx = hit.x - m->beamstop_center.x;
+    double dy = hit.y - m->beamstop_center.y;
+    double r2 = dx*dx + dy*dy;
+    return (r2 <= m->beamstop_radius * m->beamstop_radius);
+}
+
 
 // find the first intersection of particle ray with the sphere. Returns 1 if hit recorded, 0 if no forward hit.
 // must solve |(r0 - C) + t dir|^2 = R^2
@@ -44,6 +61,9 @@ int monitor_sphere_open(MonitorSphere *m, const char *path, Vec3 center, double 
     m->center = center; // from monitor sphere struct set cetner to input center
     m->radius = radius; // from monitor sphere struct set radius to input radius
     m->mode = MONITOR_SPHERE_EVENTS;
+    m->beamstop_enabled = 0;
+    m->beamstop_radius = 0.0;
+    m->beamstop_center = center;
     m->fpt = fopen(path, "w"); // open file for writing.
     if (!m->fpt) return 0; // return 0 if file failed to open
 
@@ -60,6 +80,9 @@ int monitor_sphere_open_binned(MonitorSphere *m, const char *path, Vec3 center, 
     m->center = center;
     m->radius = radius;
     m->mode = MONITOR_SPHERE_BINNED;
+    m->beamstop_enabled = 0;
+    m->beamstop_radius = 0.0;
+    m->beamstop_center = center;
     m->nx = nx;
     m->ny = ny;
     m->n_history = n_history;
@@ -99,6 +122,10 @@ int monitor_sphere_open_binned(MonitorSphere *m, const char *path, Vec3 center, 
 
 // record intersection point of particle ray with the sphere. Returns 1 if hit recorded, 0 if no forward hit.
 int monitor_sphere_record(MonitorSphere *m, const Particle *p) {
+    if (beamstop_blocks_ray(m, p->r, p->vec)) {
+        return 0;
+    }
+
     double t_hit;
     if (!ray_sphere_first_hit(p->r, p->vec, m->center, m->radius, &t_hit)) { // return 0 if no hit
         return 0;
@@ -205,4 +232,3 @@ void monitor_sphere_close(MonitorSphere *m) {
     if (m->fpt) fclose(m->fpt);
     m->fpt = NULL;
 }
-

@@ -1,0 +1,83 @@
+/*******************************************************************************
+* McStas instrument for validating MCmini solid-sphere setup.
+*******************************************************************************/
+
+DEFINE INSTRUMENT solid_sphere_validation(
+  lambda = 5.0,
+  dlambda = 0.5,
+  sphere_radius = 0.4,
+  source_radius = 0.2,
+  source_dist = 1.5,
+  focus_xw = 1.0,
+  focus_yh = 1.0,
+  E0 = 25.0,
+  dE = 2.5,
+  sigma_inc = 5.0,
+  sigma_abs = 0.4,
+  unit_cell_volume = 10.0,
+  packing_factor = 0.6,
+  p_interact = 0.0
+)
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+/* MCmini SourceSimple center is at z = -1.0 m */
+COMPONENT src = Source_simple(
+  radius = source_radius,
+  dist = source_dist,
+  focus_xw = focus_xw,
+  focus_yh = focus_yh,
+  E0 = E0,
+  dE = dE,
+  lambda0 = lambda,
+  dlambda = dlambda,
+  flux = 1,
+  gauss = 0
+)
+AT (0,0,-1.0) ABSOLUTE
+
+COMPONENT init = Union_init()
+AT (0,0,0) ABSOLUTE
+
+/* Match MCmini scatterer defaults: sigma_inc=5.0, pack=0.6, Vc=10 A^3 */
+COMPONENT sample_inc = Incoherent_process(
+  sigma = sigma_inc,
+  packing_factor = packing_factor,
+  unit_cell_volume = unit_cell_volume
+)
+AT (0,0,0) ABSOLUTE
+
+/* Match MCmini sigma_abs=0.4 barn -> macro abs = sigma*100*pack/Vc */
+COMPONENT sample_mat = Union_make_material(
+  process_string = "sample_inc",
+  my_absorption = sigma_abs * 1e2 * packing_factor / unit_cell_volume
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT solid_sphere = Union_sphere(
+  material_string = "sample_mat",
+  priority = 10,
+  p_interact = p_interact,
+  radius = sphere_radius
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT master = Union_master()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT stop = Union_stop()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.5,
+  restore_neutron = 1,
+  filename = "solid_sphere_multiple_scatter.dat"
+)
+AT (0,0,0) ABSOLUTE
+
+END
