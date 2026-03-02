@@ -42,7 +42,9 @@ Particle source_simple_emit(const SourceSimple *src, RNG *rng) {
     Vec3 target = vec3(xt, yt, zt);
 
     // normalize direction from source to target
-    Vec3 dir = v_normalize(v_sub(target, pos));
+    Vec3 dvec = v_sub(target, pos);
+    double dist_p = sqrt(v_dot(dvec, dvec));
+    Vec3 dir = v_scale(dvec, 1.0 / dist_p);
 
     // wavelength sampling: uniform in [lambda0-dlambda, lambda0+dlambda]
     double u5 = rng_uniform01(rng);
@@ -50,7 +52,42 @@ Particle source_simple_emit(const SourceSimple *src, RNG *rng) {
 
     Particle p = particle_make(pos, dir);
     p.lambda = lambda;
+    /*
+      McStas-like Source_simple weighting (adapted to MCmini per-history normalization):
+      p = pmul * pdir
+
+      McStas pmul includes /Ncount, but MCmini monitor later divides by n_history,
+      so we intentionally omit /Ncount here.
+    */
+    double src_area = 0.0;
+    if (src->radius > 0.0) {
+        src_area = M_PI * src->radius * src->radius;
+    } else {
+        src_area = src->xwidth * src->yheight;
+    }
+
+    // In our setup target center is on +z axis at distance src->dist from source center.
+    double dz = target.z - pos.z;
+    double pdir = 0.0;
+    if (src->focus_xw > 0.0 && src->focus_yh > 0.0 && dist_p > 0.0) {
+        double cos_theta = dz / dist_p;
+        pdir = (src->focus_xw * src->focus_yh) / (dist_p * dist_p);
+        // order=2 in McStas Source_simple call
+        pdir *= cos_theta * cos_theta;
+    }
+
+    double pmul;
+    if (src->flux != 0.0) {
+        pmul = src->flux * 1e4 * src_area;
+        if (src->dlambda > 0.0) {
+            pmul *= 2.0 * src->dlambda;
+        } else if (src->dE > 0.0) {
+            pmul *= 2.0 * src->dE;
+        }
+    } else {
+        pmul = 1.0 / (4.0 * M_PI);
+    }
+
+    p.p = pmul * pdir;
     return p;
 }
-
-

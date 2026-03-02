@@ -33,10 +33,10 @@ int main(void) {
     SourceSimple src = {
         .center = vec3(0.0, 0.0, -0.1),
 
-        .radius = 0.05,      // m, radius of circular source area (in x-y plane). If 0, then it's a point source.
+        .radius = 0.03,      // m, radius of circular source area (in x-y plane). If 0, then it's a point source.
 
         .dist = 1.0,       // m
-        .focus_xw = 0.04,    // m (horizontal focus width)
+        .focus_xw = 0.03,    // m (horizontal focus width)
         .focus_yh = 0.08,    // m (vertical focus height)
 
         // .E0 = 25.0,        // meV
@@ -50,7 +50,7 @@ int main(void) {
 
 
 
-    long long Nsim = 1e7; // number of simulated neutrons
+    long long Nsim = 1e8; // number of simulated neutrons
 
 
     // multiple scattering test for solid cylinder
@@ -59,8 +59,8 @@ int main(void) {
     scatterer_cyl_init(&cyl);
 
     cyl.center = vec3(0.0, 0.0, 0.0);
-    cyl.radius = 0.015; // m
-    cyl.height = 0.1; // m
+    cyl.radius = 0.01; // m
+    cyl.height = 0.06; // m
     cyl.VcA3 = 13.827; // match McStas unit_cell_volume
     cyl.sigma_abs = 5.08; // barn at 2200 m/s (vanadium)
     cyl.sigma_inc = 5.08; // barn (vanadium is mostly incoherent scatterer)
@@ -68,7 +68,7 @@ int main(void) {
     // Match McStas my_absorption = 5.08*100/13.827 (which omits packing_factor):
     // MCmini uses Sigma_abs = sigma_abs*100*pack/VcA3, so compensate by dividing by pack.
     cyl.sigma_abs = 5.08 / cyl.pack;
-    if (!monitor_sphere_open_binned(&mon, "solid_cylinder_multiple_scatter.csv",
+    if (!monitor_sphere_open_binned(&mon, "solid_cyl_r1h6_n1e8.csv",
                                   vec3(0.0, 0.0, 0.0), 1.0, // center and radius
                                   360, 180, Nsim)) { // nx, ny, n_history
         printf("Failed to open monitor\n");

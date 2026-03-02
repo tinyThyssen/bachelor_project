@@ -18,7 +18,7 @@ typedef struct {
 
     // binned
     int nx, ny;
-    long long n_history;
+    long long n_history; // number of particle histories (for normalization)
     long long hits_total;
     long long hits_in;
 
