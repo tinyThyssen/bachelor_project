@@ -1,0 +1,55 @@
+mcstas simulation description file for solid_cylinder_validation.
+Date:    Mon Mar  2 15:04:02 2026
+Program:  3.5.32, git
+
+begin instrument: solid_cylinder_validation
+  File: solid_cyl_r0p75h4_n1e8/mccode
+  Source: solid_cylinder.instr
+  Parameters:  lambda(double) dlambda(double) cylinder_radius(double) cylinder_height(double) margin(double) source_radius(double) unit_cell_volume(double) sigma_inc(double) sigma_abs(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: solid_cyl_r0p75h4_n1e8
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.5.32, git
+  Instrument: solid_cylinder.instr
+  Ncount: 100000000
+  Trace: no
+  Gravitation: no
+  Seed: 1772460240194747
+  Directory: solid_cyl_r0p75h4_n1e8
+  Param: lambda=5
+  Param: dlambda=0.5
+  Param: cylinder_radius=0.0075
+  Param: cylinder_height=0.04
+  Param: margin=0.01
+  Param: source_radius=0.03
+  Param: unit_cell_volume=13.827
+  Param: sigma_inc=5.08
+  Param: sigma_abs=5.08
+end simulation
+
+begin data
+  Date: Mon Mar  2 15:04:38 2026 (1772460278)
+  type: array_2d(360, 180)
+  Source: solid_cylinder_validation (solid_cylinder.instr)
+  component: mon_4pi
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 100000000
+  filename: solid_cylinder_multiple_scatter.dat
+  statistics: X0=-0.0110141; dX=110.726; Y0=0.506846; dY=35.6844;
+  signal: Min=0; Max=3.09742e-08; Mean=1.30036e-08;
+  values: 0.000842636 1.7675e-07 4.01253e+07
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data

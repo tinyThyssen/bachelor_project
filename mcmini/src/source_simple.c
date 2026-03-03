@@ -53,11 +53,9 @@ Particle source_simple_emit(const SourceSimple *src, RNG *rng) {
     Particle p = particle_make(pos, dir);
     p.lambda = lambda;
     /*
-      McStas-like Source_simple weighting (adapted to MCmini per-history normalization):
-      p = pmul * pdir
-
-      McStas pmul includes /Ncount, but MCmini monitor later divides by n_history,
-      so we intentionally omit /Ncount here.
+    Each pixel is now the weighted sum of neutron probabilities. 
+    The probability p of each neutron is the product of the source flux distribution (pmul) 
+    and the geometric factor (pdir) that accounts for the focusing and distance.
     */
     double src_area = 0.0;
     if (src->radius > 0.0) {

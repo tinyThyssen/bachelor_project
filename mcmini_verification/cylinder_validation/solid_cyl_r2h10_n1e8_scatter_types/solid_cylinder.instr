@@ -5,18 +5,13 @@
 DEFINE INSTRUMENT solid_cylinder_validation(
   lambda = 5.0,
   dlambda = 0.5,
-  cylinder_radius = 0.005, //m
-  cylinder_height = 0.02, //m
-  margin = 0.005, // margin added
-  unit_cell_volume = 13.827, // 
+  cylinder_radius = 0.02, //m
+  cylinder_height = 0.1, //m
+  margin = 0.01, // margin added to source focus size to ensure full illumination of cylinder
+  unit_cell_volume = 13.827,
   sigma_inc = 5.08,
   sigma_abs = 5.08
 )
-
-DECLARE
-%{
-  int    n_reflections;
-%}
 
 TRACE
 
@@ -63,9 +58,6 @@ AT (0,0,0) RELATIVE PREVIOUS
 
 COMPONENT master = Union_master()
 AT (0,0,0) ABSOLUTE
-EXTEND %{
-n_reflections = SCATTERED - 2;
-%}
 
 COMPONENT stop = Union_stop()
 AT (0,0,0) ABSOLUTE
@@ -81,11 +73,10 @@ COMPONENT mon_4pi = PSD_monitor_4PI(
   ny = 180,
   radius = 1.0,
   restore_neutron = 1,
-  filename = "solid_cylinder_multiple_scatter.dat"
+  filename = "solid_cylinder_scatter.dat"
 )
-WHEN (n_reflections >= 0)
+WHEN (SCATTERED >= 0)
 AT (0,0,0) ABSOLUTE
-
 COMPONENT mon_4pi_s1 = PSD_monitor_4PI(
   nx = 360,
   ny = 180,
@@ -93,7 +84,7 @@ COMPONENT mon_4pi_s1 = PSD_monitor_4PI(
   restore_neutron = 1,
   filename = "solid_cylinder_scatter_1.dat"
 )
-WHEN (n_reflections == 1)
+WHEN (SCATTERED == 1)
 AT (0,0,0) ABSOLUTE
 
 COMPONENT mon_4pi_s2 = PSD_monitor_4PI(
@@ -103,7 +94,7 @@ COMPONENT mon_4pi_s2 = PSD_monitor_4PI(
   restore_neutron = 1,
   filename = "solid_cylinder_scatter_2.dat"
 )
-WHEN (n_reflections == 2)
+WHEN (SCATTERED == 2)
 AT (0,0,0) ABSOLUTE
 
 COMPONENT mon_4pi_s3 = PSD_monitor_4PI(
@@ -113,7 +104,7 @@ COMPONENT mon_4pi_s3 = PSD_monitor_4PI(
   restore_neutron = 1,
   filename = "solid_cylinder_scatter_3.dat"
 )
-WHEN (n_reflections == 3)
+WHEN (SCATTERED == 3)
 AT (0,0,0) ABSOLUTE
 
 COMPONENT mon_4pi_s4 = PSD_monitor_4PI(
@@ -123,17 +114,7 @@ COMPONENT mon_4pi_s4 = PSD_monitor_4PI(
   restore_neutron = 1,
   filename = "solid_cylinder_scatter_4.dat"
 )
-WHEN (n_reflections == 4)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT mon_4pi_s5 = PSD_monitor_4PI(
-  nx = 360,
-  ny = 180,
-  radius = 1.0,
-  restore_neutron = 1,
-  filename = "solid_cylinder_scatter_5.dat"
-)
-WHEN (n_reflections == 5)
+WHEN (SCATTERED == 4)
 AT (0,0,0) ABSOLUTE
 
 

@@ -1,0 +1,164 @@
+mcstas simulation description file for solid_cylinder_validation.
+Date:    Tue Mar  3 12:42:40 2026
+Program:  3.5.32, git
+
+begin instrument: solid_cylinder_validation
+  File: solid_cyl_r0p5h2_n1e8_scatter_types/mccode
+  Source: solid_cylinder.instr
+  Parameters:  lambda(double) dlambda(double) cylinder_radius(double) cylinder_height(double) margin(double) unit_cell_volume(double) sigma_inc(double) sigma_abs(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: solid_cyl_r0p5h2_n1e8_scatter_types
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.5.32, git
+  Instrument: solid_cylinder.instr
+  Ncount: 100000000
+  Trace: no
+  Gravitation: no
+  Seed: 1772538131005221
+  Directory: solid_cyl_r0p5h2_n1e8_scatter_types
+  Param: lambda=5
+  Param: dlambda=0.5
+  Param: cylinder_radius=0.005
+  Param: cylinder_height=0.02
+  Param: margin=0.005
+  Param: unit_cell_volume=13.827
+  Param: sigma_inc=5.08
+  Param: sigma_abs=5.08
+end simulation
+
+begin data
+  Date: Tue Mar  3 12:43:31 2026 (1772538211)
+  type: array_2d(360, 180)
+  Source: solid_cylinder_validation (solid_cylinder.instr)
+  component: mon_4pi
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 100000000
+  filename: solid_cylinder_multiple_scatter.dat
+  statistics: X0=0.0302042; dX=107.312; Y0=0.511485; dY=36.9102;
+  signal: Min=0; Max=2.7357e-09; Mean=1.29836e-09;
+  values: 8.41338e-05 1.54779e-08 4.34532e+07
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data
+
+begin data
+  Date: Tue Mar  3 12:43:31 2026 (1772538211)
+  type: array_2d(360, 180)
+  Source: solid_cylinder_validation (solid_cylinder.instr)
+  component: mon_4pi_s1
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 100000000
+  filename: solid_cylinder_scatter_1.dat
+  statistics: X0=0.0278608; dX=107.475; Y0=0.512173; dY=36.9264;
+  signal: Min=0; Max=2.47914e-09; Mean=1.14554e-09;
+  values: 7.42309e-05 1.52343e-08 2.37854e+07
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data
+
+begin data
+  Date: Tue Mar  3 12:43:31 2026 (1772538211)
+  type: array_2d(360, 180)
+  Source: solid_cylinder_validation (solid_cylinder.instr)
+  component: mon_4pi_s2
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 100000000
+  filename: solid_cylinder_scatter_2.dat
+  statistics: X0=0.0497355; dX=106.185; Y0=0.509214; dY=36.7956;
+  signal: Min=0; Max=2.91513e-10; Mean=1.3415e-10;
+  values: 8.69292e-06 2.69053e-09 1.05147e+07
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data
+
+begin data
+  Date: Tue Mar  3 12:43:31 2026 (1772538211)
+  type: array_2d(360, 180)
+  Source: solid_cylinder_validation (solid_cylinder.instr)
+  component: mon_4pi_s3
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 100000000
+  filename: solid_cylinder_scatter_3.dat
+  statistics: X0=0.0321471; dX=105.431; Y0=0.485175; dY=36.7419;
+  signal: Min=0; Max=3.84095e-11; Mean=1.63525e-11;
+  values: 1.05964e-06 4.85582e-10 4.84005e+06
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data
+
+begin data
+  Date: Tue Mar  3 12:43:31 2026 (1772538211)
+  type: array_2d(360, 180)
+  Source: solid_cylinder_validation (solid_cylinder.instr)
+  component: mon_4pi_s4
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 100000000
+  filename: solid_cylinder_scatter_4.dat
+  statistics: X0=0.045275; dX=104.886; Y0=0.494101; dY=36.7266;
+  signal: Min=0; Max=5.37383e-12; Mean=2.02983e-12;
+  values: 1.31533e-07 8.85696e-11 2.26997e+06
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data
+
+begin data
+  Date: Tue Mar  3 12:43:31 2026 (1772538211)
+  type: array_2d(360, 180)
+  Source: solid_cylinder_validation (solid_cylinder.instr)
+  component: mon_4pi_s5
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 100000000
+  filename: solid_cylinder_scatter_5.dat
+  statistics: X0=0.0545517; dX=104.515; Y0=0.443495; dY=36.688;
+  signal: Min=0; Max=8.19345e-13; Mean=2.53484e-13;
+  values: 1.64258e-08 1.62265e-11 1.07168e+06
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data
