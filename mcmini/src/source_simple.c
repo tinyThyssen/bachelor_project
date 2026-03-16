@@ -86,6 +86,8 @@ Particle source_simple_emit(const SourceSimple *src, RNG *rng) {
         pmul = 1.0 / (4.0 * M_PI);
     }
 
+    // correct for focusing and distance
     p.p = pmul * pdir;
+
     return p;
 }

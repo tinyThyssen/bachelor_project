@@ -28,6 +28,7 @@ int monitor_flat_open(MonitorFlat *m, const char *path, Vec3 center, double xwid
     m->mode = MONITOR_FLAT_EVENTS;
     m->nx = m->ny = 0;
     m->I = NULL;
+    m->L = NULL;
     m->hits_total = 0;
     m->hits_in = 0;
     m->n_history = 0;
@@ -54,6 +55,7 @@ int monitor_flat_open_binned(MonitorFlat *m, const char *path, Vec3 center, // f
     m->nx = nx;
     m->ny = ny;
     m->I = NULL;
+    m->L = NULL;
     m->hits_total = 0;
     m->hits_in = 0;
     m->n_history = n_history;
@@ -68,12 +70,20 @@ int monitor_flat_open_binned(MonitorFlat *m, const char *path, Vec3 center, // f
     size_t n = (size_t)nx * (size_t)ny;
     m->I = (double*)calloc(n, sizeof(double));
     if (!m->I) return 0;
+    m->L = (double*)calloc(n, sizeof(double));
+    if (!m->L) {
+        free(m->I);
+        m->I = NULL;
+        return 0;
+    }
 
     // open output file and write header
     m->fpt = fopen(path, "w");
     if (!m->fpt) {
         free(m->I);
         m->I = NULL;
+        free(m->L);
+        m->L = NULL;
         return 0;
     }
 
@@ -83,7 +93,7 @@ int monitor_flat_open_binned(MonitorFlat *m, const char *path, Vec3 center, // f
     fprintf(m->fpt, "# xmin=%.12g xmax=%.12g ymin=%.12g ymax=%.12g\n",
             m->xmin, m->xmax, m->ymin, m->ymax);
     fprintf(m->fpt, "# n_history=%lld\n", m->n_history);
-    fprintf(m->fpt, "# columns: ix,iy,I\n");
+    fprintf(m->fpt, "# columns: ix,iy,I,L,lambda_mean\n");
     return 1;
 }
 
@@ -126,6 +136,7 @@ int monitor_flat_record(MonitorFlat *m, const Particle *p) { // record one parti
 
     size_t idx = (size_t)iy * (size_t)m->nx + (size_t)ix;
     m->I[idx] += p->p;  // sum of weights
+    m->L[idx] += p->p * p->lambda; // weighted wavelength sum
     return 1;
 }
 
@@ -135,7 +146,10 @@ void monitor_flat_normalize_per_history(MonitorFlat *m) { // normalize binned in
 
     size_t n = (size_t)m->nx * (size_t)m->ny;
     double invN = 1.0 / (double)m->n_history;
-    for (size_t i = 0; i < n; i++) m->I[i] *= invN;
+    for (size_t i = 0; i < n; i++) {
+        m->I[i] *= invN;
+        m->L[i] *= invN;
+    }
 }
 
 void monitor_flat_scale_to_total_I(MonitorFlat *m, double Itarget) { // scale binned intensity so that sum(I) matches Itarget
@@ -147,17 +161,23 @@ void monitor_flat_scale_to_total_I(MonitorFlat *m, double Itarget) { // scale bi
     if (sum <= 0.0) return;
 
     double s = Itarget / sum;
-    for (size_t i = 0; i < n; i++) m->I[i] *= s;
+    for (size_t i = 0; i < n; i++) {
+        m->I[i] *= s;
+        m->L[i] *= s;
+    }
 }
 
 void monitor_flat_close(MonitorFlat *m) {
-    if (m->mode == MONITOR_FLAT_BINNED && m->fpt && m->I) {
+    if (m->mode == MONITOR_FLAT_BINNED && m->fpt && m->I && m->L) {
         // Write binned data
         fprintf(m->fpt, "# hits_total=%lld hits_in=%lld\n", m->hits_total, m->hits_in);
         for (int iy = 0; iy < m->ny; iy++) {
             for (int ix = 0; ix < m->nx; ix++) {
                 size_t idx = (size_t)iy * (size_t)m->nx + (size_t)ix;
-                fprintf(m->fpt, "%d,%d,%.12g\n", ix, iy, m->I[idx]);
+                double lambda_mean = 0.0;
+                if (m->I[idx] > 0.0) lambda_mean = m->L[idx] / m->I[idx];
+                fprintf(m->fpt, "%d,%d,%.12g,%.12g,%.12g\n",
+                        ix, iy, m->I[idx], m->L[idx], lambda_mean);
             }
         }
     }
@@ -167,4 +187,6 @@ void monitor_flat_close(MonitorFlat *m) {
 
     free(m->I);
     m->I = NULL;
+    free(m->L);
+    m->L = NULL;
 }

@@ -37,7 +37,7 @@ static int ray_sphere_first_hit(Vec3 r0, Vec3 dir, Vec3 C, double R, double *t_h
 
     // discriminant: disc = b^2 - 4ac
     double disc = b*b - 4.0*a*c;
-    if (disc < 0.0) return 0; // no real roots, no intersection
+    if (disc < 0.0) return 0; // no real roots, no intersection. cutoff at 0 to avoid numerical issues with grazing rays
 
     // roots of quadratic: t = (-b ± sqrt(disc)) / (2a)
     double sqrt_disc = sqrt(disc);

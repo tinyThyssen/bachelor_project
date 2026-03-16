@@ -50,9 +50,9 @@ static int ray_cyl_intersect(
     Vec3 oc = v_sub(r0, center);
 
     // Interval from radial condition x^2+z^2 <= R^2 for infinite cylinder.
-    double a = dir.x*dir.x + dir.z*dir.z;
-    double b = 2.0*(oc.x*dir.x + oc.z*dir.z);
-    double c = oc.x*oc.x + oc.z*oc.z - radius*radius;
+    double a = dir.x*dir.x + dir.z*dir.z; // a = vx^2 + vz^2. dir ≈ 1. keep for generality
+    double b = 2.0*(oc.x*dir.x + oc.z*dir.z); // 
+    double c = oc.x*oc.x + oc.z*oc.z - radius*radius; // c = x^2 + z^2 - R^2. oc . oc = |oc|^2 = x^2 + y^2 + z^2, but we only want x^2 + z^2
 
     double t_side_min = -INFINITY;
     double t_side_max =  INFINITY;

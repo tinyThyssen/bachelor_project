@@ -11,7 +11,8 @@ SRC = \
   src/source_simple.c \
   src/monitor_sphere.c \
   src/monitor_flat.c \
-  src/scatterer_cyl.c
+  src/scatterer_cyl.c \
+  src/scatterer_sphere.c 
 OUT = disk_source
 
 all:

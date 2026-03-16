@@ -26,6 +26,7 @@ typedef struct {
     int nx, ny;
     double xmin, xmax, ymin, ymax;
     double *I;        // intensity sum per bin (row-major: iy*nx + ix)
+    double *L;        // weighted wavelength sum per bin: sum(p*lambda)
     long long hits_total;
     long long hits_in;
 

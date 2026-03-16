@@ -1,0 +1,48 @@
+# Format: McCode with text headers
+# URL: http://www.mccode.org
+# Creator:  3.5.32, git
+# Instrument: flat_plane_monitor.instr
+# Ncount: 1000000
+# Trace: no
+# Gravitation: no
+# Seed: 1772725141164056
+# Directory: flat_monitor
+# Param: lambda=4
+# Param: dlambda=0.1
+# Date: Thu Mar  5 16:39:02 2026 (1772725142)
+# type: array_1d(20)
+# Source: beam_validate (flat_plane_monitor.instr)
+# component: L_mon
+# position: 0 0 1
+# title: Wavelength monitor
+# Ncount: 1000000
+# filename: wavelength.dat
+# statistics: X0=4.00008; dX=0.0499999;
+# signal: Min=0; Max=4.73731; Mean=0.473013;
+# values: 9.46026 0.00946963 1e+06
+# xvar: L
+# yvar: (I,I_err)
+# xlabel: Wavelength [AA]
+# ylabel: Intensity
+# xlimits: 3 5
+# variables: L I I_err N
+3.05 0 0 0 
+3.15 0 0 0 
+3.25 0 0 0 
+3.35 0 0 0 
+3.45 0 0 0 
+3.55 0 0 0 
+3.65 0 0 0 
+3.75 0 0 0 
+3.85 0 0 0 
+3.95 4.722952995 0.00669076143 499275 
+4.05 4.737305706 0.006701306939 500725 
+4.15 0 0 0 
+4.25 0 0 0 
+4.35 0 0 0 
+4.45 0 0 0 
+4.55 0 0 0 
+4.65 0 0 0 
+4.75 0 0 0 
+4.85 0 0 0 
+4.95 0 0 0 
