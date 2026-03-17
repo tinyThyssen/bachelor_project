@@ -26,11 +26,15 @@ typedef struct {
     double phi_min, phi_max; // [-180, 180) degrees
     double theta_min, theta_max;   // [-90, 90] degrees
     double *I;               // size nx*ny
+    double *sum_w2;          // size nx*ny, stores sum of squared weights for variance estimates
 
     // beamstop settings
     int beamstop_enabled;
     double beamstop_radius;
     Vec3 beamstop_center;
+
+    // if nonzero, binned mode uses only the ray direction for angular binning
+    int direction_only;
 } MonitorSphere;
 
 

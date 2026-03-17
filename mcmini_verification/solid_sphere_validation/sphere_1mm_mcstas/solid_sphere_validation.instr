@@ -5,11 +5,11 @@
 DEFINE INSTRUMENT solid_sphere_validation(
   lambda = 4.0,
   dlambda = 0.1,
-  sphere_radius = 0.01,
-  source_radius = 0.01,
+  sphere_radius = 0.001,
+  source_radius = 0.001,
   source_dist = 1.0,
-  focus_xw = 0.02,
-  focus_yh = 0.02,
+  focus_xw = 0.002,
+  focus_yh = 0.002,
   sigma_inc = 5.08,
   sigma_abs = 5.08,
   unit_cell_volume = 13.827
@@ -71,6 +71,10 @@ n_reflections = SCATTERED - 2;
 COMPONENT stop = Union_stop()
 AT (0,0,0) ABSOLUTE
 
+COMPONENT beamstop = Beamstop(
+  radius = 0.06
+) 
+AT (0,0, 1.0) RELATIVE Origin
 
 COMPONENT mon_4pi = PSD_monitor_4PI(
   nx = 360,
@@ -79,7 +83,7 @@ COMPONENT mon_4pi = PSD_monitor_4PI(
   restore_neutron = 1,
   filename = "solid_cylinder_multiple_scatter.dat"
 )
-WHEN (n_reflections > 0)
+WHEN (n_reflections >= 0)
 AT (0,0,0) ABSOLUTE
 
 COMPONENT mon_4pi_s1 = PSD_monitor_4PI(

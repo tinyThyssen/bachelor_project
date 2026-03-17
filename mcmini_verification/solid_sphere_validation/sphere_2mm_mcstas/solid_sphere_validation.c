@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: solid_sphere_validation.instr (solid_sphere_validation)
- * Date:       Tue Mar 17 17:13:48 2026
+ * Date:       Tue Mar 17 10:47:49 2026
  * File:       ./solid_sphere_validation.c
  * CFLAGS= -DFUNNEL 
  */
@@ -6950,12 +6950,12 @@ typedef struct _struct_instrument_parameters _class_instrument_parameters;
 struct _instrument_struct {
   char   _name[256]; /* the name of this instrument e.g. 'solid_sphere_validation' */
 /* Counters per component instance */
-  double counter_AbsorbProp[16]; /* absorbed events in PROP routines */
-  double counter_N[16], counter_P[16], counter_P2[16]; /* event counters after each component instance */
-  _class_particle _trajectory[16]; /* current trajectory for STORE/RESTORE */
+  double counter_AbsorbProp[17]; /* absorbed events in PROP routines */
+  double counter_N[17], counter_P[17], counter_P2[17]; /* event counters after each component instance */
+  _class_particle _trajectory[17]; /* current trajectory for STORE/RESTORE */
 /* Components position table (absolute and relative coords) */
-  Coords _position_relative[16]; /* positions of all components */
-  Coords _position_absolute[16];
+  Coords _position_relative[17]; /* positions of all components */
+  Coords _position_absolute[17];
   _class_instrument_parameters _parameters; /* instrument parameters */
 } _instrument_var;
 struct _instrument_struct *instrument = & _instrument_var;
@@ -6966,11 +6966,11 @@ int numipar = 10;
 struct mcinputtable_struct mcinputtable[] = {
   "lambda", &(_instrument_var._parameters.lambda), instr_type_double, "4.0", "",
   "dlambda", &(_instrument_var._parameters.dlambda), instr_type_double, "0.1", "",
-  "sphere_radius", &(_instrument_var._parameters.sphere_radius), instr_type_double, "0.01", "",
-  "source_radius", &(_instrument_var._parameters.source_radius), instr_type_double, "0.01", "",
+  "sphere_radius", &(_instrument_var._parameters.sphere_radius), instr_type_double, "0.002", "",
+  "source_radius", &(_instrument_var._parameters.source_radius), instr_type_double, "0.002", "",
   "source_dist", &(_instrument_var._parameters.source_dist), instr_type_double, "1.0", "",
-  "focus_xw", &(_instrument_var._parameters.focus_xw), instr_type_double, "0.02", "",
-  "focus_yh", &(_instrument_var._parameters.focus_yh), instr_type_double, "0.02", "",
+  "focus_xw", &(_instrument_var._parameters.focus_xw), instr_type_double, "0.004", "",
+  "focus_yh", &(_instrument_var._parameters.focus_yh), instr_type_double, "0.004", "",
   "sigma_inc", &(_instrument_var._parameters.sigma_inc), instr_type_double, "5.08", "",
   "sigma_abs", &(_instrument_var._parameters.sigma_abs), instr_type_double, "5.08", "",
   "unit_cell_volume", &(_instrument_var._parameters.unit_cell_volume), instr_type_double, "13.827", "",
@@ -16272,7 +16272,38 @@ typedef struct _struct_Union_stop _class_Union_stop;
 _class_Union_stop _stop_var;
 #pragma acc declare create ( _stop_var )
 
-/* component mon_4pi=PSD_monitor_4PI() [9] DECLARE */
+/* component beamstop=Beamstop() [9] DECLARE */
+/* Parameter definition for component type 'Beamstop' */
+struct _struct_Beamstop_parameters {
+  /* Component type 'Beamstop' setting parameters */
+  MCNUM xmin;
+  MCNUM xmax;
+  MCNUM ymin;
+  MCNUM ymax;
+  MCNUM xwidth;
+  MCNUM yheight;
+  MCNUM radius;
+}; /* _struct_Beamstop_parameters */
+typedef struct _struct_Beamstop_parameters _class_Beamstop_parameters;
+
+/* Parameters for component type 'Beamstop' */
+struct _struct_Beamstop {
+  char     _name[256]; /* e.g. beamstop */
+  char     _type[256]; /* Beamstop */
+  long     _index; /* e.g. 2 index in TRACE list */
+  Coords   _position_absolute;
+  Coords   _position_relative; /* wrt PREVIOUS */
+  Rotation _rotation_absolute;
+  Rotation _rotation_relative; /* wrt PREVIOUS */
+  int      _rotation_is_identity;
+  int      _position_relative_is_zero;
+  _class_Beamstop_parameters _parameters;
+};
+typedef struct _struct_Beamstop _class_Beamstop;
+_class_Beamstop _beamstop_var;
+#pragma acc declare create ( _beamstop_var )
+
+/* component mon_4pi=PSD_monitor_4PI() [10] DECLARE */
 /* Parameter definition for component type 'PSD_monitor_4PI' */
 struct _struct_PSD_monitor_4PI_parameters {
   /* Component type 'PSD_monitor_4PI' setting parameters */
@@ -16321,7 +16352,7 @@ _class_PSD_monitor_4PI _mon_4pi_s4_var;
 _class_PSD_monitor_4PI _mon_4pi_s5_var;
 #pragma acc declare create ( _mon_4pi_s5_var )
 
-int mcNUMCOMP = 14;
+int mcNUMCOMP = 15;
 
 /* User declarations from instrument definition. Can define functions. */
   int    n_reflections;
@@ -16867,14 +16898,78 @@ int _stop_setpos(void)
   return(0);
 } /* _stop_setpos */
 
+/* component beamstop=Beamstop() SETTING, POSITION/ROTATION */
+int _beamstop_setpos(void)
+{ /* sets initial component parameters, position and rotation */
+  SIG_MESSAGE("[_beamstop_setpos] component beamstop=Beamstop() SETTING [Beamstop:0]");
+  stracpy(_beamstop_var._name, "beamstop", 16384);
+  stracpy(_beamstop_var._type, "Beamstop", 16384);
+  _beamstop_var._index=9;
+  int current_setpos_index = 9;
+  _beamstop_var._parameters.xmin = -0.05;
+  _beamstop_var._parameters.xmax = 0.05;
+  _beamstop_var._parameters.ymin = -0.05;
+  _beamstop_var._parameters.ymax = 0.05;
+  _beamstop_var._parameters.xwidth = 0;
+  _beamstop_var._parameters.yheight = 0;
+  _beamstop_var._parameters.radius = 0.06;
+
+  /* component beamstop=Beamstop() AT ROTATED */
+  {
+    Coords tc1, tc2;
+    tc1 = coords_set(0,0,0);
+    tc2 = coords_set(0,0,0);
+    Rotation tr1;
+    rot_set_rotation(tr1,0,0,0);
+    rot_set_rotation(tr1,
+      (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
+    rot_mul(tr1, _Origin_var._rotation_absolute, _beamstop_var._rotation_absolute);
+    rot_transpose(_master_var._rotation_absolute, tr1);
+    rot_mul(_beamstop_var._rotation_absolute, tr1, _beamstop_var._rotation_relative);
+    _beamstop_var._rotation_is_identity =  rot_test_identity(_beamstop_var._rotation_relative);
+    tc1 = coords_set(
+      0, 0, 1.0);
+    rot_transpose(_Origin_var._rotation_absolute, tr1);
+    tc2 = rot_apply(tr1, tc1);
+    _beamstop_var._position_absolute = coords_add(_Origin_var._position_absolute, tc2);
+    tc1 = coords_sub(_master_var._position_absolute, _beamstop_var._position_absolute);
+    _beamstop_var._position_relative = rot_apply(_beamstop_var._rotation_absolute, tc1);
+  } /* beamstop=Beamstop() AT ROTATED */
+  DEBUG_COMPONENT("beamstop", _beamstop_var._position_absolute, _beamstop_var._rotation_absolute);
+  instrument->_position_absolute[9] = _beamstop_var._position_absolute;
+  instrument->_position_relative[9] = _beamstop_var._position_relative;
+    _beamstop_var._position_relative_is_zero =  coords_test_zero(_beamstop_var._position_relative);
+  instrument->counter_N[9]  = instrument->counter_P[9] = instrument->counter_P2[9] = 0;
+  instrument->counter_AbsorbProp[9]= 0;
+  #ifdef USE_NEXUS
+  if(nxhandle) {
+    if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
+    MPI_MASTER(
+        mccomp_placement_type_nexus(nxhandle,"0008_beamstop", _beamstop_var._position_absolute, _beamstop_var._rotation_absolute, "Beamstop");
+        mccomp_param_nexus(nxhandle,"0008_beamstop", "xmin", "-0.05", "-0.05","MCNUM");
+        mccomp_param_nexus(nxhandle,"0008_beamstop", "xmax", "0.05", "0.05","MCNUM");
+        mccomp_param_nexus(nxhandle,"0008_beamstop", "ymin", "-0.05", "-0.05","MCNUM");
+        mccomp_param_nexus(nxhandle,"0008_beamstop", "ymax", "0.05", "0.05","MCNUM");
+        mccomp_param_nexus(nxhandle,"0008_beamstop", "xwidth", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0008_beamstop", "yheight", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0008_beamstop", "radius", "0", "0.06","MCNUM");
+      );
+    }
+  } else {
+    // fprintf(stderr,"NO NEXUS FILE");
+  }
+  #endif
+  return(0);
+} /* _beamstop_setpos */
+
 /* component mon_4pi=PSD_monitor_4PI() SETTING, POSITION/ROTATION */
 int _mon_4pi_setpos(void)
 { /* sets initial component parameters, position and rotation */
   SIG_MESSAGE("[_mon_4pi_setpos] component mon_4pi=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_var._name, "mon_4pi", 16384);
   stracpy(_mon_4pi_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_var._index=9;
-  int current_setpos_index = 9;
+  _mon_4pi_var._index=10;
+  int current_setpos_index = 10;
   _mon_4pi_var._parameters.nx = 360;
   _mon_4pi_var._parameters.ny = 180;
   if("solid_cylinder_multiple_scatter.dat" && strlen("solid_cylinder_multiple_scatter.dat"))
@@ -16895,31 +16990,31 @@ int _mon_4pi_setpos(void)
     rot_set_rotation(tr1,0,0,0);
     rot_set_rotation(_mon_4pi_var._rotation_absolute,
       (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
-    rot_transpose(_master_var._rotation_absolute, tr1);
+    rot_transpose(_beamstop_var._rotation_absolute, tr1);
     rot_mul(_mon_4pi_var._rotation_absolute, tr1, _mon_4pi_var._rotation_relative);
     _mon_4pi_var._rotation_is_identity =  rot_test_identity(_mon_4pi_var._rotation_relative);
     _mon_4pi_var._position_absolute = coords_set(
       0, 0, 0);
-    tc1 = coords_sub(_master_var._position_absolute, _mon_4pi_var._position_absolute);
+    tc1 = coords_sub(_beamstop_var._position_absolute, _mon_4pi_var._position_absolute);
     _mon_4pi_var._position_relative = rot_apply(_mon_4pi_var._rotation_absolute, tc1);
   } /* mon_4pi=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute);
-  instrument->_position_absolute[9] = _mon_4pi_var._position_absolute;
-  instrument->_position_relative[9] = _mon_4pi_var._position_relative;
+  instrument->_position_absolute[10] = _mon_4pi_var._position_absolute;
+  instrument->_position_relative[10] = _mon_4pi_var._position_relative;
     _mon_4pi_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_var._position_relative);
-  instrument->counter_N[9]  = instrument->counter_P[9] = instrument->counter_P2[9] = 0;
-  instrument->counter_AbsorbProp[9]= 0;
+  instrument->counter_N[10]  = instrument->counter_P[10] = instrument->counter_P2[10] = 0;
+  instrument->counter_AbsorbProp[10]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0008_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0008_mon_4pi", "nx", "90", "360","int");
-        mccomp_param_nexus(nxhandle,"0008_mon_4pi", "ny", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0008_mon_4pi", "filename", 0, "solid_cylinder_multiple_scatter.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0008_mon_4pi", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0008_mon_4pi", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0008_mon_4pi", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0009_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "nx", "90", "360","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "ny", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "filename", 0, "solid_cylinder_multiple_scatter.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -16935,8 +17030,8 @@ int _mon_4pi_s1_setpos(void)
   SIG_MESSAGE("[_mon_4pi_s1_setpos] component mon_4pi_s1=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_s1_var._name, "mon_4pi_s1", 16384);
   stracpy(_mon_4pi_s1_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_s1_var._index=10;
-  int current_setpos_index = 10;
+  _mon_4pi_s1_var._index=11;
+  int current_setpos_index = 11;
   _mon_4pi_s1_var._parameters.nx = 360;
   _mon_4pi_s1_var._parameters.ny = 180;
   if("solid_cylinder_scatter_1.dat" && strlen("solid_cylinder_scatter_1.dat"))
@@ -16966,22 +17061,22 @@ int _mon_4pi_s1_setpos(void)
     _mon_4pi_s1_var._position_relative = rot_apply(_mon_4pi_s1_var._rotation_absolute, tc1);
   } /* mon_4pi_s1=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi_s1", _mon_4pi_s1_var._position_absolute, _mon_4pi_s1_var._rotation_absolute);
-  instrument->_position_absolute[10] = _mon_4pi_s1_var._position_absolute;
-  instrument->_position_relative[10] = _mon_4pi_s1_var._position_relative;
+  instrument->_position_absolute[11] = _mon_4pi_s1_var._position_absolute;
+  instrument->_position_relative[11] = _mon_4pi_s1_var._position_relative;
     _mon_4pi_s1_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_s1_var._position_relative);
-  instrument->counter_N[10]  = instrument->counter_P[10] = instrument->counter_P2[10] = 0;
-  instrument->counter_AbsorbProp[10]= 0;
+  instrument->counter_N[11]  = instrument->counter_P[11] = instrument->counter_P2[11] = 0;
+  instrument->counter_AbsorbProp[11]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0009_mon_4pi_s1", _mon_4pi_s1_var._position_absolute, _mon_4pi_s1_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0009_mon_4pi_s1", "nx", "90", "360","int");
-        mccomp_param_nexus(nxhandle,"0009_mon_4pi_s1", "ny", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0009_mon_4pi_s1", "filename", 0, "solid_cylinder_scatter_1.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0009_mon_4pi_s1", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0009_mon_4pi_s1", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0009_mon_4pi_s1", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0010_mon_4pi_s1", _mon_4pi_s1_var._position_absolute, _mon_4pi_s1_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s1", "nx", "90", "360","int");
+        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s1", "ny", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s1", "filename", 0, "solid_cylinder_scatter_1.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s1", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s1", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s1", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -16997,8 +17092,8 @@ int _mon_4pi_s2_setpos(void)
   SIG_MESSAGE("[_mon_4pi_s2_setpos] component mon_4pi_s2=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_s2_var._name, "mon_4pi_s2", 16384);
   stracpy(_mon_4pi_s2_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_s2_var._index=11;
-  int current_setpos_index = 11;
+  _mon_4pi_s2_var._index=12;
+  int current_setpos_index = 12;
   _mon_4pi_s2_var._parameters.nx = 360;
   _mon_4pi_s2_var._parameters.ny = 180;
   if("solid_cylinder_scatter_2.dat" && strlen("solid_cylinder_scatter_2.dat"))
@@ -17028,22 +17123,22 @@ int _mon_4pi_s2_setpos(void)
     _mon_4pi_s2_var._position_relative = rot_apply(_mon_4pi_s2_var._rotation_absolute, tc1);
   } /* mon_4pi_s2=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi_s2", _mon_4pi_s2_var._position_absolute, _mon_4pi_s2_var._rotation_absolute);
-  instrument->_position_absolute[11] = _mon_4pi_s2_var._position_absolute;
-  instrument->_position_relative[11] = _mon_4pi_s2_var._position_relative;
+  instrument->_position_absolute[12] = _mon_4pi_s2_var._position_absolute;
+  instrument->_position_relative[12] = _mon_4pi_s2_var._position_relative;
     _mon_4pi_s2_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_s2_var._position_relative);
-  instrument->counter_N[11]  = instrument->counter_P[11] = instrument->counter_P2[11] = 0;
-  instrument->counter_AbsorbProp[11]= 0;
+  instrument->counter_N[12]  = instrument->counter_P[12] = instrument->counter_P2[12] = 0;
+  instrument->counter_AbsorbProp[12]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0010_mon_4pi_s2", _mon_4pi_s2_var._position_absolute, _mon_4pi_s2_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s2", "nx", "90", "360","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s2", "ny", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s2", "filename", 0, "solid_cylinder_scatter_2.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s2", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s2", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi_s2", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0011_mon_4pi_s2", _mon_4pi_s2_var._position_absolute, _mon_4pi_s2_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s2", "nx", "90", "360","int");
+        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s2", "ny", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s2", "filename", 0, "solid_cylinder_scatter_2.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s2", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s2", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s2", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -17059,8 +17154,8 @@ int _mon_4pi_s3_setpos(void)
   SIG_MESSAGE("[_mon_4pi_s3_setpos] component mon_4pi_s3=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_s3_var._name, "mon_4pi_s3", 16384);
   stracpy(_mon_4pi_s3_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_s3_var._index=12;
-  int current_setpos_index = 12;
+  _mon_4pi_s3_var._index=13;
+  int current_setpos_index = 13;
   _mon_4pi_s3_var._parameters.nx = 360;
   _mon_4pi_s3_var._parameters.ny = 180;
   if("solid_cylinder_scatter_3.dat" && strlen("solid_cylinder_scatter_3.dat"))
@@ -17090,22 +17185,22 @@ int _mon_4pi_s3_setpos(void)
     _mon_4pi_s3_var._position_relative = rot_apply(_mon_4pi_s3_var._rotation_absolute, tc1);
   } /* mon_4pi_s3=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi_s3", _mon_4pi_s3_var._position_absolute, _mon_4pi_s3_var._rotation_absolute);
-  instrument->_position_absolute[12] = _mon_4pi_s3_var._position_absolute;
-  instrument->_position_relative[12] = _mon_4pi_s3_var._position_relative;
+  instrument->_position_absolute[13] = _mon_4pi_s3_var._position_absolute;
+  instrument->_position_relative[13] = _mon_4pi_s3_var._position_relative;
     _mon_4pi_s3_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_s3_var._position_relative);
-  instrument->counter_N[12]  = instrument->counter_P[12] = instrument->counter_P2[12] = 0;
-  instrument->counter_AbsorbProp[12]= 0;
+  instrument->counter_N[13]  = instrument->counter_P[13] = instrument->counter_P2[13] = 0;
+  instrument->counter_AbsorbProp[13]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0011_mon_4pi_s3", _mon_4pi_s3_var._position_absolute, _mon_4pi_s3_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s3", "nx", "90", "360","int");
-        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s3", "ny", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s3", "filename", 0, "solid_cylinder_scatter_3.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s3", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s3", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0011_mon_4pi_s3", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0012_mon_4pi_s3", _mon_4pi_s3_var._position_absolute, _mon_4pi_s3_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s3", "nx", "90", "360","int");
+        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s3", "ny", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s3", "filename", 0, "solid_cylinder_scatter_3.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s3", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s3", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s3", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -17121,8 +17216,8 @@ int _mon_4pi_s4_setpos(void)
   SIG_MESSAGE("[_mon_4pi_s4_setpos] component mon_4pi_s4=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_s4_var._name, "mon_4pi_s4", 16384);
   stracpy(_mon_4pi_s4_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_s4_var._index=13;
-  int current_setpos_index = 13;
+  _mon_4pi_s4_var._index=14;
+  int current_setpos_index = 14;
   _mon_4pi_s4_var._parameters.nx = 360;
   _mon_4pi_s4_var._parameters.ny = 180;
   if("solid_cylinder_scatter_4.dat" && strlen("solid_cylinder_scatter_4.dat"))
@@ -17152,22 +17247,22 @@ int _mon_4pi_s4_setpos(void)
     _mon_4pi_s4_var._position_relative = rot_apply(_mon_4pi_s4_var._rotation_absolute, tc1);
   } /* mon_4pi_s4=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi_s4", _mon_4pi_s4_var._position_absolute, _mon_4pi_s4_var._rotation_absolute);
-  instrument->_position_absolute[13] = _mon_4pi_s4_var._position_absolute;
-  instrument->_position_relative[13] = _mon_4pi_s4_var._position_relative;
+  instrument->_position_absolute[14] = _mon_4pi_s4_var._position_absolute;
+  instrument->_position_relative[14] = _mon_4pi_s4_var._position_relative;
     _mon_4pi_s4_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_s4_var._position_relative);
-  instrument->counter_N[13]  = instrument->counter_P[13] = instrument->counter_P2[13] = 0;
-  instrument->counter_AbsorbProp[13]= 0;
+  instrument->counter_N[14]  = instrument->counter_P[14] = instrument->counter_P2[14] = 0;
+  instrument->counter_AbsorbProp[14]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0012_mon_4pi_s4", _mon_4pi_s4_var._position_absolute, _mon_4pi_s4_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s4", "nx", "90", "360","int");
-        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s4", "ny", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s4", "filename", 0, "solid_cylinder_scatter_4.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s4", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s4", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0012_mon_4pi_s4", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0013_mon_4pi_s4", _mon_4pi_s4_var._position_absolute, _mon_4pi_s4_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s4", "nx", "90", "360","int");
+        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s4", "ny", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s4", "filename", 0, "solid_cylinder_scatter_4.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s4", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s4", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s4", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -17183,8 +17278,8 @@ int _mon_4pi_s5_setpos(void)
   SIG_MESSAGE("[_mon_4pi_s5_setpos] component mon_4pi_s5=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_s5_var._name, "mon_4pi_s5", 16384);
   stracpy(_mon_4pi_s5_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_s5_var._index=14;
-  int current_setpos_index = 14;
+  _mon_4pi_s5_var._index=15;
+  int current_setpos_index = 15;
   _mon_4pi_s5_var._parameters.nx = 360;
   _mon_4pi_s5_var._parameters.ny = 180;
   if("solid_cylinder_scatter_5.dat" && strlen("solid_cylinder_scatter_5.dat"))
@@ -17214,22 +17309,22 @@ int _mon_4pi_s5_setpos(void)
     _mon_4pi_s5_var._position_relative = rot_apply(_mon_4pi_s5_var._rotation_absolute, tc1);
   } /* mon_4pi_s5=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi_s5", _mon_4pi_s5_var._position_absolute, _mon_4pi_s5_var._rotation_absolute);
-  instrument->_position_absolute[14] = _mon_4pi_s5_var._position_absolute;
-  instrument->_position_relative[14] = _mon_4pi_s5_var._position_relative;
+  instrument->_position_absolute[15] = _mon_4pi_s5_var._position_absolute;
+  instrument->_position_relative[15] = _mon_4pi_s5_var._position_relative;
     _mon_4pi_s5_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_s5_var._position_relative);
-  instrument->counter_N[14]  = instrument->counter_P[14] = instrument->counter_P2[14] = 0;
-  instrument->counter_AbsorbProp[14]= 0;
+  instrument->counter_N[15]  = instrument->counter_P[15] = instrument->counter_P2[15] = 0;
+  instrument->counter_AbsorbProp[15]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0013_mon_4pi_s5", _mon_4pi_s5_var._position_absolute, _mon_4pi_s5_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s5", "nx", "90", "360","int");
-        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s5", "ny", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s5", "filename", 0, "solid_cylinder_scatter_5.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s5", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s5", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0013_mon_4pi_s5", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0014_mon_4pi_s5", _mon_4pi_s5_var._position_absolute, _mon_4pi_s5_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0014_mon_4pi_s5", "nx", "90", "360","int");
+        mccomp_param_nexus(nxhandle,"0014_mon_4pi_s5", "ny", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0014_mon_4pi_s5", "filename", 0, "solid_cylinder_scatter_5.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0014_mon_4pi_s5", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0014_mon_4pi_s5", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0014_mon_4pi_s5", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -18860,6 +18955,32 @@ exit(-1);
   return(_comp);
 } /* class_Union_master_init */
 
+_class_Beamstop *class_Beamstop_init(_class_Beamstop *_comp
+) {
+  #define xmin (_comp->_parameters.xmin)
+  #define xmax (_comp->_parameters.xmax)
+  #define ymin (_comp->_parameters.ymin)
+  #define ymax (_comp->_parameters.ymax)
+  #define xwidth (_comp->_parameters.xwidth)
+  #define yheight (_comp->_parameters.yheight)
+  #define radius (_comp->_parameters.radius)
+  SIG_MESSAGE("[_beamstop_init] component beamstop=Beamstop() INITIALISE [Beamstop:0]");
+
+if (xwidth  > 0) { xmax = xwidth/2;  xmin = -xmax; }
+  if (yheight > 0) { ymax = yheight/2; ymin = -ymax; }
+
+  if (xmin == 0 && xmax == 0 && ymin == 0 & ymax == 0 && radius == 0)
+  { fprintf(stderr,"Beamstop: %s: Error: give geometry\n", NAME_CURRENT_COMP); exit(-1); }
+  #undef xmin
+  #undef xmax
+  #undef ymin
+  #undef ymax
+  #undef xwidth
+  #undef yheight
+  #undef radius
+  return(_comp);
+} /* class_Beamstop_init */
+
 _class_PSD_monitor_4PI *class_PSD_monitor_4PI_init(_class_PSD_monitor_4PI *_comp
 ) {
   #define nx (_comp->_parameters.nx)
@@ -18907,6 +19028,7 @@ int init(void) { /* called by mccode_main for solid_sphere_validation:INITIALISE
   _solid_sphere_setpos(); /* type Union_sphere */
   _master_setpos(); /* type Union_master */
   _stop_setpos(); /* type Union_stop */
+  _beamstop_setpos(); /* type Beamstop */
   _mon_4pi_setpos(); /* type PSD_monitor_4PI */
   _mon_4pi_s1_setpos(); /* type PSD_monitor_4PI */
   _mon_4pi_s2_setpos(); /* type PSD_monitor_4PI */
@@ -18929,6 +19051,8 @@ int init(void) { /* called by mccode_main for solid_sphere_validation:INITIALISE
 
   class_Union_master_init(&_master_var);
 
+
+  class_Beamstop_init(&_beamstop_var);
 
   class_PSD_monitor_4PI_init(&_mon_4pi_var);
 
@@ -18955,6 +19079,7 @@ int init(void) { /* called by mccode_main for solid_sphere_validation:INITIALISE
 #pragma acc update device(_solid_sphere_var)
 #pragma acc update device(_master_var)
 #pragma acc update device(_stop_var)
+#pragma acc update device(_beamstop_var)
 #pragma acc update device(_mon_4pi_var)
 #pragma acc update device(_mon_4pi_s1_var)
 #pragma acc update device(_mon_4pi_s2_var)
@@ -20677,6 +20802,52 @@ n_reflections = SCATTERED - 2;
 } /* class_Union_master_trace */
 
 #pragma acc routine
+void class_Beamstop_trace(_class_Beamstop *_comp
+  , _class_particle *_particle) {
+  ABSORBED=SCATTERED=RESTORE=0;
+  #define xmin (_comp->_parameters.xmin)
+  #define xmax (_comp->_parameters.xmax)
+  #define ymin (_comp->_parameters.ymin)
+  #define ymax (_comp->_parameters.ymax)
+  #define xwidth (_comp->_parameters.xwidth)
+  #define yheight (_comp->_parameters.yheight)
+  #define radius (_comp->_parameters.radius)
+  SIG_MESSAGE("[_beamstop_trace] component beamstop=Beamstop() TRACE [Beamstop:0]");
+
+    double Time = t;
+    ALLOW_BACKPROP;
+    PROP_Z0;
+    Time = t - Time;
+    if ((Time>=0) && ((radius!=0) && (x*x + y*y <= radius*radius))
+    || ((Time>=0) && (radius==0) && (x>xmin && x<xmax && y>ymin && y<ymax)))
+      ABSORB;
+    else
+      RESTORE_NEUTRON(INDEX_CURRENT_COMP, x, y, z, vx, vy, vz, t, sx, sy, sz, p);
+#ifndef NOABSORB_INF_NAN
+  /* Check for nan or inf particle parms */ 
+  if(isnan(p + t + vx + vy + vz + x + y + z)) ABSORB;
+  if(isinf(fabs(p) + fabs(t) + fabs(vx) + fabs(vy) + fabs(vz) + fabs(x) + fabs(y) + fabs(z))) ABSORB;
+#else
+  if(isnan(p)  ||  isinf(p)) printf("NAN or INF found in p,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
+  if(isnan(t)  ||  isinf(t)) printf("NAN or INF found in t,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
+  if(isnan(vx) || isinf(vx)) printf("NAN or INF found in vx, %s (particle %lld)\n",_comp->_name,_particle->_uid);
+  if(isnan(vy) || isinf(vy)) printf("NAN or INF found in vy, %s (particle %lld)\n",_comp->_name,_particle->_uid);
+  if(isnan(vz) || isinf(vz)) printf("NAN or INF found in vz, %s (particle %lld)\n",_comp->_name,_particle->_uid);
+  if(isnan(x)  ||  isinf(x)) printf("NAN or INF found in x,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
+  if(isnan(y)  ||  isinf(y)) printf("NAN or INF found in y,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
+  if(isnan(z)  ||  isinf(z)) printf("NAN or INF found in z,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
+#endif
+  #undef xmin
+  #undef xmax
+  #undef ymin
+  #undef ymax
+  #undef xwidth
+  #undef yheight
+  #undef radius
+  return;
+} /* class_Beamstop_trace */
+
+#pragma acc routine
 void class_PSD_monitor_4PI_trace(_class_PSD_monitor_4PI *_comp
   , _class_particle *_particle) {
   ABSORBED=SCATTERED=RESTORE=0;
@@ -20862,7 +21033,28 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle->_index++;
     } /* end component stop [8] */
-    /* begin component mon_4pi=PSD_monitor_4PI() [9] */
+    /* begin component beamstop=Beamstop() [9] */
+    if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
+      if (_beamstop_var._rotation_is_identity) {
+        if(!_beamstop_var._position_relative_is_zero) {
+          coords_get(coords_add(coords_set(x,y,z), _beamstop_var._position_relative),&x, &y, &z);
+        }
+      } else {
+          mccoordschange(_beamstop_var._position_relative, _beamstop_var._rotation_relative, _particle);
+      }
+    }
+    if (!ABSORBED && _particle->_index == 9) {
+      _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
+      _particle_save = *_particle;
+      DEBUG_COMP(_beamstop_var._name);
+      DEBUG_STATE();
+      class_Beamstop_trace(&_beamstop_var, _particle);
+      if (_particle->_restore)
+        particle_restore(_particle, &_particle_save);
+      _particle->_index++;
+      if (!ABSORBED) { DEBUG_STATE(); }
+    } /* end component beamstop [9] */
+    /* begin component mon_4pi=PSD_monitor_4PI() [10] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_var._rotation_is_identity) {
         if(!_mon_4pi_var._position_relative_is_zero) {
@@ -20872,19 +21064,19 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_var._position_relative, _mon_4pi_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 9) {
+    if (!ABSORBED && _particle->_index == 10) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_var._name);
       DEBUG_STATE();
-      if ((( n_reflections > 0 ))) // conditional WHEN execution
+      if ((( n_reflections >= 0 ))) // conditional WHEN execution
       class_PSD_monitor_4PI_trace(&_mon_4pi_var, _particle);
       if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi [9] */
-    /* begin component mon_4pi_s1=PSD_monitor_4PI() [10] */
+    } /* end component mon_4pi [10] */
+    /* begin component mon_4pi_s1=PSD_monitor_4PI() [11] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_s1_var._rotation_is_identity) {
         if(!_mon_4pi_s1_var._position_relative_is_zero) {
@@ -20894,7 +21086,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_s1_var._position_relative, _mon_4pi_s1_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 10) {
+    if (!ABSORBED && _particle->_index == 11) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_s1_var._name);
@@ -20905,8 +21097,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi_s1 [10] */
-    /* begin component mon_4pi_s2=PSD_monitor_4PI() [11] */
+    } /* end component mon_4pi_s1 [11] */
+    /* begin component mon_4pi_s2=PSD_monitor_4PI() [12] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_s2_var._rotation_is_identity) {
         if(!_mon_4pi_s2_var._position_relative_is_zero) {
@@ -20916,7 +21108,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_s2_var._position_relative, _mon_4pi_s2_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 11) {
+    if (!ABSORBED && _particle->_index == 12) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_s2_var._name);
@@ -20927,8 +21119,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi_s2 [11] */
-    /* begin component mon_4pi_s3=PSD_monitor_4PI() [12] */
+    } /* end component mon_4pi_s2 [12] */
+    /* begin component mon_4pi_s3=PSD_monitor_4PI() [13] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_s3_var._rotation_is_identity) {
         if(!_mon_4pi_s3_var._position_relative_is_zero) {
@@ -20938,7 +21130,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_s3_var._position_relative, _mon_4pi_s3_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 12) {
+    if (!ABSORBED && _particle->_index == 13) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_s3_var._name);
@@ -20949,8 +21141,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi_s3 [12] */
-    /* begin component mon_4pi_s4=PSD_monitor_4PI() [13] */
+    } /* end component mon_4pi_s3 [13] */
+    /* begin component mon_4pi_s4=PSD_monitor_4PI() [14] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_s4_var._rotation_is_identity) {
         if(!_mon_4pi_s4_var._position_relative_is_zero) {
@@ -20960,7 +21152,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_s4_var._position_relative, _mon_4pi_s4_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 13) {
+    if (!ABSORBED && _particle->_index == 14) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_s4_var._name);
@@ -20971,8 +21163,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi_s4 [13] */
-    /* begin component mon_4pi_s5=PSD_monitor_4PI() [14] */
+    } /* end component mon_4pi_s4 [14] */
+    /* begin component mon_4pi_s5=PSD_monitor_4PI() [15] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_s5_var._rotation_is_identity) {
         if(!_mon_4pi_s5_var._position_relative_is_zero) {
@@ -20982,7 +21174,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_s5_var._position_relative, _mon_4pi_s5_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 14) {
+    if (!ABSORBED && _particle->_index == 15) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_s5_var._name);
@@ -20993,8 +21185,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi_s5 [14] */
-    if (_particle->_index > 14)
+    } /* end component mon_4pi_s5 [15] */
+    if (_particle->_index > 15)
       ABSORBED++; /* absorbed when passed all components */
   } /* while !ABSORBED */
 
@@ -21230,8 +21422,23 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
         _particle->_index++;
       }
 
-      // mon_4pi
+      // beamstop
     if (!ABSORBED && _particle->_index == 9) {
+#ifndef MULTICORE
+        if (_beamstop_var._rotation_is_identity)
+          coords_get(coords_add(coords_set(x,y,z), _beamstop_var._position_relative),&x, &y, &z);
+        else
+#endif
+          mccoordschange(_beamstop_var._position_relative, _beamstop_var._rotation_relative, _particle);
+        _particle_save = *_particle;
+        class_Beamstop_trace(&_beamstop_var, _particle);
+        if (_particle->_restore)
+        particle_restore(_particle, &_particle_save);
+        _particle->_index++;
+      }
+
+      // mon_4pi
+    if (!ABSORBED && _particle->_index == 10) {
 #ifndef MULTICORE
         if (_mon_4pi_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_var._position_relative),&x, &y, &z);
@@ -21239,7 +21446,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
 #endif
           mccoordschange(_mon_4pi_var._position_relative, _mon_4pi_var._rotation_relative, _particle);
         _particle_save = *_particle;
-        if ((( n_reflections > 0 ))) // conditional WHEN
+        if ((( n_reflections >= 0 ))) // conditional WHEN
         class_PSD_monitor_4PI_trace(&_mon_4pi_var, _particle);
         if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
@@ -21247,7 +21454,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       }
 
       // mon_4pi_s1
-    if (!ABSORBED && _particle->_index == 10) {
+    if (!ABSORBED && _particle->_index == 11) {
 #ifndef MULTICORE
         if (_mon_4pi_s1_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_s1_var._position_relative),&x, &y, &z);
@@ -21263,7 +21470,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       }
 
       // mon_4pi_s2
-    if (!ABSORBED && _particle->_index == 11) {
+    if (!ABSORBED && _particle->_index == 12) {
 #ifndef MULTICORE
         if (_mon_4pi_s2_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_s2_var._position_relative),&x, &y, &z);
@@ -21279,7 +21486,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       }
 
       // mon_4pi_s3
-    if (!ABSORBED && _particle->_index == 12) {
+    if (!ABSORBED && _particle->_index == 13) {
 #ifndef MULTICORE
         if (_mon_4pi_s3_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_s3_var._position_relative),&x, &y, &z);
@@ -21295,7 +21502,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       }
 
       // mon_4pi_s4
-    if (!ABSORBED && _particle->_index == 13) {
+    if (!ABSORBED && _particle->_index == 14) {
 #ifndef MULTICORE
         if (_mon_4pi_s4_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_s4_var._position_relative),&x, &y, &z);
@@ -21311,7 +21518,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       }
 
       // mon_4pi_s5
-    if (!ABSORBED && _particle->_index == 14) {
+    if (!ABSORBED && _particle->_index == 15) {
 #ifndef MULTICORE
         if (_mon_4pi_s5_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_s5_var._position_relative),&x, &y, &z);
@@ -21456,6 +21663,7 @@ int save(FILE *handle) { /* called by mccode_main for solid_sphere_validation:SA
 
   /* call iteratively all components SAVE */
   class_Progress_bar_save(&_Origin_var);
+
 
 
 
@@ -22138,6 +22346,7 @@ int finally(void) { /* called by mccode_main for solid_sphere_validation:FINALLY
 #pragma acc update host(_solid_sphere_var)
 #pragma acc update host(_master_var)
 #pragma acc update host(_stop_var)
+#pragma acc update host(_beamstop_var)
 #pragma acc update host(_mon_4pi_var)
 #pragma acc update host(_mon_4pi_s1_var)
 #pragma acc update host(_mon_4pi_s2_var)
@@ -22160,6 +22369,7 @@ int finally(void) { /* called by mccode_main for solid_sphere_validation:FINALLY
 
 
   class_Union_master_finally(&_master_var);
+
 
 
   class_PSD_monitor_4PI_finally(&_mon_4pi_var);
@@ -22621,6 +22831,37 @@ _class_Union_master *class_Union_master_display(_class_Union_master *_comp
   return(_comp);
 } /* class_Union_master_display */
 
+_class_Beamstop *class_Beamstop_display(_class_Beamstop *_comp
+) {
+  #define xmin (_comp->_parameters.xmin)
+  #define xmax (_comp->_parameters.xmax)
+  #define ymin (_comp->_parameters.ymin)
+  #define ymax (_comp->_parameters.ymax)
+  #define xwidth (_comp->_parameters.xwidth)
+  #define yheight (_comp->_parameters.yheight)
+  #define radius (_comp->_parameters.radius)
+  SIG_MESSAGE("[_beamstop_display] component beamstop=Beamstop() DISPLAY [Beamstop:0]");
+
+  printf("MCDISPLAY: component %s\n", _comp->_name);
+  
+  if (radius != 0)
+    circle("xy", 0, 0, 0, radius);
+  else
+    multiline(5, (double)xmin, (double)ymin, 0.0,
+               (double)xmax, (double)ymin, 0.0,
+               (double)xmax, (double)ymax, 0.0,
+               (double)xmin, (double)ymax, 0.0,
+               (double)xmin, (double)ymin, 0.0);
+  #undef xmin
+  #undef xmax
+  #undef ymin
+  #undef ymax
+  #undef xwidth
+  #undef yheight
+  #undef radius
+  return(_comp);
+} /* class_Beamstop_display */
+
 _class_PSD_monitor_4PI *class_PSD_monitor_4PI_display(_class_PSD_monitor_4PI *_comp
 ) {
   #define nx (_comp->_parameters.nx)
@@ -22676,6 +22917,8 @@ int display(void) { /* called by mccode_main for solid_sphere_validation:DISPLAY
   class_Union_master_display(&_master_var);
 
 
+  class_Beamstop_display(&_beamstop_var);
+
   class_PSD_monitor_4PI_display(&_mon_4pi_var);
 
   class_PSD_monitor_4PI_display(&_mon_4pi_s1_var);
@@ -22707,6 +22950,7 @@ void* _getvar_parameters(char* compname)
   if (!strcmp(compname, "solid_sphere")) return (void *) &(_solid_sphere_var._parameters);
   if (!strcmp(compname, "master")) return (void *) &(_master_var._parameters);
   if (!strcmp(compname, "stop")) return (void *) &(_stop_var._parameters);
+  if (!strcmp(compname, "beamstop")) return (void *) &(_beamstop_var._parameters);
   if (!strcmp(compname, "mon_4pi")) return (void *) &(_mon_4pi_var._parameters);
   if (!strcmp(compname, "mon_4pi_s1")) return (void *) &(_mon_4pi_s1_var._parameters);
   if (!strcmp(compname, "mon_4pi_s2")) return (void *) &(_mon_4pi_s2_var._parameters);
@@ -22734,12 +22978,13 @@ int _getcomp_index(char* compname)
   if (!strcmp(compname, "solid_sphere")) return 6;
   if (!strcmp(compname, "master")) return 7;
   if (!strcmp(compname, "stop")) return 8;
-  if (!strcmp(compname, "mon_4pi")) return 9;
-  if (!strcmp(compname, "mon_4pi_s1")) return 10;
-  if (!strcmp(compname, "mon_4pi_s2")) return 11;
-  if (!strcmp(compname, "mon_4pi_s3")) return 12;
-  if (!strcmp(compname, "mon_4pi_s4")) return 13;
-  if (!strcmp(compname, "mon_4pi_s5")) return 14;
+  if (!strcmp(compname, "beamstop")) return 9;
+  if (!strcmp(compname, "mon_4pi")) return 10;
+  if (!strcmp(compname, "mon_4pi_s1")) return 11;
+  if (!strcmp(compname, "mon_4pi_s2")) return 12;
+  if (!strcmp(compname, "mon_4pi_s3")) return 13;
+  if (!strcmp(compname, "mon_4pi_s4")) return 14;
+  if (!strcmp(compname, "mon_4pi_s5")) return 15;
   return -1;
 }
 

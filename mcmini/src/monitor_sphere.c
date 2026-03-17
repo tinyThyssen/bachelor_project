@@ -64,6 +64,9 @@ int monitor_sphere_open(MonitorSphere *m, const char *path, Vec3 center, double 
     m->beamstop_enabled = 0;
     m->beamstop_radius = 0.0;
     m->beamstop_center = center;
+    m->direction_only = 0;
+    m->I = NULL;
+    m->sum_w2 = NULL;
     m->fpt = fopen(path, "w"); // open file for writing.
     if (!m->fpt) return 0; // return 0 if file failed to open
 
@@ -83,11 +86,19 @@ int monitor_sphere_open_binned(MonitorSphere *m, const char *path, Vec3 center, 
     m->beamstop_enabled = 0;
     m->beamstop_radius = 0.0;
     m->beamstop_center = center;
+    m->direction_only = 0;
     m->nx = nx;
     m->ny = ny;
     m->n_history = n_history;
     m->I = (double*)calloc((size_t)nx * (size_t)ny, sizeof(double)); // allocate memory for intensity array
-    if (!m->I) return 0; // return 0 if allocation failed
+    m->sum_w2 = (double*)calloc((size_t)nx * (size_t)ny, sizeof(double));
+    if (!m->I || !m->sum_w2) {
+        free(m->I);
+        free(m->sum_w2);
+        m->I = NULL;
+        m->sum_w2 = NULL;
+        return 0;
+    }
 
     m->hits_total = 0;
     m->hits_in = 0;
@@ -95,7 +106,9 @@ int monitor_sphere_open_binned(MonitorSphere *m, const char *path, Vec3 center, 
     m->fpt = fopen(path, "w"); // open file for writing.
     if (!m->fpt) {
         free(m->I); // free allocated memory if file fails to open
+        free(m->sum_w2);
         m->I = NULL;
+        m->sum_w2 = NULL;
         return 0; // return 0 if file failed to open
     }
 
@@ -110,7 +123,7 @@ int monitor_sphere_open_binned(MonitorSphere *m, const char *path, Vec3 center, 
     fprintf(m->fpt, "# binned sphere monitor\n");
     fprintf(m->fpt, "# nx=%d ny=%d\n", nx, ny);
     fprintf(m->fpt, "# n_history=%lld\n", m->n_history);
-    fprintf(m->fpt, "# columns: ix,iy,I\n");
+    fprintf(m->fpt, "# columns: ix,iy,I,sigma\n");
     fprintf(m->fpt, "# phi in [%.12g, %.12g] deg\n", m->phi_min, m->phi_max);
     fprintf(m->fpt, "# theta in [%.12g, %.12g] deg\n", m->theta_min, m->theta_max);
 
@@ -153,8 +166,16 @@ int monitor_sphere_record(MonitorSphere *m, const Particle *p) {
     // else if (m->mode == MONITOR_SPHERE_BINNED) {
     } else if (m->mode == MONITOR_SPHERE_BINNED) {
 
-        // unit vector from center to hit point on sphere
-        Vec3 u = v_scale(v_sub(hit, m->center), 1.0 / m->radius); // direction unit vector from center to hit
+        Vec3 u;
+        if (m->direction_only) {
+            // Direction-only mode ignores ray origin and bins purely by outgoing direction.
+            double dir_norm = sqrt(v_dot(p->vec, p->vec));
+            if (dir_norm <= 0.0) return 0;
+            u = v_scale(p->vec, 1.0 / dir_norm);
+        } else {
+            // Geometric mode bins by the actual hit point on the monitor sphere.
+            u = v_scale(v_sub(hit, m->center), 1.0 / m->radius);
+        }
 
         // McStas-like 4PI angular coordinates
         double phi_rad   = atan2(u.x, u.z);  // [-pi, pi]
@@ -176,7 +197,11 @@ int monitor_sphere_record(MonitorSphere *m, const Particle *p) {
         if (iy < 0) iy = 0;
         if (iy >= m->ny) iy = m->ny - 1;
 
-        m->I[(size_t)iy * (size_t)m->nx + (size_t)ix] += p->p; // accumulate weight in bin
+        {
+            size_t idx = (size_t)iy * (size_t)m->nx + (size_t)ix;
+            m->I[idx] += p->p; // accumulate weight in bin
+            m->sum_w2[idx] += p->p * p->p; // accumulate squared weights for variance estimate
+        }
 
         m->hits_total++; // increment total hits
         m->hits_in++; // increment hits in bounds
@@ -190,8 +215,11 @@ int monitor_sphere_record(MonitorSphere *m, const Particle *p) {
 void monitor_sphere_normalize_per_history(MonitorSphere *m) {
     if (m->mode == MONITOR_SPHERE_BINNED && m->n_history > 0) {
         size_t n = (size_t)m->nx * (size_t)m->ny;
+        double inv_n_history = 1.0 / (double)m->n_history;
+        double inv_n_history2 = inv_n_history * inv_n_history;
         for (size_t i = 0; i < n; i++) {
-            m->I[i] /= (double)m->n_history; // I <- I / n_history
+            m->I[i] *= inv_n_history; // I <- I / n_history
+            m->sum_w2[i] *= inv_n_history2; // Var(I) <- sum(w^2) / n_history^2
         }
     }
 }
@@ -207,6 +235,7 @@ void monitor_sphere_scale_to_total_I(MonitorSphere *m, double Itarget) {
             double scale = Itarget / sum; // Itarget / sum(I)
             for (size_t i = 0; i < n; i++) {
                 m->I[i] *= scale; // I <- I * scale
+                m->sum_w2[i] *= scale * scale; // Var(I) scales quadratically
             }
         }
     }
@@ -216,17 +245,20 @@ void monitor_sphere_scale_to_total_I(MonitorSphere *m, double Itarget) {
 
 // Close the monitor sphere file 
 void monitor_sphere_close(MonitorSphere *m) {
-    if (m->mode == MONITOR_SPHERE_BINNED && m->fpt && m->I) {
+    if (m->mode == MONITOR_SPHERE_BINNED && m->fpt && m->I && m->sum_w2) {
         fprintf(m->fpt, "# hits_total=%lld hits_in=%lld\n", m->hits_total, m->hits_in);
-        fprintf(m->fpt, "# columns: ix,iy,I\n");
+        fprintf(m->fpt, "# columns: ix,iy,I,sigma\n");
         for (int iy = 0; iy < m->ny; iy++) {
             for (int ix = 0; ix < m->nx; ix++) {
                 size_t idx = (size_t)iy*(size_t)m->nx + (size_t)ix;
-                fprintf(m->fpt, "%d,%d,%.12g\n", ix, iy, m->I[idx]);
+                double sigma = sqrt(m->sum_w2[idx]);
+                fprintf(m->fpt, "%d,%d,%.12g,%.12g\n", ix, iy, m->I[idx], sigma);
             }
         }
         free(m->I);
+        free(m->sum_w2);
         m->I = NULL;
+        m->sum_w2 = NULL;
     }
 
     if (m->fpt) fclose(m->fpt);
