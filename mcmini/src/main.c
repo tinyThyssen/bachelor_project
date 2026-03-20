@@ -5,7 +5,7 @@
 #include "source_simple.h"
 #include "monitor_flat.h"
 #include "monitor_sphere.h"
-#include "scatterer_sphere.h"
+#include "scatterer_cyl.h"
 #include <math.h>
 
 int main(void) {
@@ -14,10 +14,10 @@ int main(void) {
 
     SourceSimple src = {
         .center = vec3(0.0, 0.0, -0.1),
-        .radius = 0.01,      // m, radius of circular source area
+        .radius = 0.01,      // m, cylinder_height/2 to match solid_cylinder.instr
         .dist = 1.0,       // m
-        .focus_xw = 0.02,    // m (horizontal focus width)
-        .focus_yh = 0.02,    // m (vertical focus height)
+        .focus_xw = 0.015,    // m, 2*cylinder_radius + margin
+        .focus_yh = 0.025,    // m, cylinder_height + margin
 
         .lambda0 = 4.0,    // Angstrom
         .dlambda = 0.1,    // Angstrom half-width (=> [3.9, 4.1])
@@ -74,33 +74,34 @@ int main(void) {
 
     long long Nsim = 1e9; // number of simulated neutrons
 
-    // multiple scattering test for solid sphere
-    ScattererSphere sph;
+    // multiple scattering test for solid cylinder
+    ScattererCyl cyl;
     MonitorSphere mon_all;
     MonitorSphere mon_by_scatter[5];
-    scatterer_sphere_init(&sph);
+    scatterer_cyl_init(&cyl);
 
-    sph.center = vec3(0.0, 0.0, 0.0);
-    sph.radius = 0.01; // m
-    sph.VcA3 = 13.827; // match McStas unit_cell_volume
-    sph.sigma_abs = 5.08; // barn at 2200 m/s (vanadium)
-    sph.sigma_inc = 5.08; // barn (vanadium is mostly incoherent scatterer)
-    sph.pack = 1.0; // typical packing factor for powder sample
+    cyl.center = vec3(0.0, 0.0, 0.0);
+    cyl.radius = 0.005; // m
+    cyl.height = 0.02; // m
+    cyl.VcA3 = 13.827; // match McStas unit_cell_volume
+    cyl.sigma_abs = 5.08; // barn at 2200 m/s (vanadium)
+    cyl.sigma_inc = 5.08; // barn (vanadium is mostly incoherent scatterer)
+    cyl.pack = 1.0; // typical packing factor for powder sample
     // Match McStas my_absorption = 5.08*100/13.827 (which omits packing_factor):
     // MCmini uses Sigma_abs = sigma_abs*100*pack/VcA3, so compensate by dividing by pack.
-    sph.sigma_abs = 5.08 / sph.pack;
-    if (!monitor_sphere_open_binned(&mon_all, "sphere_1cm.csv",
+    cyl.sigma_abs = 5.08 / cyl.pack;
+    if (!monitor_sphere_open_binned(&mon_all, "solid_cylinder_multiple_scatter.csv",
                                   vec3(0.0, 0.0, 0.0), 1.0, // center and radius
                                   360, 180, Nsim)) { // nx, ny, n_history
         printf("Failed to open monitor\n");
         return 1;
     }
     const char *scatter_files[5] = {
-        "sphere_1cm_multiple_scatter_1.csv",
-        "sphere_1cm_multiple_scatter_2.csv",
-        "sphere_1cm_multiple_scatter_3.csv",
-        "sphere_1cm_multiple_scatter_4.csv",
-        "sphere_1cm_multiple_scatter_5.csv"
+        "solid_cylinder_scatter_1.csv",
+        "solid_cylinder_scatter_2.csv",
+        "solid_cylinder_scatter_3.csv",
+        "solid_cylinder_scatter_4.csv",
+        "solid_cylinder_scatter_5.csv"
     };
     for (int s = 0; s < 5; s++) {
         if (!monitor_sphere_open_binned(&mon_by_scatter[s], scatter_files[s],
@@ -111,24 +112,19 @@ int main(void) {
         }
     }
 
-    mon_all.direction_only = 1; // use only ray direction for binning
-    for (int s = 0; s < 5; s++) {
-        mon_by_scatter[s].direction_only = 1;
-    }
-
     for (long long i = 0; i < Nsim; i++) {
         Particle p = source_simple_emit(&src, &rng);
 
         int scat_count = 0;
         while (p.alive) {
-            ScattererEvent ev = scatterer_sphere_interact(&sph, &p, &rng);
+            ScattererEvent ev = scatterer_cyl_interact(&cyl, &p, &rng);
 
-            if (ev == SPHERE_NO_HIT) break;       // never hits sample
-            if (ev == SPHERE_TRANSMIT) break;     // left sample without interacting
-            if (ev == SPHERE_ABSORB) break;       // killed inside
-            if (ev == SPHERE_SCATTER) {
+            if (ev == CYLINDER_NO_HIT) break;       // never hits sample
+            if (ev == CYLINDER_TRANSMIT) break;     // left sample without interacting
+            if (ev == CYLINDER_ABSORB) break;       // killed inside
+            if (ev == CYLINDER_SCATTER) {
                 scat_count++;
-                if (sph.max_scat > 0 && scat_count >= sph.max_scat) {
+                if (cyl.max_scat > 0 && scat_count >= cyl.max_scat) {
                     // give up: treat as transmitted (or just stop)
                     break;
                 }

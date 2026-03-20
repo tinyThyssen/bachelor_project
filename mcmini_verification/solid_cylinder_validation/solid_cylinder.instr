@@ -3,8 +3,8 @@
 *******************************************************************************/
 
 DEFINE INSTRUMENT solid_cylinder_validation(
-  lambda = 5.0,
-  dlambda = 0.5,
+  lambda = 4.0,
+  dlambda = 0.1,
   cylinder_radius = 0.005, //m
   cylinder_height = 0.02, //m
   margin = 0.005, // margin added
@@ -71,11 +71,6 @@ COMPONENT stop = Union_stop()
 AT (0,0,0) ABSOLUTE
 
 
-COMPONENT beamstop = Beamstop(
-  radius = 0.08
-) 
-AT (0,0, 1.0) RELATIVE Origin
-
 COMPONENT mon_4pi = PSD_monitor_4PI(
   nx = 360,
   ny = 180,
@@ -83,7 +78,7 @@ COMPONENT mon_4pi = PSD_monitor_4PI(
   restore_neutron = 1,
   filename = "solid_cylinder_multiple_scatter.dat"
 )
-WHEN (n_reflections >= 0)
+WHEN (n_reflections > 0)
 AT (0,0,0) ABSOLUTE
 
 COMPONENT mon_4pi_s1 = PSD_monitor_4PI(

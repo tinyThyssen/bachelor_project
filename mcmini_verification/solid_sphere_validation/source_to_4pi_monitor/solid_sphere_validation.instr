@@ -1,0 +1,61 @@
+/*******************************************************************************
+* McStas instrument for validating MCmini solid-sphere setup.
+*******************************************************************************/
+
+DEFINE INSTRUMENT solid_sphere_validation(
+  lambda = 4.0,
+  dlambda = 0.1,
+  sphere_radius = 0.01,
+  source_radius = 0.01,
+  source_dist = 1.0,
+  focus_xw = 0.02,
+  focus_yh = 0.02,
+  sigma_inc = 5.08,
+  sigma_abs = 5.08,
+  unit_cell_volume = 13.827
+)
+
+DECLARE
+%{
+  int    n_reflections;
+%}
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+
+COMPONENT src = Source_simple(
+  radius = source_radius,
+  dist = source_dist,
+  focus_xw = focus_xw,
+  focus_yh = focus_yh,
+  lambda0 = lambda,
+  dlambda = dlambda,
+  flux = 1,
+  gauss = 0
+)
+AT (0,0,-0.1) ABSOLUTE
+
+COMPONENT src_flat = PSD_monitor(
+  nx = 200,
+  ny = 200,
+  xwidth = 2*source_radius,
+  yheight = 2*source_radius,
+  restore_neutron = 1,
+  filename = "source_flat_monitor.dat"
+)
+AT (0,0,0.001) RELATIVE src
+
+COMPONENT mon_4pi = PSD_monitor_4PI(
+  nx = 3600,
+  ny = 1800,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "source_to_4pi_monitor.dat"
+)
+AT (0,0,0) ABSOLUTE
+
+
+END

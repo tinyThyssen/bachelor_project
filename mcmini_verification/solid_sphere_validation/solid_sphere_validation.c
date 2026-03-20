@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: solid_sphere_validation.instr (solid_sphere_validation)
- * Date:       Tue Mar 17 17:13:48 2026
+ * Date:       Fri Mar 20 11:32:01 2026
  * File:       ./solid_sphere_validation.c
  * CFLAGS= -DFUNNEL 
  */
@@ -6972,7 +6972,7 @@ struct mcinputtable_struct mcinputtable[] = {
   "focus_xw", &(_instrument_var._parameters.focus_xw), instr_type_double, "0.02", "",
   "focus_yh", &(_instrument_var._parameters.focus_yh), instr_type_double, "0.02", "",
   "sigma_inc", &(_instrument_var._parameters.sigma_inc), instr_type_double, "5.08", "",
-  "sigma_abs", &(_instrument_var._parameters.sigma_abs), instr_type_double, "5.08", "",
+  "sigma_abs", &(_instrument_var._parameters.sigma_abs), instr_type_double, "0.0", "",
   "unit_cell_volume", &(_instrument_var._parameters.unit_cell_volume), instr_type_double, "13.827", "",
   NULL, NULL, instr_type_double, ""
 };

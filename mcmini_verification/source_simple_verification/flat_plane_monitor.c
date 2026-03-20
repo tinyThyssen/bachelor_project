@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: flat_plane_monitor.instr (beam_validate)
- * Date:       Thu Mar  5 16:38:56 2026
+ * Date:       Fri Mar 20 11:07:01 2026
  * File:       ./flat_plane_monitor.c
  * CFLAGS=
  */
@@ -6942,12 +6942,12 @@ typedef struct _struct_instrument_parameters _class_instrument_parameters;
 struct _instrument_struct {
   char   _name[256]; /* the name of this instrument e.g. 'beam_validate' */
 /* Counters per component instance */
-  double counter_AbsorbProp[6]; /* absorbed events in PROP routines */
-  double counter_N[6], counter_P[6], counter_P2[6]; /* event counters after each component instance */
-  _class_particle _trajectory[6]; /* current trajectory for STORE/RESTORE */
+  double counter_AbsorbProp[5]; /* absorbed events in PROP routines */
+  double counter_N[5], counter_P[5], counter_P2[5]; /* event counters after each component instance */
+  _class_particle _trajectory[5]; /* current trajectory for STORE/RESTORE */
 /* Components position table (absolute and relative coords) */
-  Coords _position_relative[6]; /* positions of all components */
-  Coords _position_absolute[6];
+  Coords _position_relative[5]; /* positions of all components */
+  Coords _position_absolute[5];
   _class_instrument_parameters _parameters; /* instrument parameters */
 } _instrument_var;
 struct _instrument_struct *instrument = & _instrument_var;
@@ -7085,47 +7085,7 @@ typedef struct _struct_PSD_monitor _class_PSD_monitor;
 _class_PSD_monitor _mon_var;
 #pragma acc declare create ( _mon_var )
 
-/* component L_mon=L_monitor() [4] DECLARE */
-/* Parameter definition for component type 'L_monitor' */
-struct _struct_L_monitor_parameters {
-  /* Component type 'L_monitor' setting parameters */
-  int nL;
-  char filename[16384];
-  int nowritefile;
-  MCNUM xmin;
-  MCNUM xmax;
-  MCNUM ymin;
-  MCNUM ymax;
-  MCNUM xwidth;
-  MCNUM yheight;
-  MCNUM Lmin;
-  MCNUM Lmax;
-  int restore_neutron;
-  /* Component type 'L_monitor' private parameters */
-  DArray1d  L_N;
-  DArray1d  L_p;
-  DArray1d  L_p2;
-}; /* _struct_L_monitor_parameters */
-typedef struct _struct_L_monitor_parameters _class_L_monitor_parameters;
-
-/* Parameters for component type 'L_monitor' */
-struct _struct_L_monitor {
-  char     _name[256]; /* e.g. L_mon */
-  char     _type[256]; /* L_monitor */
-  long     _index; /* e.g. 2 index in TRACE list */
-  Coords   _position_absolute;
-  Coords   _position_relative; /* wrt PREVIOUS */
-  Rotation _rotation_absolute;
-  Rotation _rotation_relative; /* wrt PREVIOUS */
-  int      _rotation_is_identity;
-  int      _position_relative_is_zero;
-  _class_L_monitor_parameters _parameters;
-};
-typedef struct _struct_L_monitor _class_L_monitor;
-_class_L_monitor _L_mon_var;
-#pragma acc declare create ( _L_mon_var )
-
-int mcNUMCOMP = 4;
+int mcNUMCOMP = 3;
 
 /* User declarations from instrument definition. Can define functions. */
 
@@ -7230,7 +7190,7 @@ int _src_setpos(void)
   stracpy(_src_var._type, "Source_simple", 16384);
   _src_var._index=2;
   int current_setpos_index = 2;
-  _src_var._parameters.radius = 0.1;
+  _src_var._parameters.radius = 0.2;
   _src_var._parameters.yheight = 0;
   _src_var._parameters.xwidth = 0;
   _src_var._parameters.dist = 1.0;
@@ -7277,7 +7237,7 @@ int _src_setpos(void)
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
         mccomp_placement_type_nexus(nxhandle,"0001_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_simple");
-        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "0.1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "0.2","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "yheight", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "xwidth", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "dist", "0", "1.0","MCNUM");
@@ -7307,8 +7267,8 @@ int _mon_setpos(void)
   stracpy(_mon_var._type, "PSD_monitor", 16384);
   _mon_var._index=3;
   int current_setpos_index = 3;
-  _mon_var._parameters.nx = 200;
-  _mon_var._parameters.ny = 200;
+  _mon_var._parameters.nx = 1000;
+  _mon_var._parameters.ny = 1000;
   if("flat_hits.dat" && strlen("flat_hits.dat"))
     stracpy(_mon_var._parameters.filename, "flat_hits.dat" ? "flat_hits.dat" : "", 16384);
   else 
@@ -7337,7 +7297,7 @@ int _mon_setpos(void)
     rot_mul(_mon_var._rotation_absolute, tr1, _mon_var._rotation_relative);
     _mon_var._rotation_is_identity =  rot_test_identity(_mon_var._rotation_relative);
     tc1 = coords_set(
-      0, 0, 1.0);
+      0, 0, 0.001);
     rot_transpose(_src_var._rotation_absolute, tr1);
     tc2 = rot_apply(tr1, tc1);
     _mon_var._position_absolute = coords_add(_src_var._position_absolute, tc2);
@@ -7355,8 +7315,8 @@ int _mon_setpos(void)
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
         mccomp_placement_type_nexus(nxhandle,"0002_mon", _mon_var._position_absolute, _mon_var._rotation_absolute, "PSD_monitor");
-        mccomp_param_nexus(nxhandle,"0002_mon", "nx", "90", "200","int");
-        mccomp_param_nexus(nxhandle,"0002_mon", "ny", "90", "200","int");
+        mccomp_param_nexus(nxhandle,"0002_mon", "nx", "90", "1000","int");
+        mccomp_param_nexus(nxhandle,"0002_mon", "ny", "90", "1000","int");
         mccomp_param_nexus(nxhandle,"0002_mon", "filename", 0, "flat_hits.dat", "char*");
         mccomp_param_nexus(nxhandle,"0002_mon", "xmin", "-0.05", "-0.05","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon", "xmax", "0.05", "0.05","MCNUM");
@@ -7374,84 +7334,6 @@ int _mon_setpos(void)
   #endif
   return(0);
 } /* _mon_setpos */
-
-/* component L_mon=L_monitor() SETTING, POSITION/ROTATION */
-int _L_mon_setpos(void)
-{ /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_L_mon_setpos] component L_mon=L_monitor() SETTING [L_monitor:0]");
-  stracpy(_L_mon_var._name, "L_mon", 16384);
-  stracpy(_L_mon_var._type, "L_monitor", 16384);
-  _L_mon_var._index=4;
-  int current_setpos_index = 4;
-  _L_mon_var._parameters.nL = 20;
-  if("wavelength" && strlen("wavelength"))
-    stracpy(_L_mon_var._parameters.filename, "wavelength" ? "wavelength" : "", 16384);
-  else 
-  _L_mon_var._parameters.filename[0]='\0';
-  _L_mon_var._parameters.nowritefile = 0;
-  _L_mon_var._parameters.xmin = -0.05;
-  _L_mon_var._parameters.xmax = 0.05;
-  _L_mon_var._parameters.ymin = -0.05;
-  _L_mon_var._parameters.ymax = 0.05;
-  _L_mon_var._parameters.xwidth = 0.5;
-  _L_mon_var._parameters.yheight = 0.5;
-  _L_mon_var._parameters.Lmin = 3;
-  _L_mon_var._parameters.Lmax = 5;
-  _L_mon_var._parameters.restore_neutron = 0;
-
-
-  /* component L_mon=L_monitor() AT ROTATED */
-  {
-    Coords tc1, tc2;
-    tc1 = coords_set(0,0,0);
-    tc2 = coords_set(0,0,0);
-    Rotation tr1;
-    rot_set_rotation(tr1,0,0,0);
-    rot_set_rotation(tr1,
-      (0)*DEG2RAD, (0)*DEG2RAD, (0)*DEG2RAD);
-    rot_mul(tr1, _mon_var._rotation_absolute, _L_mon_var._rotation_absolute);
-    rot_transpose(_mon_var._rotation_absolute, tr1);
-    rot_mul(_L_mon_var._rotation_absolute, tr1, _L_mon_var._rotation_relative);
-    _L_mon_var._rotation_is_identity =  rot_test_identity(_L_mon_var._rotation_relative);
-    tc1 = coords_set(
-      0, 0, 1);
-    rot_transpose(_src_var._rotation_absolute, tr1);
-    tc2 = rot_apply(tr1, tc1);
-    _L_mon_var._position_absolute = coords_add(_src_var._position_absolute, tc2);
-    tc1 = coords_sub(_mon_var._position_absolute, _L_mon_var._position_absolute);
-    _L_mon_var._position_relative = rot_apply(_L_mon_var._rotation_absolute, tc1);
-  } /* L_mon=L_monitor() AT ROTATED */
-  DEBUG_COMPONENT("L_mon", _L_mon_var._position_absolute, _L_mon_var._rotation_absolute);
-  instrument->_position_absolute[4] = _L_mon_var._position_absolute;
-  instrument->_position_relative[4] = _L_mon_var._position_relative;
-    _L_mon_var._position_relative_is_zero =  coords_test_zero(_L_mon_var._position_relative);
-  instrument->counter_N[4]  = instrument->counter_P[4] = instrument->counter_P2[4] = 0;
-  instrument->counter_AbsorbProp[4]= 0;
-  #ifdef USE_NEXUS
-  if(nxhandle) {
-    if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
-    MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0003_L_mon", _L_mon_var._position_absolute, _L_mon_var._rotation_absolute, "L_monitor");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "nL", "20", "20","int");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "filename", 0, "wavelength", "char*");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "xmin", "-0.05", "-0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "xmax", "0.05", "0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "ymin", "-0.05", "-0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "ymax", "0.05", "0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "xwidth", "0", "0.5","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "yheight", "0", "0.5","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "Lmin", "NONE", "3","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "Lmax", "NONE", "5","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_L_mon", "restore_neutron", "0", "0","int");
-      );
-    }
-  } else {
-    // fprintf(stderr,"NO NEXUS FILE");
-  }
-  #endif
-  return(0);
-} /* _L_mon_setpos */
 
 _class_Progress_bar *class_Progress_bar_init(_class_Progress_bar *_comp
 ) {
@@ -7649,59 +7531,6 @@ _class_PSD_monitor *class_PSD_monitor_init(_class_PSD_monitor *_comp
   return(_comp);
 } /* class_PSD_monitor_init */
 
-_class_L_monitor *class_L_monitor_init(_class_L_monitor *_comp
-) {
-  #define nL (_comp->_parameters.nL)
-  #define filename (_comp->_parameters.filename)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define xmin (_comp->_parameters.xmin)
-  #define xmax (_comp->_parameters.xmax)
-  #define ymin (_comp->_parameters.ymin)
-  #define ymax (_comp->_parameters.ymax)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define yheight (_comp->_parameters.yheight)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define L_N (_comp->_parameters.L_N)
-  #define L_p (_comp->_parameters.L_p)
-  #define L_p2 (_comp->_parameters.L_p2)
-  SIG_MESSAGE("[_L_mon_init] component L_mon=L_monitor() INITIALISE [L_monitor:0]");
-
-  if (xwidth  > 0) { xmax = xwidth/2;  xmin = -xmax; }
-  if (yheight > 0) { ymax = yheight/2; ymin = -ymax; }
-
-  if ((xmin >= xmax) || (ymin >= ymax)) {
-    printf("L_monitor: %s: Null detection area !\n"
-      "ERROR      (xwidth,yheight,xmin,xmax,ymin,ymax). Exiting",
-      NAME_CURRENT_COMP);
-    exit(0);
-  }
-
-  L_N = create_darr1d(nL);
-  L_p = create_darr1d(nL);
-  L_p2 = create_darr1d(nL);
-
-  // Use instance name for monitor output if no input was given
-  if (!strcmp(filename,"\0")) sprintf(filename,"%s",NAME_CURRENT_COMP);
-  #undef nL
-  #undef filename
-  #undef nowritefile
-  #undef xmin
-  #undef xmax
-  #undef ymin
-  #undef ymax
-  #undef xwidth
-  #undef yheight
-  #undef Lmin
-  #undef Lmax
-  #undef restore_neutron
-  #undef L_N
-  #undef L_p
-  #undef L_p2
-  return(_comp);
-} /* class_L_monitor_init */
-
 
 
 int init(void) { /* called by mccode_main for beam_validate:INITIALISE */
@@ -7713,7 +7542,6 @@ int init(void) { /* called by mccode_main for beam_validate:INITIALISE */
   _Origin_setpos(); /* type Progress_bar */
   _src_setpos(); /* type Source_simple */
   _mon_setpos(); /* type PSD_monitor */
-  _L_mon_setpos(); /* type L_monitor */
 
   /* call iteratively all components INITIALISE */
   class_Progress_bar_init(&_Origin_var);
@@ -7721,8 +7549,6 @@ int init(void) { /* called by mccode_main for beam_validate:INITIALISE */
   class_Source_simple_init(&_src_var);
 
   class_PSD_monitor_init(&_mon_var);
-
-  class_L_monitor_init(&_L_mon_var);
 
   if (mcdotrace) display();
   DEBUG_INSTR_END();
@@ -7732,7 +7558,6 @@ int init(void) { /* called by mccode_main for beam_validate:INITIALISE */
 #pragma acc update device(_Origin_var)
 #pragma acc update device(_src_var)
 #pragma acc update device(_mon_var)
-#pragma acc update device(_L_mon_var)
 #pragma acc update device(_instrument_var)
 #endif
 
@@ -8041,79 +7866,6 @@ void class_PSD_monitor_trace(_class_PSD_monitor *_comp
   return;
 } /* class_PSD_monitor_trace */
 
-#pragma acc routine
-void class_L_monitor_trace(_class_L_monitor *_comp
-  , _class_particle *_particle) {
-  ABSORBED=SCATTERED=RESTORE=0;
-  #define nL (_comp->_parameters.nL)
-  #define filename (_comp->_parameters.filename)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define xmin (_comp->_parameters.xmin)
-  #define xmax (_comp->_parameters.xmax)
-  #define ymin (_comp->_parameters.ymin)
-  #define ymax (_comp->_parameters.ymax)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define yheight (_comp->_parameters.yheight)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define L_N (_comp->_parameters.L_N)
-  #define L_p (_comp->_parameters.L_p)
-  #define L_p2 (_comp->_parameters.L_p2)
-  SIG_MESSAGE("[_L_mon_trace] component L_mon=L_monitor() TRACE [L_monitor:0]");
-
-  PROP_Z0;
-  if (x>xmin && x<xmax && y>ymin && y<ymax)
-  {
-    double L = (2*PI/V2K)/sqrt(vx*vx + vy*vy + vz*vz);
-    int i = floor((L-Lmin)*nL/(Lmax-Lmin));
-    if(i >= 0 && i < nL)
-    {
-      double p2 = p*p;
-      #pragma acc atomic
-      L_N[i] = L_N[i] +1;
-      #pragma acc atomic
-      L_p[i] = L_p[i] + p;
-      #pragma acc atomic
-      L_p2[i] = L_p2[i] + p2;
-      SCATTER;
-    }
-  }
-  if (restore_neutron) {
-    RESTORE_NEUTRON(INDEX_CURRENT_COMP, x, y, z, vx, vy, vz, t, sx, sy, sz, p);
-  }
-#ifndef NOABSORB_INF_NAN
-  /* Check for nan or inf particle parms */ 
-  if(isnan(p + t + vx + vy + vz + x + y + z)) ABSORB;
-  if(isinf(fabs(p) + fabs(t) + fabs(vx) + fabs(vy) + fabs(vz) + fabs(x) + fabs(y) + fabs(z))) ABSORB;
-#else
-  if(isnan(p)  ||  isinf(p)) printf("NAN or INF found in p,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(t)  ||  isinf(t)) printf("NAN or INF found in t,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vx) || isinf(vx)) printf("NAN or INF found in vx, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vy) || isinf(vy)) printf("NAN or INF found in vy, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vz) || isinf(vz)) printf("NAN or INF found in vz, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(x)  ||  isinf(x)) printf("NAN or INF found in x,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(y)  ||  isinf(y)) printf("NAN or INF found in y,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(z)  ||  isinf(z)) printf("NAN or INF found in z,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-#endif
-  #undef nL
-  #undef filename
-  #undef nowritefile
-  #undef xmin
-  #undef xmax
-  #undef ymin
-  #undef ymax
-  #undef xwidth
-  #undef yheight
-  #undef Lmin
-  #undef Lmax
-  #undef restore_neutron
-  #undef L_N
-  #undef L_p
-  #undef L_p2
-  return;
-} /* class_L_monitor_trace */
-
 /* *****************************************************************************
 * instrument 'beam_validate' TRACE
 ***************************************************************************** */
@@ -8197,28 +7949,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
     } /* end component mon [3] */
-    /* begin component L_mon=L_monitor() [4] */
-    if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
-      if (_L_mon_var._rotation_is_identity) {
-        if(!_L_mon_var._position_relative_is_zero) {
-          coords_get(coords_add(coords_set(x,y,z), _L_mon_var._position_relative),&x, &y, &z);
-        }
-      } else {
-          mccoordschange(_L_mon_var._position_relative, _L_mon_var._rotation_relative, _particle);
-      }
-    }
-    if (!ABSORBED && _particle->_index == 4) {
-      _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
-      _particle_save = *_particle;
-      DEBUG_COMP(_L_mon_var._name);
-      DEBUG_STATE();
-      class_L_monitor_trace(&_L_mon_var, _particle);
-      if (_particle->_restore)
-        particle_restore(_particle, &_particle_save);
-      _particle->_index++;
-      if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component L_mon [4] */
-    if (_particle->_index > 4)
+    if (_particle->_index > 3)
       ABSORBED++; /* absorbed when passed all components */
   } /* while !ABSORBED */
 
@@ -8414,21 +8145,6 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
         _particle->_index++;
       }
 
-      // L_mon
-    if (!ABSORBED && _particle->_index == 4) {
-#ifndef MULTICORE
-        if (_L_mon_var._rotation_is_identity)
-          coords_get(coords_add(coords_set(x,y,z), _L_mon_var._position_relative),&x, &y, &z);
-        else
-#endif
-          mccoordschange(_L_mon_var._position_relative, _L_mon_var._rotation_relative, _particle);
-        _particle_save = *_particle;
-        class_L_monitor_trace(&_L_mon_var, _particle);
-        if (_particle->_restore)
-        particle_restore(_particle, &_particle_save);
-        _particle->_index++;
-      }
-
     }
 
     // jump to next viable seed
@@ -8562,52 +8278,6 @@ _class_PSD_monitor *class_PSD_monitor_save(_class_PSD_monitor *_comp
   return(_comp);
 } /* class_PSD_monitor_save */
 
-_class_L_monitor *class_L_monitor_save(_class_L_monitor *_comp
-) {
-  #define nL (_comp->_parameters.nL)
-  #define filename (_comp->_parameters.filename)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define xmin (_comp->_parameters.xmin)
-  #define xmax (_comp->_parameters.xmax)
-  #define ymin (_comp->_parameters.ymin)
-  #define ymax (_comp->_parameters.ymax)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define yheight (_comp->_parameters.yheight)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define L_N (_comp->_parameters.L_N)
-  #define L_p (_comp->_parameters.L_p)
-  #define L_p2 (_comp->_parameters.L_p2)
-  SIG_MESSAGE("[_L_mon_save] component L_mon=L_monitor() SAVE [L_monitor:0]");
-
-if (!nowritefile) {
-  DETECTOR_OUT_1D(
-    "Wavelength monitor",
-    "Wavelength [AA]",
-    "Intensity",
-    "L", Lmin, Lmax, nL,
-    &L_N[0],&L_p[0],&L_p2[0],
-    filename);
-}
-  #undef nL
-  #undef filename
-  #undef nowritefile
-  #undef xmin
-  #undef xmax
-  #undef ymin
-  #undef ymax
-  #undef xwidth
-  #undef yheight
-  #undef Lmin
-  #undef Lmax
-  #undef restore_neutron
-  #undef L_N
-  #undef L_p
-  #undef L_p2
-  return(_comp);
-} /* class_L_monitor_save */
-
 
 
 int save(FILE *handle) { /* called by mccode_main for beam_validate:SAVE */
@@ -8618,8 +8288,6 @@ int save(FILE *handle) { /* called by mccode_main for beam_validate:SAVE */
 
 
   class_PSD_monitor_save(&_mon_var);
-
-  class_L_monitor_save(&_L_mon_var);
 
   if (!handle) siminfo_close(); 
 
@@ -8703,53 +8371,12 @@ _class_PSD_monitor *class_PSD_monitor_finally(_class_PSD_monitor *_comp
   return(_comp);
 } /* class_PSD_monitor_finally */
 
-_class_L_monitor *class_L_monitor_finally(_class_L_monitor *_comp
-) {
-  #define nL (_comp->_parameters.nL)
-  #define filename (_comp->_parameters.filename)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define xmin (_comp->_parameters.xmin)
-  #define xmax (_comp->_parameters.xmax)
-  #define ymin (_comp->_parameters.ymin)
-  #define ymax (_comp->_parameters.ymax)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define yheight (_comp->_parameters.yheight)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define L_N (_comp->_parameters.L_N)
-  #define L_p (_comp->_parameters.L_p)
-  #define L_p2 (_comp->_parameters.L_p2)
-  SIG_MESSAGE("[_L_mon_finally] component L_mon=L_monitor() FINALLY [L_monitor:0]");
-
-  destroy_darr1d(L_N);
-  destroy_darr1d(L_p);
-  destroy_darr1d(L_p2);
-  #undef nL
-  #undef filename
-  #undef nowritefile
-  #undef xmin
-  #undef xmax
-  #undef ymin
-  #undef ymax
-  #undef xwidth
-  #undef yheight
-  #undef Lmin
-  #undef Lmax
-  #undef restore_neutron
-  #undef L_N
-  #undef L_p
-  #undef L_p2
-  return(_comp);
-} /* class_L_monitor_finally */
-
 
 
 int finally(void) { /* called by mccode_main for beam_validate:FINALLY */
 #pragma acc update host(_Origin_var)
 #pragma acc update host(_src_var)
 #pragma acc update host(_mon_var)
-#pragma acc update host(_L_mon_var)
 #pragma acc update host(_instrument_var)
 
   siminfo_init(NULL);
@@ -8760,8 +8387,6 @@ int finally(void) { /* called by mccode_main for beam_validate:FINALLY */
 
 
   class_PSD_monitor_finally(&_mon_var);
-
-  class_L_monitor_finally(&_L_mon_var);
 
   siminfo_close(); 
 
@@ -8912,49 +8537,6 @@ _class_PSD_monitor *class_PSD_monitor_display(_class_PSD_monitor *_comp
   return(_comp);
 } /* class_PSD_monitor_display */
 
-_class_L_monitor *class_L_monitor_display(_class_L_monitor *_comp
-) {
-  #define nL (_comp->_parameters.nL)
-  #define filename (_comp->_parameters.filename)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define xmin (_comp->_parameters.xmin)
-  #define xmax (_comp->_parameters.xmax)
-  #define ymin (_comp->_parameters.ymin)
-  #define ymax (_comp->_parameters.ymax)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define yheight (_comp->_parameters.yheight)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define L_N (_comp->_parameters.L_N)
-  #define L_p (_comp->_parameters.L_p)
-  #define L_p2 (_comp->_parameters.L_p2)
-  SIG_MESSAGE("[_L_mon_display] component L_mon=L_monitor() DISPLAY [L_monitor:0]");
-
-  printf("MCDISPLAY: component %s\n", _comp->_name);
-  multiline(5, (double)xmin, (double)ymin, 0.0,
-               (double)xmax, (double)ymin, 0.0,
-               (double)xmax, (double)ymax, 0.0,
-               (double)xmin, (double)ymax, 0.0,
-               (double)xmin, (double)ymin, 0.0);
-  #undef nL
-  #undef filename
-  #undef nowritefile
-  #undef xmin
-  #undef xmax
-  #undef ymin
-  #undef ymax
-  #undef xwidth
-  #undef yheight
-  #undef Lmin
-  #undef Lmax
-  #undef restore_neutron
-  #undef L_N
-  #undef L_p
-  #undef L_p2
-  return(_comp);
-} /* class_L_monitor_display */
-
 
   #undef magnify
   #undef line
@@ -8976,8 +8558,6 @@ int display(void) { /* called by mccode_main for beam_validate:DISPLAY */
 
   class_PSD_monitor_display(&_mon_var);
 
-  class_L_monitor_display(&_L_mon_var);
-
   printf("MCDISPLAY: end\n");
 
   return(0);
@@ -8992,7 +8572,6 @@ void* _getvar_parameters(char* compname)
   if (!strcmp(compname, "Origin")) return (void *) &(_Origin_var._parameters);
   if (!strcmp(compname, "src")) return (void *) &(_src_var._parameters);
   if (!strcmp(compname, "mon")) return (void *) &(_mon_var._parameters);
-  if (!strcmp(compname, "L_mon")) return (void *) &(_L_mon_var._parameters);
   return 0;
 }
 
@@ -9009,7 +8588,6 @@ int _getcomp_index(char* compname)
   if (!strcmp(compname, "Origin")) return 1;
   if (!strcmp(compname, "src")) return 2;
   if (!strcmp(compname, "mon")) return 3;
-  if (!strcmp(compname, "L_mon")) return 4;
   return -1;
 }
 

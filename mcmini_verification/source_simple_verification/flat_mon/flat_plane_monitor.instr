@@ -1,0 +1,66 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: test (rename also the example and DEFINE lines below)
+*
+* %Identification
+* Written by: Your name (email)
+* Date: Current Date
+* Origin: Your institution
+* %INSTRUMENT_SITE: Templates
+*
+* Instrument short description
+*
+* %Description
+* Instrument longer description (type, elements, usage...)
+*
+* Example: mcrun test.instr <parameters=values>
+*
+* once your instrument is written and functional:
+* - replace INSTRUMENT_SITE entry above with your Institution name as a single word
+* - rename the instrument name after DEFINE INSTRUMENT below
+* - update the parameter help in the following Parameters section
+* - update the instrument description, and better add a usage example with a
+*     sensible parameter set.
+*
+* %Parameters
+*
+* %Link
+* A reference/HTML link for more information
+*
+* %End
+*******************************************************************************/
+DEFINE INSTRUMENT beam_validate(lambda=4.0, dlambda=0.1)
+
+TRACE
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+// Explicit, reproducible beam definition
+COMPONENT src = Source_simple(
+  radius = 0.2,         // use large radius to mimic Source_div rectangle
+  dist = 1.0,         // distance to monitor (for focusing)
+  focus_xw = 0.4,
+  focus_yh = 0.4,
+  lambda0  = lambda,
+  dlambda  = dlambda,
+  flux     = 1
+)
+AT (0,0,0) RELATIVE Origin
+
+// Flat monitor very close to source (or pick your chosen z)
+COMPONENT mon = PSD_monitor(
+  filename = "flat_hits.dat",
+  xwidth = 0.5,
+  yheight = 0.5,
+  nx = 1000,
+  ny = 1000,
+  restore_neutron = 1
+)
+AT (0,0,0.001) RELATIVE src
+
+
+END
+
+
+

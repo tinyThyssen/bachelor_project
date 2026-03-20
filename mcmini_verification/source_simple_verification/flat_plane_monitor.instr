@@ -38,7 +38,7 @@ AT (0,0,0) ABSOLUTE
 
 // Explicit, reproducible beam definition
 COMPONENT src = Source_simple(
-  radius = 0.1,         // use large radius to mimic Source_div rectangle
+  radius = 0.2,         // use large radius to mimic Source_div rectangle
   dist = 1.0,         // distance to monitor (for focusing)
   focus_xw = 0.4,
   focus_yh = 0.4,
@@ -53,23 +53,11 @@ COMPONENT mon = PSD_monitor(
   filename = "flat_hits.dat",
   xwidth = 0.5,
   yheight = 0.5,
-  nx = 200,
-  ny = 200,
+  nx = 1000,
+  ny = 1000,
   restore_neutron = 1
 )
-AT (0,0,1.0) RELATIVE src
-
-COMPONENT L_mon = L_monitor(
-    filename = "wavelength",
-    xwidth = 0.5,
-    yheight = 0.5,
-    Lmin = 3,
-    Lmax = 5
-) AT (0,0,1) RELATIVE src
-ROTATED (0, 0, 0) RELATIVE PREVIOUS
-
-
-
+AT (0,0,0.001) RELATIVE src
 
 
 END
