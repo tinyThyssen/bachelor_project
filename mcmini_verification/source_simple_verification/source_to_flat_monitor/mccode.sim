@@ -1,0 +1,52 @@
+mcstas simulation description file for beam_validate.
+Date:    Sun Mar 22 16:54:41 2026
+Program:  3.5.32, git
+
+begin instrument: beam_validate
+  File: source_to_flat_monitor/mccode
+  Source: flat_plane_monitor.instr
+  Parameters:  lambda(double) dlambda(double) monitor_distance(double) monitor_xwidth(double) monitor_yheight(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: source_to_flat_monitor
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.5.32, git
+  Instrument: flat_plane_monitor.instr
+  Ncount: 1000000000
+  Trace: no
+  Gravitation: no
+  Seed: 1774194878942346
+  Directory: source_to_flat_monitor
+  Nodes: 6
+  Param: lambda=4
+  Param: dlambda=0.1
+  Param: monitor_distance=1
+  Param: monitor_xwidth=1
+  Param: monitor_yheight=1
+end simulation
+
+begin data
+  Date: Sun Mar 22 16:55:16 2026 (1774194916)
+  type: array_2d(2000, 2000)
+  Source: beam_validate (flat_plane_monitor.instr)
+  component: mon
+  position: 0 0 1
+  title: PSD monitor
+  Ncount: 999999996
+  filename: flat_hits.dat
+  statistics: X0=0.000280335; dX=14.2282; Y0=-0.000275473; dY=14.2282;
+  signal: Min=0; Max=0.000105055; Mean=2.15106e-05;
+  values: 86.0424 0.00273569 1e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -50 50 -50 50
+  variables: I I_err N
+end data

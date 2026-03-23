@@ -11,7 +11,7 @@ DEFINE INSTRUMENT solid_sphere_validation(
   focus_xw = 0.02,
   focus_yh = 0.02,
   sigma_inc = 5.08,
-  sigma_abs = 0.0,
+  sigma_abs = 5.08,
   unit_cell_volume = 13.827
 )
 

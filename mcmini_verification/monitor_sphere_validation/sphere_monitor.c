@@ -1,8 +1,8 @@
 /* Automatically generated file. Do not edit. 
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
- * Instrument: sphere_monitor.instr (beam_validate)
- * Date:       Fri Mar 13 15:26:01 2026
+ * Instrument: sphere_monitor.instr (sphere_validate)
+ * Date:       Sun Mar 22 15:47:44 2026
  * File:       ./sphere_monitor.c
  * CFLAGS=
  */
@@ -6909,7 +6909,7 @@ int plane_intersect(double *t, double x, double y, double z,
 
 
 /* *****************************************************************************
-* Start of instrument 'beam_validate' generated code
+* Start of instrument 'sphere_validate' generated code
 ***************************************************************************** */
 
 #ifdef MC_TRACE_ENABLED
@@ -6919,27 +6919,29 @@ int traceenabled = 0;
 #endif
 #define MCSTAS "/opt/homebrew/Caskroom/miniconda/base/envs/mcstas/share/mcstas/resources/"
 int   defaultmain         = 1;
-char  instrument_name[]   = "beam_validate";
+char  instrument_name[]   = "sphere_validate";
 char  instrument_source[] = "sphere_monitor.instr";
 char *instrument_exe      = NULL; /* will be set to argv[0] in main */
-char  instrument_code[]   = "Instrument beam_validate source code sphere_monitor.instr is not embedded in this executable.\n  Use --source option when running mcstas.\n";
+char  instrument_code[]   = "Instrument sphere_validate source code sphere_monitor.instr is not embedded in this executable.\n  Use --source option when running mcstas.\n";
 
 int main(int argc, char *argv[]){return mccode_main(argc, argv);}
 
 /* *****************************************************************************
-* instrument 'beam_validate' and components DECLARE
+* instrument 'sphere_validate' and components DECLARE
 ***************************************************************************** */
 
 /* Instrument parameters: structure and a table for the initialisation
    (Used in e.g. inputparse and I/O function (e.g. detector_out) */
 
 struct _struct_instrument_parameters {
-  char beam_validate_has_no_parameter;
+  MCNUM lambda;
+  MCNUM dlambda;
+  MCNUM monitor_radius;
 };
 typedef struct _struct_instrument_parameters _class_instrument_parameters;
 
 struct _instrument_struct {
-  char   _name[256]; /* the name of this instrument e.g. 'beam_validate' */
+  char   _name[256]; /* the name of this instrument e.g. 'sphere_validate' */
 /* Counters per component instance */
   double counter_AbsorbProp[5]; /* absorbed events in PROP routines */
   double counter_N[5], counter_P[5], counter_P2[5]; /* event counters after each component instance */
@@ -6953,8 +6955,11 @@ struct _instrument_struct *instrument = & _instrument_var;
 #pragma acc declare create ( _instrument_var )
 #pragma acc declare create ( instrument )
 
-int numipar = 0;
+int numipar = 3;
 struct mcinputtable_struct mcinputtable[] = {
+  "lambda", &(_instrument_var._parameters.lambda), instr_type_double, "4.0", "",
+  "dlambda", &(_instrument_var._parameters.dlambda), instr_type_double, "0.1", "",
+  "monitor_radius", &(_instrument_var._parameters.monitor_radius), instr_type_double, "1.0", "",
   NULL, NULL, instr_type_double, ""
 };
 
@@ -7043,7 +7048,7 @@ typedef struct _struct_Source_simple _class_Source_simple;
 _class_Source_simple _src_var;
 #pragma acc declare create ( _src_var )
 
-/* component mon=PSD_monitor_4PI() [3] DECLARE */
+/* component mon_4pi=PSD_monitor_4PI() [3] DECLARE */
 /* Parameter definition for component type 'PSD_monitor_4PI' */
 struct _struct_PSD_monitor_4PI_parameters {
   /* Component type 'PSD_monitor_4PI' setting parameters */
@@ -7062,7 +7067,7 @@ typedef struct _struct_PSD_monitor_4PI_parameters _class_PSD_monitor_4PI_paramet
 
 /* Parameters for component type 'PSD_monitor_4PI' */
 struct _struct_PSD_monitor_4PI {
-  char     _name[256]; /* e.g. mon */
+  char     _name[256]; /* e.g. mon_4pi */
   char     _type[256]; /* PSD_monitor_4PI */
   long     _index; /* e.g. 2 index in TRACE list */
   Coords   _position_absolute;
@@ -7074,8 +7079,8 @@ struct _struct_PSD_monitor_4PI {
   _class_PSD_monitor_4PI_parameters _parameters;
 };
 typedef struct _struct_PSD_monitor_4PI _class_PSD_monitor_4PI;
-_class_PSD_monitor_4PI _mon_var;
-#pragma acc declare create ( _mon_var )
+_class_PSD_monitor_4PI _mon_4pi_var;
+#pragma acc declare create ( _mon_4pi_var )
 
 int mcNUMCOMP = 3;
 
@@ -7084,10 +7089,10 @@ int mcNUMCOMP = 3;
 #undef compcurname
 #undef compcurtype
 #undef compcurindex
-/* end of instrument 'beam_validate' and components DECLARE */
+/* end of instrument 'sphere_validate' and components DECLARE */
 
 /* *****************************************************************************
-* instrument 'beam_validate' and components INITIALISE
+* instrument 'sphere_validate' and components INITIALISE
 ***************************************************************************** */
 
 double index_getdistance(int first_index, int second_index)
@@ -7182,16 +7187,16 @@ int _src_setpos(void)
   stracpy(_src_var._type, "Source_simple", 16384);
   _src_var._index=2;
   int current_setpos_index = 2;
-  _src_var._parameters.radius = 0.2;
+  _src_var._parameters.radius = 0.25;
   _src_var._parameters.yheight = 0;
   _src_var._parameters.xwidth = 0;
   _src_var._parameters.dist = 1.0;
-  _src_var._parameters.focus_xw = 1.0;
-  _src_var._parameters.focus_yh = 1.0;
+  _src_var._parameters.focus_xw = 0.5;
+  _src_var._parameters.focus_yh = 0.5;
   _src_var._parameters.E0 = 0;
   _src_var._parameters.dE = 0;
-  _src_var._parameters.lambda0 = 4.0;
-  _src_var._parameters.dlambda = 0.1;
+  _src_var._parameters.lambda0 = _instrument_var._parameters.lambda;
+  _src_var._parameters.dlambda = _instrument_var._parameters.dlambda;
   _src_var._parameters.flux = 1;
   _src_var._parameters.gauss = 0;
   _src_var._parameters.target_index = + 1;
@@ -7229,16 +7234,16 @@ int _src_setpos(void)
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
         mccomp_placement_type_nexus(nxhandle,"0001_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_simple");
-        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "0.2","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "0.25","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "yheight", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "xwidth", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "dist", "0", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_xw", ".045", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", ".12", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "focus_xw", ".045", "0.5","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", ".12", "0.5","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "E0", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "dE", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "4.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0", "0.1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "_instrument_var._parameters.lambda","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0", "_instrument_var._parameters.dlambda","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "flux", "1", "1","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "gauss", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "target_index", "+ 1", "+ 1","int");
@@ -7251,63 +7256,59 @@ int _src_setpos(void)
   return(0);
 } /* _src_setpos */
 
-/* component mon=PSD_monitor_4PI() SETTING, POSITION/ROTATION */
-int _mon_setpos(void)
+/* component mon_4pi=PSD_monitor_4PI() SETTING, POSITION/ROTATION */
+int _mon_4pi_setpos(void)
 { /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_mon_setpos] component mon=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
-  stracpy(_mon_var._name, "mon", 16384);
-  stracpy(_mon_var._type, "PSD_monitor_4PI", 16384);
-  _mon_var._index=3;
+  SIG_MESSAGE("[_mon_4pi_setpos] component mon_4pi=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
+  stracpy(_mon_4pi_var._name, "mon_4pi", 16384);
+  stracpy(_mon_4pi_var._type, "PSD_monitor_4PI", 16384);
+  _mon_4pi_var._index=3;
   int current_setpos_index = 3;
-  _mon_var._parameters.nx = 360;
-  _mon_var._parameters.ny = 180;
-  if("sphere_hits" && strlen("sphere_hits"))
-    stracpy(_mon_var._parameters.filename, "sphere_hits" ? "sphere_hits" : "", 16384);
+  _mon_4pi_var._parameters.nx = 3600;
+  _mon_4pi_var._parameters.ny = 1800;
+  if("source_to_4pi_monitor.dat" && strlen("source_to_4pi_monitor.dat"))
+    stracpy(_mon_4pi_var._parameters.filename, "source_to_4pi_monitor.dat" ? "source_to_4pi_monitor.dat" : "", 16384);
   else 
-  _mon_var._parameters.filename[0]='\0';
-  _mon_var._parameters.nowritefile = 0;
-  _mon_var._parameters.radius = 1.0;
-  _mon_var._parameters.restore_neutron = 0;
+  _mon_4pi_var._parameters.filename[0]='\0';
+  _mon_4pi_var._parameters.nowritefile = 0;
+  _mon_4pi_var._parameters.radius = _instrument_var._parameters.monitor_radius;
+  _mon_4pi_var._parameters.restore_neutron = 1;
 
 
-  /* component mon=PSD_monitor_4PI() AT ROTATED */
+  /* component mon_4pi=PSD_monitor_4PI() AT ROTATED */
   {
     Coords tc1, tc2;
     tc1 = coords_set(0,0,0);
     tc2 = coords_set(0,0,0);
     Rotation tr1;
     rot_set_rotation(tr1,0,0,0);
-    rot_set_rotation(tr1,
+    rot_set_rotation(_mon_4pi_var._rotation_absolute,
       (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
-    rot_mul(tr1, _src_var._rotation_absolute, _mon_var._rotation_absolute);
     rot_transpose(_src_var._rotation_absolute, tr1);
-    rot_mul(_mon_var._rotation_absolute, tr1, _mon_var._rotation_relative);
-    _mon_var._rotation_is_identity =  rot_test_identity(_mon_var._rotation_relative);
-    tc1 = coords_set(
+    rot_mul(_mon_4pi_var._rotation_absolute, tr1, _mon_4pi_var._rotation_relative);
+    _mon_4pi_var._rotation_is_identity =  rot_test_identity(_mon_4pi_var._rotation_relative);
+    _mon_4pi_var._position_absolute = coords_set(
       0, 0, 0);
-    rot_transpose(_src_var._rotation_absolute, tr1);
-    tc2 = rot_apply(tr1, tc1);
-    _mon_var._position_absolute = coords_add(_src_var._position_absolute, tc2);
-    tc1 = coords_sub(_src_var._position_absolute, _mon_var._position_absolute);
-    _mon_var._position_relative = rot_apply(_mon_var._rotation_absolute, tc1);
-  } /* mon=PSD_monitor_4PI() AT ROTATED */
-  DEBUG_COMPONENT("mon", _mon_var._position_absolute, _mon_var._rotation_absolute);
-  instrument->_position_absolute[3] = _mon_var._position_absolute;
-  instrument->_position_relative[3] = _mon_var._position_relative;
-    _mon_var._position_relative_is_zero =  coords_test_zero(_mon_var._position_relative);
+    tc1 = coords_sub(_src_var._position_absolute, _mon_4pi_var._position_absolute);
+    _mon_4pi_var._position_relative = rot_apply(_mon_4pi_var._rotation_absolute, tc1);
+  } /* mon_4pi=PSD_monitor_4PI() AT ROTATED */
+  DEBUG_COMPONENT("mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute);
+  instrument->_position_absolute[3] = _mon_4pi_var._position_absolute;
+  instrument->_position_relative[3] = _mon_4pi_var._position_relative;
+    _mon_4pi_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_var._position_relative);
   instrument->counter_N[3]  = instrument->counter_P[3] = instrument->counter_P2[3] = 0;
   instrument->counter_AbsorbProp[3]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0002_mon", _mon_var._position_absolute, _mon_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0002_mon", "nx", "90", "360","int");
-        mccomp_param_nexus(nxhandle,"0002_mon", "ny", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0002_mon", "filename", 0, "sphere_hits", "char*");
-        mccomp_param_nexus(nxhandle,"0002_mon", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0002_mon", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon", "restore_neutron", "0", "0","int");
+        mccomp_placement_type_nexus(nxhandle,"0002_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0002_mon_4pi", "nx", "90", "3600","int");
+        mccomp_param_nexus(nxhandle,"0002_mon_4pi", "ny", "90", "1800","int");
+        mccomp_param_nexus(nxhandle,"0002_mon_4pi", "filename", 0, "source_to_4pi_monitor.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0002_mon_4pi", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0002_mon_4pi", "radius", "1", "_instrument_var._parameters.monitor_radius","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon_4pi", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -7315,7 +7316,7 @@ int _mon_setpos(void)
   }
   #endif
   return(0);
-} /* _mon_setpos */
+} /* _mon_4pi_setpos */
 
 _class_Progress_bar *class_Progress_bar_init(_class_Progress_bar *_comp
 ) {
@@ -7473,7 +7474,7 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_init(_class_PSD_monitor_4PI *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_init] component mon=PSD_monitor_4PI() INITIALISE [PSD_monitor_4PI:0]");
+  SIG_MESSAGE("[_mon_4pi_init] component mon_4pi=PSD_monitor_4PI() INITIALISE [PSD_monitor_4PI:0]");
 
   PSD_N = create_darr2d(nx, ny);
   PSD_p = create_darr2d(nx, ny);
@@ -7495,22 +7496,22 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_init(_class_PSD_monitor_4PI *_comp
 
 
 
-int init(void) { /* called by mccode_main for beam_validate:INITIALISE */
+int init(void) { /* called by mccode_main for sphere_validate:INITIALISE */
   DEBUG_INSTR();
 
   /* code_main/parseoptions/readparams sets instrument parameters value */
-  stracpy(instrument->_name, "beam_validate", 256);
+  stracpy(instrument->_name, "sphere_validate", 256);
 
   _Origin_setpos(); /* type Progress_bar */
   _src_setpos(); /* type Source_simple */
-  _mon_setpos(); /* type PSD_monitor_4PI */
+  _mon_4pi_setpos(); /* type PSD_monitor_4PI */
 
   /* call iteratively all components INITIALISE */
   class_Progress_bar_init(&_Origin_var);
 
   class_Source_simple_init(&_src_var);
 
-  class_PSD_monitor_4PI_init(&_mon_var);
+  class_PSD_monitor_4PI_init(&_mon_4pi_var);
 
   if (mcdotrace) display();
   DEBUG_INSTR_END();
@@ -7519,7 +7520,7 @@ int init(void) { /* called by mccode_main for beam_validate:INITIALISE */
 #include <openacc.h>
 #pragma acc update device(_Origin_var)
 #pragma acc update device(_src_var)
-#pragma acc update device(_mon_var)
+#pragma acc update device(_mon_4pi_var)
 #pragma acc update device(_instrument_var)
 #endif
 
@@ -7770,7 +7771,7 @@ void class_PSD_monitor_4PI_trace(_class_PSD_monitor_4PI *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_trace] component mon=PSD_monitor_4PI() TRACE [PSD_monitor_4PI:0]");
+  SIG_MESSAGE("[_mon_4pi_trace] component mon_4pi=PSD_monitor_4PI() TRACE [PSD_monitor_4PI:0]");
 
   double t0, t1, phi, theta;
   int i,j;
@@ -7836,12 +7837,12 @@ void class_PSD_monitor_4PI_trace(_class_PSD_monitor_4PI *_comp
 } /* class_PSD_monitor_4PI_trace */
 
 /* *****************************************************************************
-* instrument 'beam_validate' TRACE
+* instrument 'sphere_validate' TRACE
 ***************************************************************************** */
 
 #ifndef FUNNEL
 #pragma acc routine
-int raytrace(_class_particle* _particle) { /* single event propagation, called by mccode_main for beam_validate:TRACE */
+int raytrace(_class_particle* _particle) { /* single event propagation, called by mccode_main for sphere_validate:TRACE */
 
   /* init variables and counters for TRACE */
   #undef ABSORB0
@@ -7897,27 +7898,27 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
     } /* end component src [2] */
-    /* begin component mon=PSD_monitor_4PI() [3] */
+    /* begin component mon_4pi=PSD_monitor_4PI() [3] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
-      if (_mon_var._rotation_is_identity) {
-        if(!_mon_var._position_relative_is_zero) {
-          coords_get(coords_add(coords_set(x,y,z), _mon_var._position_relative),&x, &y, &z);
+      if (_mon_4pi_var._rotation_is_identity) {
+        if(!_mon_4pi_var._position_relative_is_zero) {
+          coords_get(coords_add(coords_set(x,y,z), _mon_4pi_var._position_relative),&x, &y, &z);
         }
       } else {
-          mccoordschange(_mon_var._position_relative, _mon_var._rotation_relative, _particle);
+          mccoordschange(_mon_4pi_var._position_relative, _mon_4pi_var._rotation_relative, _particle);
       }
     }
     if (!ABSORBED && _particle->_index == 3) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
-      DEBUG_COMP(_mon_var._name);
+      DEBUG_COMP(_mon_4pi_var._name);
       DEBUG_STATE();
-      class_PSD_monitor_4PI_trace(&_mon_var, _particle);
+      class_PSD_monitor_4PI_trace(&_mon_4pi_var, _particle);
       if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon [3] */
+    } /* end component mon_4pi [3] */
     if (_particle->_index > 3)
       ABSORBED++; /* absorbed when passed all components */
   } /* while !ABSORBED */
@@ -8099,16 +8100,16 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
         _particle->_index++;
       }
 
-      // mon
+      // mon_4pi
     if (!ABSORBED && _particle->_index == 3) {
 #ifndef MULTICORE
-        if (_mon_var._rotation_is_identity)
-          coords_get(coords_add(coords_set(x,y,z), _mon_var._position_relative),&x, &y, &z);
+        if (_mon_4pi_var._rotation_is_identity)
+          coords_get(coords_add(coords_set(x,y,z), _mon_4pi_var._position_relative),&x, &y, &z);
         else
 #endif
-          mccoordschange(_mon_var._position_relative, _mon_var._rotation_relative, _particle);
+          mccoordschange(_mon_4pi_var._position_relative, _mon_4pi_var._rotation_relative, _particle);
         _particle_save = *_particle;
-        class_PSD_monitor_4PI_trace(&_mon_var, _particle);
+        class_PSD_monitor_4PI_trace(&_mon_4pi_var, _particle);
         if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
         _particle->_index++;
@@ -8160,7 +8161,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
 #undef ABSORB
 #undef ABSORB0
 /* *****************************************************************************
-* instrument 'beam_validate' and components SAVE
+* instrument 'sphere_validate' and components SAVE
 ***************************************************************************** */
 
 _class_Progress_bar *class_Progress_bar_save(_class_Progress_bar *_comp
@@ -8213,7 +8214,7 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_save(_class_PSD_monitor_4PI *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_save] component mon=PSD_monitor_4PI() SAVE [PSD_monitor_4PI:0]");
+  SIG_MESSAGE("[_mon_4pi_save] component mon_4pi=PSD_monitor_4PI() SAVE [PSD_monitor_4PI:0]");
 
 if (!nowritefile) {
   DETECTOR_OUT_2D(
@@ -8239,14 +8240,14 @@ if (!nowritefile) {
 
 
 
-int save(FILE *handle) { /* called by mccode_main for beam_validate:SAVE */
+int save(FILE *handle) { /* called by mccode_main for sphere_validate:SAVE */
   if (!handle) siminfo_init(NULL);
 
   /* call iteratively all components SAVE */
   class_Progress_bar_save(&_Origin_var);
 
 
-  class_PSD_monitor_4PI_save(&_mon_var);
+  class_PSD_monitor_4PI_save(&_mon_4pi_var);
 
   if (!handle) siminfo_close(); 
 
@@ -8254,7 +8255,7 @@ int save(FILE *handle) { /* called by mccode_main for beam_validate:SAVE */
 } /* save */
 
 /* *****************************************************************************
-* instrument 'beam_validate' and components FINALLY
+* instrument 'sphere_validate' and components FINALLY
 ***************************************************************************** */
 
 _class_Progress_bar *class_Progress_bar_finally(_class_Progress_bar *_comp
@@ -8303,7 +8304,7 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_finally(_class_PSD_monitor_4PI *_c
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_finally] component mon=PSD_monitor_4PI() FINALLY [PSD_monitor_4PI:0]");
+  SIG_MESSAGE("[_mon_4pi_finally] component mon_4pi=PSD_monitor_4PI() FINALLY [PSD_monitor_4PI:0]");
 
   destroy_darr2d(PSD_N);
   destroy_darr2d(PSD_p);
@@ -8322,10 +8323,10 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_finally(_class_PSD_monitor_4PI *_c
 
 
 
-int finally(void) { /* called by mccode_main for beam_validate:FINALLY */
+int finally(void) { /* called by mccode_main for sphere_validate:FINALLY */
 #pragma acc update host(_Origin_var)
 #pragma acc update host(_src_var)
-#pragma acc update host(_mon_var)
+#pragma acc update host(_mon_4pi_var)
 #pragma acc update host(_instrument_var)
 
   siminfo_init(NULL);
@@ -8335,7 +8336,7 @@ int finally(void) { /* called by mccode_main for beam_validate:FINALLY */
   class_Progress_bar_finally(&_Origin_var);
 
 
-  class_PSD_monitor_4PI_finally(&_mon_var);
+  class_PSD_monitor_4PI_finally(&_mon_4pi_var);
 
   siminfo_close(); 
 
@@ -8343,7 +8344,7 @@ int finally(void) { /* called by mccode_main for beam_validate:FINALLY */
 } /* finally */
 
 /* *****************************************************************************
-* instrument 'beam_validate' and components DISPLAY
+* instrument 'sphere_validate' and components DISPLAY
 ***************************************************************************** */
 
   #define magnify     mcdis_magnify
@@ -8455,7 +8456,7 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_display(_class_PSD_monitor_4PI *_c
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_display] component mon=PSD_monitor_4PI() DISPLAY [PSD_monitor_4PI:0]");
+  SIG_MESSAGE("[_mon_4pi_display] component mon_4pi=PSD_monitor_4PI() DISPLAY [PSD_monitor_4PI:0]");
 
   printf("MCDISPLAY: component %s\n", _comp->_name);
   circle("xy",0,0,0,radius);
@@ -8484,7 +8485,7 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_display(_class_PSD_monitor_4PI *_c
   #undef cylinder
   #undef sphere
 
-int display(void) { /* called by mccode_main for beam_validate:DISPLAY */
+int display(void) { /* called by mccode_main for sphere_validate:DISPLAY */
   printf("MCDISPLAY: start\n");
 
   /* call iteratively all components DISPLAY */
@@ -8492,7 +8493,7 @@ int display(void) { /* called by mccode_main for beam_validate:DISPLAY */
 
   class_Source_simple_display(&_src_var);
 
-  class_PSD_monitor_4PI_display(&_mon_var);
+  class_PSD_monitor_4PI_display(&_mon_4pi_var);
 
   printf("MCDISPLAY: end\n");
 
@@ -8507,7 +8508,7 @@ void* _getvar_parameters(char* compname)
   #endif
   if (!strcmp(compname, "Origin")) return (void *) &(_Origin_var._parameters);
   if (!strcmp(compname, "src")) return (void *) &(_src_var._parameters);
-  if (!strcmp(compname, "mon")) return (void *) &(_mon_var._parameters);
+  if (!strcmp(compname, "mon_4pi")) return (void *) &(_mon_4pi_var._parameters);
   return 0;
 }
 
@@ -8523,7 +8524,7 @@ int _getcomp_index(char* compname)
 {
   if (!strcmp(compname, "Origin")) return 1;
   if (!strcmp(compname, "src")) return 2;
-  if (!strcmp(compname, "mon")) return 3;
+  if (!strcmp(compname, "mon_4pi")) return 3;
   return -1;
 }
 

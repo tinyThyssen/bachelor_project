@@ -30,7 +30,13 @@
 *
 * %End
 *******************************************************************************/
-DEFINE INSTRUMENT beam_validate(lambda=4.0, dlambda=0.1)
+DEFINE INSTRUMENT beam_validate(
+  lambda=4.0,
+  dlambda=0.1,
+  monitor_distance=1.0,
+  monitor_xwidth=1.0,
+  monitor_yheight=1.0
+)
 
 TRACE
 COMPONENT Origin = Progress_bar()
@@ -38,29 +44,29 @@ AT (0,0,0) ABSOLUTE
 
 // Explicit, reproducible beam definition
 COMPONENT src = Source_simple(
-  radius = 0.2,         // use large radius to mimic Source_div rectangle
-  dist = 1.0,         // distance to monitor (for focusing)
-  focus_xw = 0.4,
-  focus_yh = 0.4,
+  radius = 0.25,
+  dist = 1.0,
+  focus_xw = 0.5,
+  focus_yh = 0.5,
   lambda0  = lambda,
   dlambda  = dlambda,
   flux     = 1
 )
 AT (0,0,0) RELATIVE Origin
 
-// Flat monitor very close to source (or pick your chosen z)
+// Flat monitor placed downstream to test whether any asymmetry is already present
+// before the 4PI binning stage.
 COMPONENT mon = PSD_monitor(
   filename = "flat_hits.dat",
-  xwidth = 0.5,
-  yheight = 0.5,
-  nx = 1000,
-  ny = 1000,
+  xwidth = monitor_xwidth,
+  yheight = monitor_yheight,
+  nx = 2000,
+  ny = 2000,
   restore_neutron = 1
 )
-AT (0,0,0.001) RELATIVE src
+AT (0,0,monitor_distance) RELATIVE src
 
 
 END
-
 
 

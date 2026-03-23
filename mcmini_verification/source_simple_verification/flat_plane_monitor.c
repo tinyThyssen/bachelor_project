@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: flat_plane_monitor.instr (beam_validate)
- * Date:       Fri Mar 20 11:07:01 2026
+ * Date:       Sun Mar 22 16:54:36 2026
  * File:       ./flat_plane_monitor.c
  * CFLAGS=
  */
@@ -6936,6 +6936,9 @@ int main(int argc, char *argv[]){return mccode_main(argc, argv);}
 struct _struct_instrument_parameters {
   MCNUM lambda;
   MCNUM dlambda;
+  MCNUM monitor_distance;
+  MCNUM monitor_xwidth;
+  MCNUM monitor_yheight;
 };
 typedef struct _struct_instrument_parameters _class_instrument_parameters;
 
@@ -6954,10 +6957,13 @@ struct _instrument_struct *instrument = & _instrument_var;
 #pragma acc declare create ( _instrument_var )
 #pragma acc declare create ( instrument )
 
-int numipar = 2;
+int numipar = 5;
 struct mcinputtable_struct mcinputtable[] = {
   "lambda", &(_instrument_var._parameters.lambda), instr_type_double, "4.0", "",
   "dlambda", &(_instrument_var._parameters.dlambda), instr_type_double, "0.1", "",
+  "monitor_distance", &(_instrument_var._parameters.monitor_distance), instr_type_double, "1.0", "",
+  "monitor_xwidth", &(_instrument_var._parameters.monitor_xwidth), instr_type_double, "1.0", "",
+  "monitor_yheight", &(_instrument_var._parameters.monitor_yheight), instr_type_double, "1.0", "",
   NULL, NULL, instr_type_double, ""
 };
 
@@ -7190,12 +7196,12 @@ int _src_setpos(void)
   stracpy(_src_var._type, "Source_simple", 16384);
   _src_var._index=2;
   int current_setpos_index = 2;
-  _src_var._parameters.radius = 0.2;
+  _src_var._parameters.radius = 0.25;
   _src_var._parameters.yheight = 0;
   _src_var._parameters.xwidth = 0;
   _src_var._parameters.dist = 1.0;
-  _src_var._parameters.focus_xw = 0.4;
-  _src_var._parameters.focus_yh = 0.4;
+  _src_var._parameters.focus_xw = 0.5;
+  _src_var._parameters.focus_yh = 0.5;
   _src_var._parameters.E0 = 0;
   _src_var._parameters.dE = 0;
   _src_var._parameters.lambda0 = _instrument_var._parameters.lambda;
@@ -7237,12 +7243,12 @@ int _src_setpos(void)
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
         mccomp_placement_type_nexus(nxhandle,"0001_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_simple");
-        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "0.2","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "0.25","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "yheight", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "xwidth", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "dist", "0", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_xw", ".045", "0.4","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", ".12", "0.4","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "focus_xw", ".045", "0.5","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", ".12", "0.5","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "E0", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "dE", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "_instrument_var._parameters.lambda","MCNUM");
@@ -7267,8 +7273,8 @@ int _mon_setpos(void)
   stracpy(_mon_var._type, "PSD_monitor", 16384);
   _mon_var._index=3;
   int current_setpos_index = 3;
-  _mon_var._parameters.nx = 1000;
-  _mon_var._parameters.ny = 1000;
+  _mon_var._parameters.nx = 2000;
+  _mon_var._parameters.ny = 2000;
   if("flat_hits.dat" && strlen("flat_hits.dat"))
     stracpy(_mon_var._parameters.filename, "flat_hits.dat" ? "flat_hits.dat" : "", 16384);
   else 
@@ -7277,8 +7283,8 @@ int _mon_setpos(void)
   _mon_var._parameters.xmax = 0.05;
   _mon_var._parameters.ymin = -0.05;
   _mon_var._parameters.ymax = 0.05;
-  _mon_var._parameters.xwidth = 0.5;
-  _mon_var._parameters.yheight = 0.5;
+  _mon_var._parameters.xwidth = _instrument_var._parameters.monitor_xwidth;
+  _mon_var._parameters.yheight = _instrument_var._parameters.monitor_yheight;
   _mon_var._parameters.restore_neutron = 1;
   _mon_var._parameters.nowritefile = 0;
 
@@ -7297,7 +7303,7 @@ int _mon_setpos(void)
     rot_mul(_mon_var._rotation_absolute, tr1, _mon_var._rotation_relative);
     _mon_var._rotation_is_identity =  rot_test_identity(_mon_var._rotation_relative);
     tc1 = coords_set(
-      0, 0, 0.001);
+      0, 0, _instrument_var._parameters.monitor_distance);
     rot_transpose(_src_var._rotation_absolute, tr1);
     tc2 = rot_apply(tr1, tc1);
     _mon_var._position_absolute = coords_add(_src_var._position_absolute, tc2);
@@ -7315,15 +7321,15 @@ int _mon_setpos(void)
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
         mccomp_placement_type_nexus(nxhandle,"0002_mon", _mon_var._position_absolute, _mon_var._rotation_absolute, "PSD_monitor");
-        mccomp_param_nexus(nxhandle,"0002_mon", "nx", "90", "1000","int");
-        mccomp_param_nexus(nxhandle,"0002_mon", "ny", "90", "1000","int");
+        mccomp_param_nexus(nxhandle,"0002_mon", "nx", "90", "2000","int");
+        mccomp_param_nexus(nxhandle,"0002_mon", "ny", "90", "2000","int");
         mccomp_param_nexus(nxhandle,"0002_mon", "filename", 0, "flat_hits.dat", "char*");
         mccomp_param_nexus(nxhandle,"0002_mon", "xmin", "-0.05", "-0.05","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon", "xmax", "0.05", "0.05","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon", "ymin", "-0.05", "-0.05","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon", "ymax", "0.05", "0.05","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon", "xwidth", "0", "0.5","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon", "yheight", "0", "0.5","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "xwidth", "0", "_instrument_var._parameters.monitor_xwidth","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon", "yheight", "0", "_instrument_var._parameters.monitor_yheight","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon", "restore_neutron", "0", "1","int");
         mccomp_param_nexus(nxhandle,"0002_mon", "nowritefile", "0", "0","int");
       );

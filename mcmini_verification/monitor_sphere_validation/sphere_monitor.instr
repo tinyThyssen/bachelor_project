@@ -33,17 +33,8 @@
 DEFINE INSTRUMENT sphere_validate(
   lambda = 4.0,
   dlambda = 0.1,
-  sphere_radius = 0.001, //m
-  margin = 0.005, // margin added
-  unit_cell_volume = 13.827, // 
-  sigma_inc = 5.08,
-  sigma_abs = 5.08
+  monitor_radius = 1.0
   )
-
-DECLARE
-%{
-  int    n_reflections;
-%}
 
 TRACE
 COMPONENT Origin = Progress_bar()
@@ -51,114 +42,22 @@ AT (0,0,0) ABSOLUTE
 
 // Explicit, reproducible beam definition
 COMPONENT src = Source_simple(
-    radius = 0.001,
+    radius = 0.25,
     dist = 1.0,
-    focus_xw = 0.002,
-    focus_yh = 0.002,
-    lambda0 = 4.0,
-    dlambda = 0.1
+    focus_xw = 0.5,
+    focus_yh = 0.5,
+    lambda0 = lambda,
+    dlambda = dlambda
 ) AT (0,0,0) RELATIVE Origin
-ROTATED (0, 0, -0.1) RELATIVE PREVIOUS
-
-COMPONENT init = Union_init()
-AT (0,0,0) ABSOLUTE
-
-COMPONENT sample_inc = Incoherent_process(
-  sigma = sigma_inc,
-  unit_cell_volume = unit_cell_volume
-)
-AT (0,0,0) ABSOLUTE
-
-/* Match MCmini sigma_abs=0.4 barn -> macro abs = sigma*100*pack/Vc */
-COMPONENT sample_mat = Union_make_material(
-  process_string = "sample_inc",
-  my_absorption =  sigma_abs * 1e2 / unit_cell_volume 
-)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT solid_cylinder = Union_sphere(
-    priority = 10,
-    radius = 0.001,
-    material_string = "sample_mat"
-)
-AT (0,0,0) RELATIVE PREVIOUS
-
-
-COMPONENT master = Union_master()
-AT (0,0,0) ABSOLUTE
-EXTEND %{
-n_reflections = SCATTERED - 2;
-%}
-
-COMPONENT stop = Union_stop()
-AT (0,0,0) ABSOLUTE
-
-
-COMPONENT beamstop = Beamstop(
-  radius = 0.0015
-) 
-AT (0,0, 1.0) RELATIVE Origin
-
-
+ROTATED (0, 0, 0) RELATIVE PREVIOUS
 
 COMPONENT mon_4pi = PSD_monitor_4PI(
-  nx = 360,
-  ny = 180,
-  radius = 1.0,
+  nx = 3600,
+  ny = 1800,
+  radius = monitor_radius,
   restore_neutron = 1,
-  filename = "solid_sphere_multiple_scatter.dat"
+  filename = "source_to_4pi_monitor.dat"
 )
-WHEN (n_reflections >= 0)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT mon_4pi_s1 = PSD_monitor_4PI(
-  nx = 360,
-  ny = 180,
-  radius = 1.0,
-  restore_neutron = 1,
-  filename = "solid_sphere_scatter_1.dat"
-)
-WHEN (n_reflections == 1)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT mon_4pi_s2 = PSD_monitor_4PI(
-  nx = 360,
-  ny = 180,
-  radius = 1.0,
-  restore_neutron = 1,
-  filename = "solid_sphere_scatter_2.dat"
-)
-WHEN (n_reflections == 2)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT mon_4pi_s3 = PSD_monitor_4PI(
-  nx = 360,
-  ny = 180,
-  radius = 1.0,
-  restore_neutron = 1,
-  filename = "solid_sphere_scatter_3.dat"
-)
-WHEN (n_reflections == 3)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT mon_4pi_s4 = PSD_monitor_4PI(
-  nx = 360,
-  ny = 180,
-  radius = 1.0,
-  restore_neutron = 1,
-  filename = "solid_sphere_scatter_4.dat"
-)
-WHEN (n_reflections == 4)
-AT (0,0,0) ABSOLUTE
-
-COMPONENT mon_4pi_s5 = PSD_monitor_4PI(
-  nx = 360,
-  ny = 180,
-  radius = 1.0,
-  restore_neutron = 1,
-  filename = "solid_sphere_scatter_5.dat"
-)
-WHEN (n_reflections == 5)
 AT (0,0,0) ABSOLUTE
 
 

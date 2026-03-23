@@ -1,0 +1,72 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: test (rename also the example and DEFINE lines below)
+*
+* %Identification
+* Written by: Your name (email)
+* Date: Current Date
+* Origin: Your institution
+* %INSTRUMENT_SITE: Templates
+*
+* Instrument short description
+*
+* %Description
+* Instrument longer description (type, elements, usage...)
+*
+* Example: mcrun test.instr <parameters=values>
+*
+* once your instrument is written and functional:
+* - replace INSTRUMENT_SITE entry above with your Institution name as a single word
+* - rename the instrument name after DEFINE INSTRUMENT below
+* - update the parameter help in the following Parameters section
+* - update the instrument description, and better add a usage example with a
+*     sensible parameter set.
+*
+* %Parameters
+*
+* %Link
+* A reference/HTML link for more information
+*
+* %End
+*******************************************************************************/
+DEFINE INSTRUMENT beam_validate(
+  lambda=4.0,
+  dlambda=0.1,
+  monitor_distance=1.0,
+  monitor_xwidth=1.0,
+  monitor_yheight=1.0
+)
+
+TRACE
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+// Explicit, reproducible beam definition
+COMPONENT src = Source_simple(
+  radius = 0.25,
+  dist = 1.0,
+  focus_xw = 0.5,
+  focus_yh = 0.5,
+  lambda0  = lambda,
+  dlambda  = dlambda,
+  flux     = 1
+)
+AT (0,0,0) RELATIVE Origin
+
+// Flat monitor placed downstream to test whether any asymmetry is already present
+// before the 4PI binning stage.
+COMPONENT mon = PSD_monitor(
+  filename = "flat_hits.dat",
+  xwidth = monitor_xwidth,
+  yheight = monitor_yheight,
+  nx = 2000,
+  ny = 2000,
+  restore_neutron = 1
+)
+AT (0,0,monitor_distance) RELATIVE src
+
+
+END
+
+

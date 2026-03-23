@@ -1,0 +1,64 @@
+/*******************************************************************************
+*         McStas instrument definition URL=http://www.mcstas.org
+*
+* Instrument: test (rename also the example and DEFINE lines below)
+*
+* %Identification
+* Written by: Your name (email)
+* Date: Current Date
+* Origin: Your institution
+* %INSTRUMENT_SITE: Templates
+*
+* Instrument short description
+*
+* %Description
+* Instrument longer description (type, elements, usage...)
+*
+* Example: mcrun test.instr <parameters=values>
+*
+* once your instrument is written and functional:
+* - replace INSTRUMENT_SITE entry above with your Institution name as a single word
+* - rename the instrument name after DEFINE INSTRUMENT below
+* - update the parameter help in the following Parameters section
+* - update the instrument description, and better add a usage example with a
+*     sensible parameter set.
+*
+* %Parameters
+*
+* %Link
+* A reference/HTML link for more information
+*
+* %End
+*******************************************************************************/
+DEFINE INSTRUMENT sphere_validate(
+  lambda = 4.0,
+  dlambda = 0.1,
+  monitor_radius = 1.0
+  )
+
+TRACE
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+// Explicit, reproducible beam definition
+COMPONENT src = Source_simple(
+    radius = 0.25,
+    dist = 1.0,
+    focus_xw = 0.5,
+    focus_yh = 0.5,
+    lambda0 = lambda,
+    dlambda = dlambda
+) AT (0,0,0) RELATIVE Origin
+ROTATED (0, 0, 0) RELATIVE PREVIOUS
+
+COMPONENT mon_4pi = PSD_monitor_4PI(
+  nx = 3600,
+  ny = 1800,
+  radius = monitor_radius,
+  restore_neutron = 1,
+  filename = "source_to_4pi_monitor.dat"
+)
+AT (0,0,0) ABSOLUTE
+
+
+END
