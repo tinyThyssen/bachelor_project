@@ -42,9 +42,9 @@ Particle source_simple_emit(const SourceSimple *src, RNG *rng) {
     Vec3 target = vec3(xt, yt, zt);
 
     // normalize direction from source to target
-    Vec3 dvec = v_sub(target, pos);
-    double dist_p = sqrt(v_dot(dvec, dvec));
-    Vec3 dir = v_scale(dvec, 1.0 / dist_p);
+    Vec3 dvec = v_sub(target, pos); // vector from source position to target position
+    double dist_p = sqrt(v_dot(dvec, dvec)); // distance from source position to target position
+    Vec3 dir = v_scale(dvec, 1.0 / dist_p); // unit vector in direction from source to target
 
     // wavelength sampling: uniform in [lambda0-dlambda, lambda0+dlambda]
     double u5 = rng_uniform01(rng);

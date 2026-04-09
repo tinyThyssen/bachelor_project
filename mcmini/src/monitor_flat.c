@@ -3,12 +3,11 @@
 #include <math.h>
 #include <stdlib.h>
 
-// Ray-plane intersection. Returns 1 if hit, 0 if no hit (parallel or behind).
-static int ray_plane_hit(Vec3 r0, Vec3 dir, Vec3 plane_center, Vec3 plane_normal, double *t_hit) {
-    double denom = v_dot(dir, plane_normal); // ray direction dot plane normal
-    if (fabs(denom) < 1e-12) return 0; // return 0 if ray is parallel to plane
-    double t = v_dot(v_sub(plane_center, r0), plane_normal) / denom; // compute intersection t
-    if (t < 0.0) return 0; // return 0 if intersection is behind ray origin
+// Ray-plane intersection for a plane fixed at z = plane_z. Returns 1 if hit, 0 if no hit.
+static int ray_plane_hit_z(Vec3 r0, Vec3 dir, double plane_z, double *t_hit) {
+    if (fabs(dir.z) < 1e-12) return 0; // ray is parallel to the monitor plane
+    double t = (plane_z - r0.z) / dir.z;
+    if (t < 0.0) return 0; // intersection is behind the ray origin
     *t_hit = t;
     return 1;
 }
@@ -99,7 +98,7 @@ int monitor_flat_open_binned(MonitorFlat *m, const char *path, Vec3 center, // f
 
 int monitor_flat_record(MonitorFlat *m, const Particle *p) { // record one particle hit (works for both modes)
     double t_hit;
-    if (!ray_plane_hit(p->r, p->vec, m->center, m->normal, &t_hit)) {
+    if (!ray_plane_hit_z(p->r, p->vec, m->center.z, &t_hit)) {
         return 0;
     }
     m->hits_total++;
