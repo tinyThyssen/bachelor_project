@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: cylinder.instr (hollow_cylinder)
- * Date:       Wed Apr 15 16:14:26 2026
+ * Date:       Wed Apr 15 15:07:58 2026
  * File:       ./cylinder.c
  * CFLAGS= -DFUNNEL 
  */
@@ -6946,12 +6946,12 @@ typedef struct _struct_instrument_parameters _class_instrument_parameters;
 struct _instrument_struct {
   char   _name[256]; /* the name of this instrument e.g. 'hollow_cylinder' */
 /* Counters per component instance */
-  double counter_AbsorbProp[13]; /* absorbed events in PROP routines */
-  double counter_N[13], counter_P[13], counter_P2[13]; /* event counters after each component instance */
-  _class_particle _trajectory[13]; /* current trajectory for STORE/RESTORE */
+  double counter_AbsorbProp[12]; /* absorbed events in PROP routines */
+  double counter_N[12], counter_P[12], counter_P2[12]; /* event counters after each component instance */
+  _class_particle _trajectory[12]; /* current trajectory for STORE/RESTORE */
 /* Components position table (absolute and relative coords) */
-  Coords _position_relative[13]; /* positions of all components */
-  Coords _position_absolute[13];
+  Coords _position_relative[12]; /* positions of all components */
+  Coords _position_absolute[12];
   _class_instrument_parameters _parameters; /* instrument parameters */
 } _instrument_var;
 struct _instrument_struct *instrument = & _instrument_var;
@@ -16265,31 +16265,7 @@ typedef struct _struct_Union_stop _class_Union_stop;
 _class_Union_stop _stop_var;
 #pragma acc declare create ( _stop_var )
 
-/* component scatter_filter=Arm() [10] DECLARE */
-/* Parameter definition for component type 'Arm' */
-struct _struct_Arm_parameters {
-  char Arm_has_no_parameters;
-}; /* _struct_Arm_parameters */
-typedef struct _struct_Arm_parameters _class_Arm_parameters;
-
-/* Parameters for component type 'Arm' */
-struct _struct_Arm {
-  char     _name[256]; /* e.g. scatter_filter */
-  char     _type[256]; /* Arm */
-  long     _index; /* e.g. 2 index in TRACE list */
-  Coords   _position_absolute;
-  Coords   _position_relative; /* wrt PREVIOUS */
-  Rotation _rotation_absolute;
-  Rotation _rotation_relative; /* wrt PREVIOUS */
-  int      _rotation_is_identity;
-  int      _position_relative_is_zero;
-  _class_Arm_parameters _parameters;
-};
-typedef struct _struct_Arm _class_Arm;
-_class_Arm _scatter_filter_var;
-#pragma acc declare create ( _scatter_filter_var )
-
-/* component mon_4pi=PSD_monitor_4PI() [11] DECLARE */
+/* component mon_4pi=PSD_monitor_4PI() [10] DECLARE */
 /* Parameter definition for component type 'PSD_monitor_4PI' */
 struct _struct_PSD_monitor_4PI_parameters {
   /* Component type 'PSD_monitor_4PI' setting parameters */
@@ -16323,10 +16299,9 @@ typedef struct _struct_PSD_monitor_4PI _class_PSD_monitor_4PI;
 _class_PSD_monitor_4PI _mon_4pi_var;
 #pragma acc declare create ( _mon_4pi_var )
 
-int mcNUMCOMP = 11;
+int mcNUMCOMP = 10;
 
 /* User declarations from instrument definition. Can define functions. */
-  double theta_deg;
 
 #undef compcurname
 #undef compcurtype
@@ -16962,59 +16937,14 @@ int _stop_setpos(void)
   return(0);
 } /* _stop_setpos */
 
-/* component scatter_filter=Arm() SETTING, POSITION/ROTATION */
-int _scatter_filter_setpos(void)
-{ /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_scatter_filter_setpos] component scatter_filter=Arm() SETTING [Arm:0]");
-  stracpy(_scatter_filter_var._name, "scatter_filter", 16384);
-  stracpy(_scatter_filter_var._type, "Arm", 16384);
-  _scatter_filter_var._index=10;
-  int current_setpos_index = 10;
-  /* component scatter_filter=Arm() AT ROTATED */
-  {
-    Coords tc1, tc2;
-    tc1 = coords_set(0,0,0);
-    tc2 = coords_set(0,0,0);
-    Rotation tr1;
-    rot_set_rotation(tr1,0,0,0);
-    rot_set_rotation(_scatter_filter_var._rotation_absolute,
-      (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
-    rot_transpose(_master_var._rotation_absolute, tr1);
-    rot_mul(_scatter_filter_var._rotation_absolute, tr1, _scatter_filter_var._rotation_relative);
-    _scatter_filter_var._rotation_is_identity =  rot_test_identity(_scatter_filter_var._rotation_relative);
-    _scatter_filter_var._position_absolute = coords_set(
-      0, 0, 0);
-    tc1 = coords_sub(_master_var._position_absolute, _scatter_filter_var._position_absolute);
-    _scatter_filter_var._position_relative = rot_apply(_scatter_filter_var._rotation_absolute, tc1);
-  } /* scatter_filter=Arm() AT ROTATED */
-  DEBUG_COMPONENT("scatter_filter", _scatter_filter_var._position_absolute, _scatter_filter_var._rotation_absolute);
-  instrument->_position_absolute[10] = _scatter_filter_var._position_absolute;
-  instrument->_position_relative[10] = _scatter_filter_var._position_relative;
-    _scatter_filter_var._position_relative_is_zero =  coords_test_zero(_scatter_filter_var._position_relative);
-  instrument->counter_N[10]  = instrument->counter_P[10] = instrument->counter_P2[10] = 0;
-  instrument->counter_AbsorbProp[10]= 0;
-  #ifdef USE_NEXUS
-  if(nxhandle) {
-    if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
-    MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0009_scatter_filter", _scatter_filter_var._position_absolute, _scatter_filter_var._rotation_absolute, "Arm");
-      );
-    }
-  } else {
-    // fprintf(stderr,"NO NEXUS FILE");
-  }
-  #endif
-  return(0);
-} /* _scatter_filter_setpos */
-
 /* component mon_4pi=PSD_monitor_4PI() SETTING, POSITION/ROTATION */
 int _mon_4pi_setpos(void)
 { /* sets initial component parameters, position and rotation */
   SIG_MESSAGE("[_mon_4pi_setpos] component mon_4pi=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_var._name, "mon_4pi", 16384);
   stracpy(_mon_4pi_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_var._index=11;
-  int current_setpos_index = 11;
+  _mon_4pi_var._index=10;
+  int current_setpos_index = 10;
   _mon_4pi_var._parameters.nx = 180;
   _mon_4pi_var._parameters.ny = 90;
   if("cylinder_scattered.dat" && strlen("cylinder_scattered.dat"))
@@ -17035,31 +16965,31 @@ int _mon_4pi_setpos(void)
     rot_set_rotation(tr1,0,0,0);
     rot_set_rotation(_mon_4pi_var._rotation_absolute,
       (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
-    rot_transpose(_scatter_filter_var._rotation_absolute, tr1);
+    rot_transpose(_master_var._rotation_absolute, tr1);
     rot_mul(_mon_4pi_var._rotation_absolute, tr1, _mon_4pi_var._rotation_relative);
     _mon_4pi_var._rotation_is_identity =  rot_test_identity(_mon_4pi_var._rotation_relative);
     _mon_4pi_var._position_absolute = coords_set(
       0, 0, 0);
-    tc1 = coords_sub(_scatter_filter_var._position_absolute, _mon_4pi_var._position_absolute);
+    tc1 = coords_sub(_master_var._position_absolute, _mon_4pi_var._position_absolute);
     _mon_4pi_var._position_relative = rot_apply(_mon_4pi_var._rotation_absolute, tc1);
   } /* mon_4pi=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute);
-  instrument->_position_absolute[11] = _mon_4pi_var._position_absolute;
-  instrument->_position_relative[11] = _mon_4pi_var._position_relative;
+  instrument->_position_absolute[10] = _mon_4pi_var._position_absolute;
+  instrument->_position_relative[10] = _mon_4pi_var._position_relative;
     _mon_4pi_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_var._position_relative);
-  instrument->counter_N[11]  = instrument->counter_P[11] = instrument->counter_P2[11] = 0;
-  instrument->counter_AbsorbProp[11]= 0;
+  instrument->counter_N[10]  = instrument->counter_P[10] = instrument->counter_P2[10] = 0;
+  instrument->counter_AbsorbProp[10]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0010_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "nx", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "ny", "90", "90","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "filename", 0, "cylinder_scattered.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0009_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "nx", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "ny", "90", "90","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "filename", 0, "cylinder_scattered.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -18711,23 +18641,6 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
   /* code_main/parseoptions/readparams sets instrument parameters value */
   stracpy(instrument->_name, "hollow_cylinder", 256);
 
-  /* Instrument 'hollow_cylinder' INITIALISE */
-  SIG_MESSAGE("[hollow_cylinder] INITIALISE [(null):-1]");
-  #define lambda0 (instrument->_parameters.lambda0)
-  #define dlambda (instrument->_parameters.dlambda)
-  #define cylinder_radius (instrument->_parameters.cylinder_radius)
-  #define cylinder_height (instrument->_parameters.cylinder_height)
-  #define thickness (instrument->_parameters.thickness)
-  #define margin (instrument->_parameters.margin)
-{
-  theta_deg = 0.0;
-}
-  #undef lambda0
-  #undef dlambda
-  #undef cylinder_radius
-  #undef cylinder_height
-  #undef thickness
-  #undef margin
   _Origin_setpos(); /* type Progress_bar */
   _src_setpos(); /* type Source_simple */
   _init_setpos(); /* type Union_init */
@@ -18737,7 +18650,6 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
   _inner_vacuum_setpos(); /* type Union_cylinder */
   _master_setpos(); /* type Union_master */
   _stop_setpos(); /* type Union_stop */
-  _scatter_filter_setpos(); /* type Arm */
   _mon_4pi_setpos(); /* type PSD_monitor_4PI */
 
   /* call iteratively all components INITIALISE */
@@ -18758,7 +18670,6 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
   class_Union_master_init(&_master_var);
 
 
-
   class_PSD_monitor_4PI_init(&_mon_4pi_var);
 
   if (mcdotrace) display();
@@ -18775,7 +18686,6 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
 #pragma acc update device(_inner_vacuum_var)
 #pragma acc update device(_master_var)
 #pragma acc update device(_stop_var)
-#pragma acc update device(_scatter_filter_var)
 #pragma acc update device(_mon_4pi_var)
 #pragma acc update device(_instrument_var)
 #endif
@@ -20488,39 +20398,6 @@ void class_Union_master_trace(_class_Union_master *_comp
 } /* class_Union_master_trace */
 
 #pragma acc routine
-void class_Arm_trace(_class_Arm *_comp
-  , _class_particle *_particle) {
-  ABSORBED=SCATTERED=RESTORE=0;
-  SIG_MESSAGE("[_scatter_filter_trace] component scatter_filter=Arm() TRACE [Arm:0]");
-
-#ifndef NOABSORB_INF_NAN
-  /* Check for nan or inf particle parms */ 
-  if(isnan(p + t + vx + vy + vz + x + y + z)) ABSORB;
-  if(isinf(fabs(p) + fabs(t) + fabs(vx) + fabs(vy) + fabs(vz) + fabs(x) + fabs(y) + fabs(z))) ABSORB;
-#else
-  if(isnan(p)  ||  isinf(p)) printf("NAN or INF found in p,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(t)  ||  isinf(t)) printf("NAN or INF found in t,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vx) || isinf(vx)) printf("NAN or INF found in vx, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vy) || isinf(vy)) printf("NAN or INF found in vy, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vz) || isinf(vz)) printf("NAN or INF found in vz, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(x)  ||  isinf(x)) printf("NAN or INF found in x,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(y)  ||  isinf(y)) printf("NAN or INF found in y,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(z)  ||  isinf(z)) printf("NAN or INF found in z,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-#endif
-
-if (_comp->_index == 10) { // EXTEND 'scatter_filter'
-  /* horizontal longitude in degrees, from outgoing direction */
-  theta_deg = RAD2DEG * atan2(vx, vz);
-
-  /* keep only side windows */
-  if (!((theta_deg >= 30 && theta_deg <= 120) ||
-        (theta_deg >= -120 && theta_deg <= -30))) ABSORB;
-}
-
-  return;
-} /* class_Arm_trace */
-
-#pragma acc routine
 void class_PSD_monitor_4PI_trace(_class_PSD_monitor_4PI *_comp
   , _class_particle *_particle) {
   ABSORBED=SCATTERED=RESTORE=0;
@@ -20711,28 +20588,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle->_index++;
     } /* end component stop [9] */
-    /* begin component scatter_filter=Arm() [10] */
-    if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
-      if (_scatter_filter_var._rotation_is_identity) {
-        if(!_scatter_filter_var._position_relative_is_zero) {
-          coords_get(coords_add(coords_set(x,y,z), _scatter_filter_var._position_relative),&x, &y, &z);
-        }
-      } else {
-          mccoordschange(_scatter_filter_var._position_relative, _scatter_filter_var._rotation_relative, _particle);
-      }
-    }
-    if (!ABSORBED && _particle->_index == 10) {
-      _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
-      _particle_save = *_particle;
-      DEBUG_COMP(_scatter_filter_var._name);
-      DEBUG_STATE();
-      class_Arm_trace(&_scatter_filter_var, _particle); /* contains EXTEND code */
-      if (_particle->_restore)
-        particle_restore(_particle, &_particle_save);
-      _particle->_index++;
-      if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component scatter_filter [10] */
-    /* begin component mon_4pi=PSD_monitor_4PI() [11] */
+    /* begin component mon_4pi=PSD_monitor_4PI() [10] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_var._rotation_is_identity) {
         if(!_mon_4pi_var._position_relative_is_zero) {
@@ -20742,7 +20598,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_var._position_relative, _mon_4pi_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 11) {
+    if (!ABSORBED && _particle->_index == 10) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_var._name);
@@ -20752,8 +20608,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi [11] */
-    if (_particle->_index > 11)
+    } /* end component mon_4pi [10] */
+    if (_particle->_index > 10)
       ABSORBED++; /* absorbed when passed all components */
   } /* while !ABSORBED */
 
@@ -20994,23 +20850,8 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
         _particle->_index++;
       }
 
-      // scatter_filter
-    if (!ABSORBED && _particle->_index == 10) {
-#ifndef MULTICORE
-        if (_scatter_filter_var._rotation_is_identity)
-          coords_get(coords_add(coords_set(x,y,z), _scatter_filter_var._position_relative),&x, &y, &z);
-        else
-#endif
-          mccoordschange(_scatter_filter_var._position_relative, _scatter_filter_var._rotation_relative, _particle);
-        _particle_save = *_particle;
-        class_Arm_trace(&_scatter_filter_var, _particle); /* contains EXTEND code */
-        if (_particle->_restore)
-        particle_restore(_particle, &_particle_save);
-        _particle->_index++;
-      }
-
       // mon_4pi
-    if (!ABSORBED && _particle->_index == 11) {
+    if (!ABSORBED && _particle->_index == 10) {
 #ifndef MULTICORE
         if (_mon_4pi_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_var._position_relative),&x, &y, &z);
@@ -21154,7 +20995,6 @@ int save(FILE *handle) { /* called by mccode_main for hollow_cylinder:SAVE */
 
   /* call iteratively all components SAVE */
   class_Progress_bar_save(&_Origin_var);
-
 
 
 
@@ -21829,7 +21669,6 @@ int finally(void) { /* called by mccode_main for hollow_cylinder:FINALLY */
 #pragma acc update host(_inner_vacuum_var)
 #pragma acc update host(_master_var)
 #pragma acc update host(_stop_var)
-#pragma acc update host(_scatter_filter_var)
 #pragma acc update host(_mon_4pi_var)
 #pragma acc update host(_instrument_var)
 
@@ -21848,7 +21687,6 @@ int finally(void) { /* called by mccode_main for hollow_cylinder:FINALLY */
 
 
   class_Union_master_finally(&_master_var);
-
 
 
   class_PSD_monitor_4PI_finally(&_mon_4pi_var);
@@ -22300,25 +22138,6 @@ _class_Union_master *class_Union_master_display(_class_Union_master *_comp
   return(_comp);
 } /* class_Union_master_display */
 
-_class_Arm *class_Arm_display(_class_Arm *_comp
-) {
-  SIG_MESSAGE("[_scatter_filter_display] component scatter_filter=Arm() DISPLAY [Arm:0]");
-
-  printf("MCDISPLAY: component %s\n", _comp->_name);
-  /* A bit ugly; hard-coded dimensions. */
-  
-  line(0,0,0,0.2,0,0);
-  line(0,0,0,0,0.2,0);
-  line(0,0,0,0,0,0.2);
-
-
-  cone(0.2,0,0,0.01,0.02,1,0,0);
-  cone(0,0.2,0,0.01,0.02,0,1,0);
-  cone(0,0,0.2,0.01,0.02,0,0,1);
-
-  return(_comp);
-} /* class_Arm_display */
-
 _class_PSD_monitor_4PI *class_PSD_monitor_4PI_display(_class_PSD_monitor_4PI *_comp
 ) {
   #define nx (_comp->_parameters.nx)
@@ -22375,8 +22194,6 @@ int display(void) { /* called by mccode_main for hollow_cylinder:DISPLAY */
   class_Union_master_display(&_master_var);
 
 
-  class_Arm_display(&_scatter_filter_var);
-
   class_PSD_monitor_4PI_display(&_mon_4pi_var);
 
   printf("MCDISPLAY: end\n");
@@ -22399,7 +22216,6 @@ void* _getvar_parameters(char* compname)
   if (!strcmp(compname, "inner_vacuum")) return (void *) &(_inner_vacuum_var._parameters);
   if (!strcmp(compname, "master")) return (void *) &(_master_var._parameters);
   if (!strcmp(compname, "stop")) return (void *) &(_stop_var._parameters);
-  if (!strcmp(compname, "scatter_filter")) return (void *) &(_scatter_filter_var._parameters);
   if (!strcmp(compname, "mon_4pi")) return (void *) &(_mon_4pi_var._parameters);
   return 0;
 }
@@ -22423,8 +22239,7 @@ int _getcomp_index(char* compname)
   if (!strcmp(compname, "inner_vacuum")) return 7;
   if (!strcmp(compname, "master")) return 8;
   if (!strcmp(compname, "stop")) return 9;
-  if (!strcmp(compname, "scatter_filter")) return 10;
-  if (!strcmp(compname, "mon_4pi")) return 11;
+  if (!strcmp(compname, "mon_4pi")) return 10;
   return -1;
 }
 

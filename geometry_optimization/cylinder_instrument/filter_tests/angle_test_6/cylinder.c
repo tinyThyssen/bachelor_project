@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: cylinder.instr (hollow_cylinder)
- * Date:       Wed Apr 15 16:14:26 2026
+ * Date:       Wed Apr 15 15:21:47 2026
  * File:       ./cylinder.c
  * CFLAGS= -DFUNNEL 
  */
@@ -16326,7 +16326,7 @@ _class_PSD_monitor_4PI _mon_4pi_var;
 int mcNUMCOMP = 11;
 
 /* User declarations from instrument definition. Can define functions. */
-  double theta_deg;
+  double phi_deg;
 
 #undef compcurname
 #undef compcurtype
@@ -18720,7 +18720,7 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
   #define thickness (instrument->_parameters.thickness)
   #define margin (instrument->_parameters.margin)
 {
-  theta_deg = 0.0;
+  phi_deg = 0.0;
 }
   #undef lambda0
   #undef dlambda
@@ -20510,11 +20510,11 @@ void class_Arm_trace(_class_Arm *_comp
 
 if (_comp->_index == 10) { // EXTEND 'scatter_filter'
   /* horizontal longitude in degrees, from outgoing direction */
-  theta_deg = RAD2DEG * atan2(vx, vz);
+  phi_deg = RAD2DEG * atan2(vy, sqrt(vx*vx + vz*vz));
 
-  /* keep only side windows */
-  if (!((theta_deg >= 30 && theta_deg <= 120) ||
-        (theta_deg >= -120 && theta_deg <= -30))) ABSORB;
+
+  /* remove 30 degrees from poles */
+  if (fabs(phi_deg) >= 70) ABSORB;
 }
 
   return;

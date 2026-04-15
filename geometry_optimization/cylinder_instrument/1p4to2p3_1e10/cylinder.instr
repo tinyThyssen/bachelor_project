@@ -1,3 +1,4 @@
+
 DEFINE INSTRUMENT hollow_cylinder(
   lambda0 = 4.0,
   dlambda = 0.1,
@@ -9,18 +10,16 @@ DEFINE INSTRUMENT hollow_cylinder(
 
 DECLARE
 %{
-  double theta_deg;
+  int raw_scattered;
 %}
 
 INITIALIZE
 %{
-  theta_deg = 0.0;
+  raw_scattered = -999;
 %}
 
 TRACE
 
-COMPONENT Origin = Progress_bar()
-AT (0,0,0) ABSOLUTE
 
 COMPONENT src = Source_simple(
   radius = cylinder_height/2,
@@ -65,19 +64,18 @@ AT (0,0,0) ABSOLUTE
 
 COMPONENT master = Union_master()
 AT (0,0,0) ABSOLUTE
+EXTEND %{
+  raw_scattered = SCATTERED;
+%}
 
 COMPONENT stop = Union_stop()
 AT (0,0,0) ABSOLUTE
 
+
 COMPONENT scatter_filter = Arm()
 AT (0,0,0) ABSOLUTE
 EXTEND %{
-  /* horizontal longitude in degrees, from outgoing direction */
-  theta_deg = RAD2DEG * atan2(vx, vz);
-
-  /* keep only side windows */
-  if (!((theta_deg >= 30 && theta_deg <= 120) ||
-        (theta_deg >= -120 && theta_deg <= -30))) ABSORB;
+  if (raw_scattered == 0 || raw_scattered == 2) ABSORB;
 %}
 
 COMPONENT mon_4pi = PSD_monitor_4PI(
@@ -88,5 +86,6 @@ COMPONENT mon_4pi = PSD_monitor_4PI(
   filename = "cylinder_scattered.dat"
 )
 AT (0,0,0) ABSOLUTE
+
 
 END

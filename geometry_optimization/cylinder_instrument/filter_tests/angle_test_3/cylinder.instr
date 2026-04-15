@@ -10,11 +10,13 @@ DEFINE INSTRUMENT hollow_cylinder(
 DECLARE
 %{
   double theta_deg;
+  double phi_deg;
 %}
 
 INITIALIZE
 %{
   theta_deg = 0.0;
+  phi_deg = 0.0;
 %}
 
 TRACE
@@ -74,10 +76,14 @@ AT (0,0,0) ABSOLUTE
 EXTEND %{
   /* horizontal longitude in degrees, from outgoing direction */
   theta_deg = RAD2DEG * atan2(vx, vz);
+  phi_deg = RAD2DEG * atan2(vy, sqrt(vx*vx + vz*vz));
+
 
   /* keep only side windows */
-  if (!((theta_deg >= 30 && theta_deg <= 120) ||
-        (theta_deg >= -120 && theta_deg <= -30))) ABSORB;
+  if (!((theta_deg >= 40 && theta_deg <= 110) ||
+        (theta_deg >= -110 && theta_deg <= -40))) ABSORB;
+  /* remove 30 degrees from poles */
+  if (fabs(phi_deg) >= 70) ABSORB;
 %}
 
 COMPONENT mon_4pi = PSD_monitor_4PI(

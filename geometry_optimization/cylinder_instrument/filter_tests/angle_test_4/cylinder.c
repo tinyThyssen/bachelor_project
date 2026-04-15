@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: cylinder.instr (hollow_cylinder)
- * Date:       Wed Apr 15 16:14:26 2026
+ * Date:       Wed Apr 15 15:19:37 2026
  * File:       ./cylinder.c
  * CFLAGS= -DFUNNEL 
  */
@@ -20512,9 +20512,10 @@ if (_comp->_index == 10) { // EXTEND 'scatter_filter'
   /* horizontal longitude in degrees, from outgoing direction */
   theta_deg = RAD2DEG * atan2(vx, vz);
 
+
   /* keep only side windows */
-  if (!((theta_deg >= 30 && theta_deg <= 120) ||
-        (theta_deg >= -120 && theta_deg <= -30))) ABSORB;
+  if (!((theta_deg >= 40 && theta_deg <= 110) ||
+        (theta_deg >= -110 && theta_deg <= -40))) ABSORB;
 }
 
   return;
