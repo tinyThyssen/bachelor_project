@@ -1,0 +1,214 @@
+/*******************************************************************************
+* McStas instrument for determining the SCATTERED offset in the hollow cylinder
+* Union setup.
+*
+* Strategy:
+* 1. Record raw SCATTERED value immediately after Union_master.
+* 2. Split output into several PSD_monitor_4PI monitors using WHEN(raw_scattered==k).
+* 3. Inspect which monitor contains the direct transmitted beam.
+* 4. That k-value is the baseline offset for "no physical scatter".
+*******************************************************************************/
+
+DEFINE INSTRUMENT hollow_cylinder_offset_debug(
+  lambda0 = 4.0,
+  dlambda = 0.1,
+  cylinder_radius = 0.01,
+  cylinder_height = 0.06,
+  thickness = 0.002,
+  margin = 0.01,
+  unit_cell_volume = 13.827,
+  sigma_inc = 5.08,
+  sigma_abs = 5.08
+)
+
+DECLARE
+%{
+  int raw_scattered;
+%}
+
+INITIALIZE
+%{
+  raw_scattered = -999;
+%}
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT src = Source_simple(
+  radius   = cylinder_height/2,
+  dist     = 1.0,
+  focus_xw = 2*cylinder_radius + margin,
+  focus_yh = cylinder_height + margin,
+  lambda0  = lambda0,
+  dlambda  = dlambda,
+  flux     = 1,
+  gauss    = 0
+)
+AT (0,0,-0.2) ABSOLUTE
+
+COMPONENT init = Union_init()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT sample_inc = Incoherent_process(
+  sigma = sigma_inc,
+  unit_cell_volume = unit_cell_volume
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT sample_mat = Union_make_material(
+  process_string = "sample_inc",
+  my_absorption  = sigma_abs * 1e2 / unit_cell_volume
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT hollow_cylinder_shell = Union_cylinder(
+  priority = 10,
+  radius = cylinder_radius,
+  yheight = cylinder_height,
+  material_string = "sample_mat"
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT inner_vacuum = Union_cylinder(
+  priority = 20,
+  radius = cylinder_radius - thickness,
+  yheight = cylinder_height - 2*thickness,
+  material_string = "Vacuum"
+)
+AT (0,0,0) ABSOLUTE
+
+/* Record raw SCATTERED immediately after the Union transport */
+COMPONENT master = Union_master()
+AT (0,0,0) ABSOLUTE
+EXTEND %{
+  raw_scattered = SCATTERED;
+%}
+
+/* Keep Union bookkeeping in the standard place after Union_master */
+COMPONENT stop = Union_stop()
+AT (0,0,0) ABSOLUTE
+
+/* Optional reference monitor: everything mixed together */
+COMPONENT mon_all = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_all.dat"
+)
+AT (0,0,0) ABSOLUTE
+
+/* Raw SCATTERED diagnostic monitors */
+COMPONENT mon_raw_0 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_0.dat"
+)
+WHEN (raw_scattered == 0)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_raw_1 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_1.dat"
+)
+WHEN (raw_scattered == 1)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_raw_2 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_2.dat"
+)
+WHEN (raw_scattered == 2)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_raw_3 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_3.dat"
+)
+WHEN (raw_scattered == 3)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_raw_4 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_4.dat"
+)
+WHEN (raw_scattered == 4)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_raw_5 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_5.dat"
+)
+WHEN (raw_scattered == 5)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_raw_6 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_6.dat"
+)
+WHEN (raw_scattered == 6)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_raw_7 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_7.dat"
+)
+WHEN (raw_scattered == 7)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_raw_ge8 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_scattered_ge8.dat"
+)
+WHEN (raw_scattered >= 8)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_with_4 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_with_4.dat"
+)
+WHEN (raw_scattered != 0 && raw_scattered != 2)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_without_4 = PSD_monitor_4PI(
+  nx = 360,
+  ny = 180,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "raw_without_4.dat"
+)
+WHEN (raw_scattered != 0 && raw_scattered != 2 && raw_scattered != 4)
+AT (0,0,0) ABSOLUTE
+
+END
