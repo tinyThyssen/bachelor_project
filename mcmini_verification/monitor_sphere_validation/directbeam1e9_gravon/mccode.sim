@@ -1,0 +1,47 @@
+mcstas simulation description file for sphere_validate.
+Date:    Thu Apr 16 17:14:12 2026
+Program:  3.5.32, git
+
+begin instrument: sphere_validate
+  File: directbeam1e9_gravoff/mccode
+  Source: sphere_monitor.instr
+  Parameters: 
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: directbeam1e9_gravoff
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.5.32, git
+  Instrument: sphere_monitor.instr
+  Ncount: 1000000000
+  Trace: no
+  Gravitation: yes
+  Seed: 1776352452845493
+  Directory: directbeam1e9_gravoff
+  Nodes: 6
+end simulation
+
+begin data
+  Date: Thu Apr 16 17:14:40 2026 (1776352480)
+  type: array_2d(3600, 1800)
+  Source: sphere_validate (sphere_monitor.instr)
+  component: mon_4pi
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 999999996
+  filename: source_to_4pi_monitor.dat
+  statistics: X0=0.000291579; dX=8.07141; Y0=0.049642; dY=7.99366;
+  signal: Min=0; Max=0.0011607; Mean=1.3278e-05;
+  values: 86.0417 0.00273566 1e+09
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data

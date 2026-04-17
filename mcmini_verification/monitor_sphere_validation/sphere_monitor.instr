@@ -31,12 +31,10 @@
 * %End
 *******************************************************************************/
 DEFINE INSTRUMENT sphere_validate(
-  lambda = 4.0,
-  dlambda = 0.1,
-  monitor_radius = 1.0
   )
 
 TRACE
+
 COMPONENT Origin = Progress_bar()
 AT (0,0,0) ABSOLUTE
 
@@ -46,15 +44,15 @@ COMPONENT src = Source_simple(
     dist = 1.0,
     focus_xw = 0.5,
     focus_yh = 0.5,
-    lambda0 = lambda,
-    dlambda = dlambda
+    lambda0 = 4.0,
+    dlambda = 0.1
 ) AT (0,0,0) RELATIVE Origin
-ROTATED (0, 0, 0) RELATIVE PREVIOUS
+ROTATED (0, 0, 0) ABSOLUTE
 
 COMPONENT mon_4pi = PSD_monitor_4PI(
   nx = 3600,
   ny = 1800,
-  radius = monitor_radius,
+  radius = 1.0,
   restore_neutron = 1,
   filename = "source_to_4pi_monitor.dat"
 )

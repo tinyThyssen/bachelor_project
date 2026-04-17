@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: sphere_monitor.instr (sphere_validate)
- * Date:       Sun Mar 22 15:47:44 2026
+ * Date:       Thu Apr 16 17:09:41 2026
  * File:       ./sphere_monitor.c
  * CFLAGS=
  */
@@ -6934,9 +6934,7 @@ int main(int argc, char *argv[]){return mccode_main(argc, argv);}
    (Used in e.g. inputparse and I/O function (e.g. detector_out) */
 
 struct _struct_instrument_parameters {
-  MCNUM lambda;
-  MCNUM dlambda;
-  MCNUM monitor_radius;
+  char sphere_validate_has_no_parameter;
 };
 typedef struct _struct_instrument_parameters _class_instrument_parameters;
 
@@ -6955,11 +6953,8 @@ struct _instrument_struct *instrument = & _instrument_var;
 #pragma acc declare create ( _instrument_var )
 #pragma acc declare create ( instrument )
 
-int numipar = 3;
+int numipar = 0;
 struct mcinputtable_struct mcinputtable[] = {
-  "lambda", &(_instrument_var._parameters.lambda), instr_type_double, "4.0", "",
-  "dlambda", &(_instrument_var._parameters.dlambda), instr_type_double, "0.1", "",
-  "monitor_radius", &(_instrument_var._parameters.monitor_radius), instr_type_double, "1.0", "",
   NULL, NULL, instr_type_double, ""
 };
 
@@ -7195,8 +7190,8 @@ int _src_setpos(void)
   _src_var._parameters.focus_yh = 0.5;
   _src_var._parameters.E0 = 0;
   _src_var._parameters.dE = 0;
-  _src_var._parameters.lambda0 = _instrument_var._parameters.lambda;
-  _src_var._parameters.dlambda = _instrument_var._parameters.dlambda;
+  _src_var._parameters.lambda0 = 4.0;
+  _src_var._parameters.dlambda = 0.1;
   _src_var._parameters.flux = 1;
   _src_var._parameters.gauss = 0;
   _src_var._parameters.target_index = + 1;
@@ -7209,9 +7204,8 @@ int _src_setpos(void)
     tc2 = coords_set(0,0,0);
     Rotation tr1;
     rot_set_rotation(tr1,0,0,0);
-    rot_set_rotation(tr1,
+    rot_set_rotation(_src_var._rotation_absolute,
       (0)*DEG2RAD, (0)*DEG2RAD, (0)*DEG2RAD);
-    rot_mul(tr1, _Origin_var._rotation_absolute, _src_var._rotation_absolute);
     rot_transpose(_Origin_var._rotation_absolute, tr1);
     rot_mul(_src_var._rotation_absolute, tr1, _src_var._rotation_relative);
     _src_var._rotation_is_identity =  rot_test_identity(_src_var._rotation_relative);
@@ -7242,8 +7236,8 @@ int _src_setpos(void)
         mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", ".12", "0.5","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "E0", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "dE", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "_instrument_var._parameters.lambda","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0", "_instrument_var._parameters.dlambda","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "4.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0", "0.1","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "flux", "1", "1","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "gauss", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "target_index", "+ 1", "+ 1","int");
@@ -7271,7 +7265,7 @@ int _mon_4pi_setpos(void)
   else 
   _mon_4pi_var._parameters.filename[0]='\0';
   _mon_4pi_var._parameters.nowritefile = 0;
-  _mon_4pi_var._parameters.radius = _instrument_var._parameters.monitor_radius;
+  _mon_4pi_var._parameters.radius = 1.0;
   _mon_4pi_var._parameters.restore_neutron = 1;
 
 
@@ -7307,7 +7301,7 @@ int _mon_4pi_setpos(void)
         mccomp_param_nexus(nxhandle,"0002_mon_4pi", "ny", "90", "1800","int");
         mccomp_param_nexus(nxhandle,"0002_mon_4pi", "filename", 0, "source_to_4pi_monitor.dat", "char*");
         mccomp_param_nexus(nxhandle,"0002_mon_4pi", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0002_mon_4pi", "radius", "1", "_instrument_var._parameters.monitor_radius","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon_4pi", "radius", "1", "1.0","MCNUM");
         mccomp_param_nexus(nxhandle,"0002_mon_4pi", "restore_neutron", "0", "1","int");
       );
     }

@@ -1,0 +1,89 @@
+DEFINE INSTRUMENT hollow_cylinder(
+  lambda0 = 4.0,
+  dlambda = 0.1,
+  cylinder_radius = 0.01,
+  cylinder_height = 0.06,
+  thickness = 0.001,
+  margin = 0.01
+)
+
+DECLARE
+%{
+  double theta_deg;
+%}
+
+INITIALIZE
+%{
+  theta_deg = 0.0;
+%}
+
+TRACE
+
+COMPONENT src = Source_simple(
+  radius = cylinder_height/2,
+  dist = 1.0,
+  focus_xw = 2*cylinder_radius + margin,
+  focus_yh = cylinder_height + margin,
+  lambda0 = lambda0,
+  dlambda = dlambda
+)
+AT (0,0,-0.2) ABSOLUTE
+
+COMPONENT init = Union_init()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT sample_inc = Incoherent_process(
+  sigma = 5.08,
+  unit_cell_volume = 13.827
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT sample_mat = Union_make_material(
+  process_string = "sample_inc",
+  my_absorption = 5.08 * 1e2 / 13.827
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT hollow_cylinder_shell = Union_cylinder(
+    priority = 10,
+    radius = cylinder_radius,
+    yheight = cylinder_height,
+    material_string = "sample_mat"
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT inner_vacuum = Union_cylinder(
+  priority = 20,
+  radius = cylinder_radius - thickness,
+  yheight = cylinder_height - 2*thickness,
+  material_string = "Vacuum"
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT master = Union_master()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT stop = Union_stop()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT scatter_filter = Arm()
+AT (0,0,0) ABSOLUTE
+EXTEND %{
+  /* horizontal longitude in degrees, from outgoing direction */
+  theta_deg = RAD2DEG * atan2(vx, vz);
+
+  /* keep only side windows */
+  if (!((theta_deg >= 30 && theta_deg <= 120) ||
+        (theta_deg >= -120 && theta_deg <= -30))) ABSORB;
+%}
+
+COMPONENT mon_4pi = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "cylinder_scattered.dat"
+)
+AT (0,0,0) ABSOLUTE
+
+END

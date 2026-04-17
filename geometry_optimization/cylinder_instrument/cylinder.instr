@@ -19,9 +19,6 @@ INITIALIZE
 
 TRACE
 
-COMPONENT Origin = Progress_bar()
-AT (0,0,0) ABSOLUTE
-
 COMPONENT src = Source_simple(
   radius = cylinder_height/2,
   dist = 1.0,

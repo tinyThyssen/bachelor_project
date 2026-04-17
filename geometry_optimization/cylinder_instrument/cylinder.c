@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: cylinder.instr (hollow_cylinder)
- * Date:       Wed Apr 15 16:14:26 2026
+ * Date:       Wed Apr 15 21:20:05 2026
  * File:       ./cylinder.c
  * CFLAGS= -DFUNNEL 
  */
@@ -6946,12 +6946,12 @@ typedef struct _struct_instrument_parameters _class_instrument_parameters;
 struct _instrument_struct {
   char   _name[256]; /* the name of this instrument e.g. 'hollow_cylinder' */
 /* Counters per component instance */
-  double counter_AbsorbProp[13]; /* absorbed events in PROP routines */
-  double counter_N[13], counter_P[13], counter_P2[13]; /* event counters after each component instance */
-  _class_particle _trajectory[13]; /* current trajectory for STORE/RESTORE */
+  double counter_AbsorbProp[12]; /* absorbed events in PROP routines */
+  double counter_N[12], counter_P[12], counter_P2[12]; /* event counters after each component instance */
+  _class_particle _trajectory[12]; /* current trajectory for STORE/RESTORE */
 /* Components position table (absolute and relative coords) */
-  Coords _position_relative[13]; /* positions of all components */
-  Coords _position_absolute[13];
+  Coords _position_relative[12]; /* positions of all components */
+  Coords _position_absolute[12];
   _class_instrument_parameters _parameters; /* instrument parameters */
 } _instrument_var;
 struct _instrument_struct *instrument = & _instrument_var;
@@ -15822,41 +15822,7 @@ int physics_scattering(enum process choice, double *k_final, double *k_initial, 
 
 /* ********************** component definition declarations. **************** */
 
-/* component Origin=Progress_bar() [1] DECLARE */
-/* Parameter definition for component type 'Progress_bar' */
-struct _struct_Progress_bar_parameters {
-  /* Component type 'Progress_bar' setting parameters */
-  char profile[16384];
-  MCNUM percent;
-  MCNUM flag_save;
-  MCNUM minutes;
-  /* Component type 'Progress_bar' private parameters */
-  double  IntermediateCnts;
-  time_t  StartTime;
-  time_t  EndTime;
-  time_t  CurrentTime;
-  char  infostring[64];
-}; /* _struct_Progress_bar_parameters */
-typedef struct _struct_Progress_bar_parameters _class_Progress_bar_parameters;
-
-/* Parameters for component type 'Progress_bar' */
-struct _struct_Progress_bar {
-  char     _name[256]; /* e.g. Origin */
-  char     _type[256]; /* Progress_bar */
-  long     _index; /* e.g. 2 index in TRACE list */
-  Coords   _position_absolute;
-  Coords   _position_relative; /* wrt PREVIOUS */
-  Rotation _rotation_absolute;
-  Rotation _rotation_relative; /* wrt PREVIOUS */
-  int      _rotation_is_identity;
-  int      _position_relative_is_zero;
-  _class_Progress_bar_parameters _parameters;
-};
-typedef struct _struct_Progress_bar _class_Progress_bar;
-_class_Progress_bar _Origin_var;
-#pragma acc declare create ( _Origin_var )
-
-/* component src=Source_simple() [2] DECLARE */
+/* component src=Source_simple() [1] DECLARE */
 /* Parameter definition for component type 'Source_simple' */
 struct _struct_Source_simple_parameters {
   /* Component type 'Source_simple' setting parameters */
@@ -15900,7 +15866,7 @@ typedef struct _struct_Source_simple _class_Source_simple;
 _class_Source_simple _src_var;
 #pragma acc declare create ( _src_var )
 
-/* component init=Union_init() [3] DECLARE */
+/* component init=Union_init() [2] DECLARE */
 /* Parameter definition for component type 'Union_init' */
 struct _struct_Union_init_parameters {
   /* Component type 'Union_init' private parameters */
@@ -15936,7 +15902,7 @@ typedef struct _struct_Union_init _class_Union_init;
 _class_Union_init _init_var;
 #pragma acc declare create ( _init_var )
 
-/* component sample_inc=Incoherent_process() [4] DECLARE */
+/* component sample_inc=Incoherent_process() [3] DECLARE */
 /* Parameter definition for component type 'Incoherent_process' */
 struct _struct_Incoherent_process_parameters {
   /* Component type 'Incoherent_process' setting parameters */
@@ -15972,7 +15938,7 @@ typedef struct _struct_Incoherent_process _class_Incoherent_process;
 _class_Incoherent_process _sample_inc_var;
 #pragma acc declare create ( _sample_inc_var )
 
-/* component sample_mat=Union_make_material() [5] DECLARE */
+/* component sample_mat=Union_make_material() [4] DECLARE */
 /* Parameter definition for component type 'Union_make_material' */
 struct _struct_Union_make_material_parameters {
   /* Component type 'Union_make_material' setting parameters */
@@ -16008,7 +15974,7 @@ typedef struct _struct_Union_make_material _class_Union_make_material;
 _class_Union_make_material _sample_mat_var;
 #pragma acc declare create ( _sample_mat_var )
 
-/* component hollow_cylinder_shell=Union_cylinder() [6] DECLARE */
+/* component hollow_cylinder_shell=Union_cylinder() [5] DECLARE */
 /* Parameter definition for component type 'Union_cylinder' */
 struct _struct_Union_cylinder_parameters {
   /* Component type 'Union_cylinder' setting parameters */
@@ -16061,7 +16027,7 @@ _class_Union_cylinder _hollow_cylinder_shell_var;
 _class_Union_cylinder _inner_vacuum_var;
 #pragma acc declare create ( _inner_vacuum_var )
 
-/* component master=Union_master() [8] DECLARE */
+/* component master=Union_master() [7] DECLARE */
 /* Parameter definition for component type 'Union_master' */
 struct _struct_Union_master_parameters {
   /* Component type 'Union_master' setting parameters */
@@ -16241,7 +16207,7 @@ typedef struct _struct_Union_master _class_Union_master;
 _class_Union_master _master_var;
 #pragma acc declare create ( _master_var )
 
-/* component stop=Union_stop() [9] DECLARE */
+/* component stop=Union_stop() [8] DECLARE */
 /* Parameter definition for component type 'Union_stop' */
 struct _struct_Union_stop_parameters {
   char Union_stop_has_no_parameters;
@@ -16265,7 +16231,7 @@ typedef struct _struct_Union_stop _class_Union_stop;
 _class_Union_stop _stop_var;
 #pragma acc declare create ( _stop_var )
 
-/* component scatter_filter=Arm() [10] DECLARE */
+/* component scatter_filter=Arm() [9] DECLARE */
 /* Parameter definition for component type 'Arm' */
 struct _struct_Arm_parameters {
   char Arm_has_no_parameters;
@@ -16289,7 +16255,7 @@ typedef struct _struct_Arm _class_Arm;
 _class_Arm _scatter_filter_var;
 #pragma acc declare create ( _scatter_filter_var )
 
-/* component mon_4pi=PSD_monitor_4PI() [11] DECLARE */
+/* component mon_4pi=PSD_monitor_4PI() [10] DECLARE */
 /* Parameter definition for component type 'PSD_monitor_4PI' */
 struct _struct_PSD_monitor_4PI_parameters {
   /* Component type 'PSD_monitor_4PI' setting parameters */
@@ -16323,7 +16289,7 @@ typedef struct _struct_PSD_monitor_4PI _class_PSD_monitor_4PI;
 _class_PSD_monitor_4PI _mon_4pi_var;
 #pragma acc declare create ( _mon_4pi_var )
 
-int mcNUMCOMP = 11;
+int mcNUMCOMP = 10;
 
 /* User declarations from instrument definition. Can define functions. */
   double theta_deg;
@@ -16364,71 +16330,14 @@ double checked_setpos_getdistance(int current_index, char* first_component, char
 }
 #define setpos_getdistance(first, second) checked_setpos_getdistance(current_setpos_index, first, second)
 
-/* component Origin=Progress_bar() SETTING, POSITION/ROTATION */
-int _Origin_setpos(void)
-{ /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_Origin_setpos] component Origin=Progress_bar() SETTING [Progress_bar:0]");
-  stracpy(_Origin_var._name, "Origin", 16384);
-  stracpy(_Origin_var._type, "Progress_bar", 16384);
-  _Origin_var._index=1;
-  int current_setpos_index = 1;
-  if("NULL" && strlen("NULL"))
-    stracpy(_Origin_var._parameters.profile, "NULL" ? "NULL" : "", 16384);
-  else 
-  _Origin_var._parameters.profile[0]='\0';
-  _Origin_var._parameters.percent = 10;
-  _Origin_var._parameters.flag_save = 0;
-  _Origin_var._parameters.minutes = 0;
-
-
-  /* component Origin=Progress_bar() AT ROTATED */
-  {
-    Coords tc1, tc2;
-    tc1 = coords_set(0,0,0);
-    tc2 = coords_set(0,0,0);
-    Rotation tr1;
-    rot_set_rotation(tr1,0,0,0);
-    rot_set_rotation(_Origin_var._rotation_absolute,
-      (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
-    rot_copy(_Origin_var._rotation_relative, _Origin_var._rotation_absolute);
-    _Origin_var._rotation_is_identity =  rot_test_identity(_Origin_var._rotation_relative);
-    _Origin_var._position_absolute = coords_set(
-      0, 0, 0);
-    tc1 = coords_neg(_Origin_var._position_absolute);
-    _Origin_var._position_relative = rot_apply(_Origin_var._rotation_absolute, tc1);
-  } /* Origin=Progress_bar() AT ROTATED */
-  DEBUG_COMPONENT("Origin", _Origin_var._position_absolute, _Origin_var._rotation_absolute);
-  instrument->_position_absolute[1] = _Origin_var._position_absolute;
-  instrument->_position_relative[1] = _Origin_var._position_relative;
-    _Origin_var._position_relative_is_zero =  coords_test_zero(_Origin_var._position_relative);
-  instrument->counter_N[1]  = instrument->counter_P[1] = instrument->counter_P2[1] = 0;
-  instrument->counter_AbsorbProp[1]= 0;
-  #ifdef USE_NEXUS
-  if(nxhandle) {
-    if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
-    MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0000_Origin", _Origin_var._position_absolute, _Origin_var._rotation_absolute, "Progress_bar");
-        mccomp_param_nexus(nxhandle,"0000_Origin", "profile", "NULL", "NULL", "char*");
-        mccomp_param_nexus(nxhandle,"0000_Origin", "percent", "10", "10","MCNUM");
-        mccomp_param_nexus(nxhandle,"0000_Origin", "flag_save", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0000_Origin", "minutes", "0", "0","MCNUM");
-      );
-    }
-  } else {
-    // fprintf(stderr,"NO NEXUS FILE");
-  }
-  #endif
-  return(0);
-} /* _Origin_setpos */
-
 /* component src=Source_simple() SETTING, POSITION/ROTATION */
 int _src_setpos(void)
 { /* sets initial component parameters, position and rotation */
   SIG_MESSAGE("[_src_setpos] component src=Source_simple() SETTING [Source_simple:0]");
   stracpy(_src_var._name, "src", 16384);
   stracpy(_src_var._type, "Source_simple", 16384);
-  _src_var._index=2;
-  int current_setpos_index = 2;
+  _src_var._index=1;
+  int current_setpos_index = 1;
   _src_var._parameters.radius = _instrument_var._parameters.cylinder_height / 2;
   _src_var._parameters.yheight = 0;
   _src_var._parameters.xwidth = 0;
@@ -16453,38 +16362,37 @@ int _src_setpos(void)
     rot_set_rotation(tr1,0,0,0);
     rot_set_rotation(_src_var._rotation_absolute,
       (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
-    rot_transpose(_Origin_var._rotation_absolute, tr1);
-    rot_mul(_src_var._rotation_absolute, tr1, _src_var._rotation_relative);
+    rot_copy(_src_var._rotation_relative, _src_var._rotation_absolute);
     _src_var._rotation_is_identity =  rot_test_identity(_src_var._rotation_relative);
     _src_var._position_absolute = coords_set(
       0, 0, -0.2);
-    tc1 = coords_sub(_Origin_var._position_absolute, _src_var._position_absolute);
+    tc1 = coords_neg(_src_var._position_absolute);
     _src_var._position_relative = rot_apply(_src_var._rotation_absolute, tc1);
   } /* src=Source_simple() AT ROTATED */
   DEBUG_COMPONENT("src", _src_var._position_absolute, _src_var._rotation_absolute);
-  instrument->_position_absolute[2] = _src_var._position_absolute;
-  instrument->_position_relative[2] = _src_var._position_relative;
+  instrument->_position_absolute[1] = _src_var._position_absolute;
+  instrument->_position_relative[1] = _src_var._position_relative;
     _src_var._position_relative_is_zero =  coords_test_zero(_src_var._position_relative);
-  instrument->counter_N[2]  = instrument->counter_P[2] = instrument->counter_P2[2] = 0;
-  instrument->counter_AbsorbProp[2]= 0;
+  instrument->counter_N[1]  = instrument->counter_P[1] = instrument->counter_P2[1] = 0;
+  instrument->counter_AbsorbProp[1]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0001_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_simple");
-        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "_instrument_var._parameters.cylinder_height / 2","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "yheight", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "xwidth", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dist", "0", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_xw", ".045", "2 * _instrument_var._parameters.cylinder_radius + _instrument_var._parameters.margin","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", ".12", "_instrument_var._parameters.cylinder_height + _instrument_var._parameters.margin","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "E0", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dE", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "_instrument_var._parameters.lambda0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0", "_instrument_var._parameters.dlambda","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "flux", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "gauss", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "target_index", "+ 1", "+ 1","int");
+        mccomp_placement_type_nexus(nxhandle,"0000_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_simple");
+        mccomp_param_nexus(nxhandle,"0000_src", "radius", "0.1", "_instrument_var._parameters.cylinder_height / 2","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "yheight", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "xwidth", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "dist", "0", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "focus_xw", ".045", "2 * _instrument_var._parameters.cylinder_radius + _instrument_var._parameters.margin","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "focus_yh", ".12", "_instrument_var._parameters.cylinder_height + _instrument_var._parameters.margin","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "E0", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "dE", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "lambda0", "0", "_instrument_var._parameters.lambda0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "dlambda", "0", "_instrument_var._parameters.dlambda","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "flux", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "gauss", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0000_src", "target_index", "+ 1", "+ 1","int");
       );
     }
   } else {
@@ -16500,8 +16408,8 @@ int _init_setpos(void)
   SIG_MESSAGE("[_init_setpos] component init=Union_init() SETTING [Union_init:0]");
   stracpy(_init_var._name, "init", 16384);
   stracpy(_init_var._type, "Union_init", 16384);
-  _init_var._index=3;
-  int current_setpos_index = 3;
+  _init_var._index=2;
+  int current_setpos_index = 2;
 
   /* component init=Union_init() AT ROTATED */
   {
@@ -16521,16 +16429,16 @@ int _init_setpos(void)
     _init_var._position_relative = rot_apply(_init_var._rotation_absolute, tc1);
   } /* init=Union_init() AT ROTATED */
   DEBUG_COMPONENT("init", _init_var._position_absolute, _init_var._rotation_absolute);
-  instrument->_position_absolute[3] = _init_var._position_absolute;
-  instrument->_position_relative[3] = _init_var._position_relative;
+  instrument->_position_absolute[2] = _init_var._position_absolute;
+  instrument->_position_relative[2] = _init_var._position_relative;
     _init_var._position_relative_is_zero =  coords_test_zero(_init_var._position_relative);
-  instrument->counter_N[3]  = instrument->counter_P[3] = instrument->counter_P2[3] = 0;
-  instrument->counter_AbsorbProp[3]= 0;
+  instrument->counter_N[2]  = instrument->counter_P[2] = instrument->counter_P2[2] = 0;
+  instrument->counter_AbsorbProp[2]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0002_init", _init_var._position_absolute, _init_var._rotation_absolute, "Union_init");
+        mccomp_placement_type_nexus(nxhandle,"0001_init", _init_var._position_absolute, _init_var._rotation_absolute, "Union_init");
       );
     }
   } else {
@@ -16546,8 +16454,8 @@ int _sample_inc_setpos(void)
   SIG_MESSAGE("[_sample_inc_setpos] component sample_inc=Incoherent_process() SETTING [Incoherent_process:0]");
   stracpy(_sample_inc_var._name, "sample_inc", 16384);
   stracpy(_sample_inc_var._type, "Incoherent_process", 16384);
-  _sample_inc_var._index=4;
-  int current_setpos_index = 4;
+  _sample_inc_var._index=3;
+  int current_setpos_index = 3;
   _sample_inc_var._parameters.sigma = 5.08;
   _sample_inc_var._parameters.f_QE = 0;
   _sample_inc_var._parameters.gamma = 0;
@@ -16578,23 +16486,23 @@ int _sample_inc_setpos(void)
     _sample_inc_var._position_relative = rot_apply(_sample_inc_var._rotation_absolute, tc1);
   } /* sample_inc=Incoherent_process() AT ROTATED */
   DEBUG_COMPONENT("sample_inc", _sample_inc_var._position_absolute, _sample_inc_var._rotation_absolute);
-  instrument->_position_absolute[4] = _sample_inc_var._position_absolute;
-  instrument->_position_relative[4] = _sample_inc_var._position_relative;
+  instrument->_position_absolute[3] = _sample_inc_var._position_absolute;
+  instrument->_position_relative[3] = _sample_inc_var._position_relative;
     _sample_inc_var._position_relative_is_zero =  coords_test_zero(_sample_inc_var._position_relative);
-  instrument->counter_N[4]  = instrument->counter_P[4] = instrument->counter_P2[4] = 0;
-  instrument->counter_AbsorbProp[4]= 0;
+  instrument->counter_N[3]  = instrument->counter_P[3] = instrument->counter_P2[3] = 0;
+  instrument->counter_AbsorbProp[3]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0003_sample_inc", _sample_inc_var._position_absolute, _sample_inc_var._rotation_absolute, "Incoherent_process");
-        mccomp_param_nexus(nxhandle,"0003_sample_inc", "sigma", "5.08", "5.08","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_sample_inc", "f_QE", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_sample_inc", "gamma", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_sample_inc", "packing_factor", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_sample_inc", "unit_cell_volume", "13.8", "13.827","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_sample_inc", "interact_fraction", "-1", "-1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_sample_inc", "init", "init", "init", "char*");
+        mccomp_placement_type_nexus(nxhandle,"0002_sample_inc", _sample_inc_var._position_absolute, _sample_inc_var._rotation_absolute, "Incoherent_process");
+        mccomp_param_nexus(nxhandle,"0002_sample_inc", "sigma", "5.08", "5.08","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_sample_inc", "f_QE", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_sample_inc", "gamma", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_sample_inc", "packing_factor", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_sample_inc", "unit_cell_volume", "13.8", "13.827","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_sample_inc", "interact_fraction", "-1", "-1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_sample_inc", "init", "init", "init", "char*");
       );
     }
   } else {
@@ -16610,8 +16518,8 @@ int _sample_mat_setpos(void)
   SIG_MESSAGE("[_sample_mat_setpos] component sample_mat=Union_make_material() SETTING [Union_make_material:0]");
   stracpy(_sample_mat_var._name, "sample_mat", 16384);
   stracpy(_sample_mat_var._type, "Union_make_material", 16384);
-  _sample_mat_var._index=5;
-  int current_setpos_index = 5;
+  _sample_mat_var._index=4;
+  int current_setpos_index = 4;
   if("sample_inc" && strlen("sample_inc"))
     stracpy(_sample_mat_var._parameters.process_string, "sample_inc" ? "sample_inc" : "", 16384);
   else 
@@ -16642,20 +16550,20 @@ int _sample_mat_setpos(void)
     _sample_mat_var._position_relative = rot_apply(_sample_mat_var._rotation_absolute, tc1);
   } /* sample_mat=Union_make_material() AT ROTATED */
   DEBUG_COMPONENT("sample_mat", _sample_mat_var._position_absolute, _sample_mat_var._rotation_absolute);
-  instrument->_position_absolute[5] = _sample_mat_var._position_absolute;
-  instrument->_position_relative[5] = _sample_mat_var._position_relative;
+  instrument->_position_absolute[4] = _sample_mat_var._position_absolute;
+  instrument->_position_relative[4] = _sample_mat_var._position_relative;
     _sample_mat_var._position_relative_is_zero =  coords_test_zero(_sample_mat_var._position_relative);
-  instrument->counter_N[5]  = instrument->counter_P[5] = instrument->counter_P2[5] = 0;
-  instrument->counter_AbsorbProp[5]= 0;
+  instrument->counter_N[4]  = instrument->counter_P[4] = instrument->counter_P2[4] = 0;
+  instrument->counter_AbsorbProp[4]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0004_sample_mat", _sample_mat_var._position_absolute, _sample_mat_var._rotation_absolute, "Union_make_material");
-        mccomp_param_nexus(nxhandle,"0004_sample_mat", "process_string", "NULL", "sample_inc", "char*");
-        mccomp_param_nexus(nxhandle,"0004_sample_mat", "my_absorption", "NONE", "5.08 * 1e2 / 13.827","MCNUM");
-        mccomp_param_nexus(nxhandle,"0004_sample_mat", "absorber", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0004_sample_mat", "init", "init", "init", "char*");
+        mccomp_placement_type_nexus(nxhandle,"0003_sample_mat", _sample_mat_var._position_absolute, _sample_mat_var._rotation_absolute, "Union_make_material");
+        mccomp_param_nexus(nxhandle,"0003_sample_mat", "process_string", "NULL", "sample_inc", "char*");
+        mccomp_param_nexus(nxhandle,"0003_sample_mat", "my_absorption", "NONE", "5.08 * 1e2 / 13.827","MCNUM");
+        mccomp_param_nexus(nxhandle,"0003_sample_mat", "absorber", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0003_sample_mat", "init", "init", "init", "char*");
       );
     }
   } else {
@@ -16671,8 +16579,8 @@ int _hollow_cylinder_shell_setpos(void)
   SIG_MESSAGE("[_hollow_cylinder_shell_setpos] component hollow_cylinder_shell=Union_cylinder() SETTING [Union_cylinder:0]");
   stracpy(_hollow_cylinder_shell_var._name, "hollow_cylinder_shell", 16384);
   stracpy(_hollow_cylinder_shell_var._type, "Union_cylinder", 16384);
-  _hollow_cylinder_shell_var._index=6;
-  int current_setpos_index = 6;
+  _hollow_cylinder_shell_var._index=5;
+  int current_setpos_index = 5;
   if("sample_mat" && strlen("sample_mat"))
     stracpy(_hollow_cylinder_shell_var._parameters.material_string, "sample_mat" ? "sample_mat" : "", 16384);
   else 
@@ -16718,35 +16626,35 @@ int _hollow_cylinder_shell_setpos(void)
     _hollow_cylinder_shell_var._position_relative = rot_apply(_hollow_cylinder_shell_var._rotation_absolute, tc1);
   } /* hollow_cylinder_shell=Union_cylinder() AT ROTATED */
   DEBUG_COMPONENT("hollow_cylinder_shell", _hollow_cylinder_shell_var._position_absolute, _hollow_cylinder_shell_var._rotation_absolute);
-  instrument->_position_absolute[6] = _hollow_cylinder_shell_var._position_absolute;
-  instrument->_position_relative[6] = _hollow_cylinder_shell_var._position_relative;
+  instrument->_position_absolute[5] = _hollow_cylinder_shell_var._position_absolute;
+  instrument->_position_relative[5] = _hollow_cylinder_shell_var._position_relative;
     _hollow_cylinder_shell_var._position_relative_is_zero =  coords_test_zero(_hollow_cylinder_shell_var._position_relative);
-  instrument->counter_N[6]  = instrument->counter_P[6] = instrument->counter_P2[6] = 0;
-  instrument->counter_AbsorbProp[6]= 0;
+  instrument->counter_N[5]  = instrument->counter_P[5] = instrument->counter_P2[5] = 0;
+  instrument->counter_AbsorbProp[5]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0005_hollow_cylinder_shell", _hollow_cylinder_shell_var._position_absolute, _hollow_cylinder_shell_var._rotation_absolute, "Union_cylinder");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "material_string", 0, "sample_mat", "char*");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "priority", "NONE", "10","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "radius", "NONE", "_instrument_var._parameters.cylinder_radius","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "yheight", "NONE", "_instrument_var._parameters.cylinder_height","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "visualize", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "target_index", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "target_x", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "target_y", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "target_z", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "focus_aw", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "focus_ah", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "focus_xw", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "focus_xh", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "focus_r", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "p_interact", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "mask_string", 0, 0, "char*");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "mask_setting", 0, 0, "char*");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "number_of_activations", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0005_hollow_cylinder_shell", "init", "init", "init", "char*");
+        mccomp_placement_type_nexus(nxhandle,"0004_hollow_cylinder_shell", _hollow_cylinder_shell_var._position_absolute, _hollow_cylinder_shell_var._rotation_absolute, "Union_cylinder");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "material_string", 0, "sample_mat", "char*");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "priority", "NONE", "10","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "radius", "NONE", "_instrument_var._parameters.cylinder_radius","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "yheight", "NONE", "_instrument_var._parameters.cylinder_height","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "visualize", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "target_index", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "target_x", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "target_y", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "target_z", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "focus_aw", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "focus_ah", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "focus_xw", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "focus_xh", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "focus_r", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "p_interact", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "mask_string", 0, 0, "char*");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "mask_setting", 0, 0, "char*");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "number_of_activations", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0004_hollow_cylinder_shell", "init", "init", "init", "char*");
       );
     }
   } else {
@@ -16762,8 +16670,8 @@ int _inner_vacuum_setpos(void)
   SIG_MESSAGE("[_inner_vacuum_setpos] component inner_vacuum=Union_cylinder() SETTING [Union_cylinder:0]");
   stracpy(_inner_vacuum_var._name, "inner_vacuum", 16384);
   stracpy(_inner_vacuum_var._type, "Union_cylinder", 16384);
-  _inner_vacuum_var._index=7;
-  int current_setpos_index = 7;
+  _inner_vacuum_var._index=6;
+  int current_setpos_index = 6;
   if("Vacuum" && strlen("Vacuum"))
     stracpy(_inner_vacuum_var._parameters.material_string, "Vacuum" ? "Vacuum" : "", 16384);
   else 
@@ -16809,35 +16717,35 @@ int _inner_vacuum_setpos(void)
     _inner_vacuum_var._position_relative = rot_apply(_inner_vacuum_var._rotation_absolute, tc1);
   } /* inner_vacuum=Union_cylinder() AT ROTATED */
   DEBUG_COMPONENT("inner_vacuum", _inner_vacuum_var._position_absolute, _inner_vacuum_var._rotation_absolute);
-  instrument->_position_absolute[7] = _inner_vacuum_var._position_absolute;
-  instrument->_position_relative[7] = _inner_vacuum_var._position_relative;
+  instrument->_position_absolute[6] = _inner_vacuum_var._position_absolute;
+  instrument->_position_relative[6] = _inner_vacuum_var._position_relative;
     _inner_vacuum_var._position_relative_is_zero =  coords_test_zero(_inner_vacuum_var._position_relative);
-  instrument->counter_N[7]  = instrument->counter_P[7] = instrument->counter_P2[7] = 0;
-  instrument->counter_AbsorbProp[7]= 0;
+  instrument->counter_N[6]  = instrument->counter_P[6] = instrument->counter_P2[6] = 0;
+  instrument->counter_AbsorbProp[6]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0006_inner_vacuum", _inner_vacuum_var._position_absolute, _inner_vacuum_var._rotation_absolute, "Union_cylinder");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "material_string", 0, "Vacuum", "char*");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "priority", "NONE", "20","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "radius", "NONE", "_instrument_var._parameters.cylinder_radius - _instrument_var._parameters.thickness","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "yheight", "NONE", "_instrument_var._parameters.cylinder_height - 2 * _instrument_var._parameters.thickness","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "visualize", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "target_index", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "target_x", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "target_y", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "target_z", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "focus_aw", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "focus_ah", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "focus_xw", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "focus_xh", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "focus_r", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "p_interact", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "mask_string", 0, 0, "char*");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "mask_setting", 0, 0, "char*");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "number_of_activations", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0006_inner_vacuum", "init", "init", "init", "char*");
+        mccomp_placement_type_nexus(nxhandle,"0005_inner_vacuum", _inner_vacuum_var._position_absolute, _inner_vacuum_var._rotation_absolute, "Union_cylinder");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "material_string", 0, "Vacuum", "char*");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "priority", "NONE", "20","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "radius", "NONE", "_instrument_var._parameters.cylinder_radius - _instrument_var._parameters.thickness","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "yheight", "NONE", "_instrument_var._parameters.cylinder_height - 2 * _instrument_var._parameters.thickness","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "visualize", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "target_index", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "target_x", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "target_y", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "target_z", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "focus_aw", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "focus_ah", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "focus_xw", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "focus_xh", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "focus_r", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "p_interact", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "mask_string", 0, 0, "char*");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "mask_setting", 0, 0, "char*");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "number_of_activations", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0005_inner_vacuum", "init", "init", "init", "char*");
       );
     }
   } else {
@@ -16853,8 +16761,8 @@ int _master_setpos(void)
   SIG_MESSAGE("[_master_setpos] component master=Union_master() SETTING [Union_master:0]");
   stracpy(_master_var._name, "master", 16384);
   stracpy(_master_var._type, "Union_master", 16384);
-  _master_var._index=8;
-  int current_setpos_index = 8;
+  _master_var._index=7;
+  int current_setpos_index = 7;
   _master_var._parameters.verbal = 1;
   _master_var._parameters.list_verbal = 0;
   _master_var._parameters.finally_verbal = 0;
@@ -16888,26 +16796,26 @@ int _master_setpos(void)
     _master_var._position_relative = rot_apply(_master_var._rotation_absolute, tc1);
   } /* master=Union_master() AT ROTATED */
   DEBUG_COMPONENT("master", _master_var._position_absolute, _master_var._rotation_absolute);
-  instrument->_position_absolute[8] = _master_var._position_absolute;
-  instrument->_position_relative[8] = _master_var._position_relative;
+  instrument->_position_absolute[7] = _master_var._position_absolute;
+  instrument->_position_relative[7] = _master_var._position_relative;
     _master_var._position_relative_is_zero =  coords_test_zero(_master_var._position_relative);
-  instrument->counter_N[8]  = instrument->counter_P[8] = instrument->counter_P2[8] = 0;
-  instrument->counter_AbsorbProp[8]= 0;
+  instrument->counter_N[7]  = instrument->counter_P[7] = instrument->counter_P2[7] = 0;
+  instrument->counter_AbsorbProp[7]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0007_master", _master_var._position_absolute, _master_var._rotation_absolute, "Union_master");
-        mccomp_param_nexus(nxhandle,"0007_master", "verbal", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "list_verbal", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "finally_verbal", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "allow_inside_start", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "enable_tagging", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "history_limit", "300000", "300000","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "enable_conditionals", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "inherit_number_of_scattering_events", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "weight_ratio_limit", "1e-90", "1e-90","MCNUM");
-        mccomp_param_nexus(nxhandle,"0007_master", "init", "init", "init", "char*");
+        mccomp_placement_type_nexus(nxhandle,"0006_master", _master_var._position_absolute, _master_var._rotation_absolute, "Union_master");
+        mccomp_param_nexus(nxhandle,"0006_master", "verbal", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "list_verbal", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "finally_verbal", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "allow_inside_start", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "enable_tagging", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "history_limit", "300000", "300000","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "enable_conditionals", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "inherit_number_of_scattering_events", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "weight_ratio_limit", "1e-90", "1e-90","MCNUM");
+        mccomp_param_nexus(nxhandle,"0006_master", "init", "init", "init", "char*");
       );
     }
   } else {
@@ -16923,8 +16831,8 @@ int _stop_setpos(void)
   SIG_MESSAGE("[_stop_setpos] component stop=Union_stop() SETTING [Union_stop:0]");
   stracpy(_stop_var._name, "stop", 16384);
   stracpy(_stop_var._type, "Union_stop", 16384);
-  _stop_var._index=9;
-  int current_setpos_index = 9;
+  _stop_var._index=8;
+  int current_setpos_index = 8;
   /* component stop=Union_stop() AT ROTATED */
   {
     Coords tc1, tc2;
@@ -16943,16 +16851,16 @@ int _stop_setpos(void)
     _stop_var._position_relative = rot_apply(_stop_var._rotation_absolute, tc1);
   } /* stop=Union_stop() AT ROTATED */
   DEBUG_COMPONENT("stop", _stop_var._position_absolute, _stop_var._rotation_absolute);
-  instrument->_position_absolute[9] = _stop_var._position_absolute;
-  instrument->_position_relative[9] = _stop_var._position_relative;
+  instrument->_position_absolute[8] = _stop_var._position_absolute;
+  instrument->_position_relative[8] = _stop_var._position_relative;
     _stop_var._position_relative_is_zero =  coords_test_zero(_stop_var._position_relative);
-  instrument->counter_N[9]  = instrument->counter_P[9] = instrument->counter_P2[9] = 0;
-  instrument->counter_AbsorbProp[9]= 0;
+  instrument->counter_N[8]  = instrument->counter_P[8] = instrument->counter_P2[8] = 0;
+  instrument->counter_AbsorbProp[8]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0008_stop", _stop_var._position_absolute, _stop_var._rotation_absolute, "Union_stop");
+        mccomp_placement_type_nexus(nxhandle,"0007_stop", _stop_var._position_absolute, _stop_var._rotation_absolute, "Union_stop");
       );
     }
   } else {
@@ -16968,8 +16876,8 @@ int _scatter_filter_setpos(void)
   SIG_MESSAGE("[_scatter_filter_setpos] component scatter_filter=Arm() SETTING [Arm:0]");
   stracpy(_scatter_filter_var._name, "scatter_filter", 16384);
   stracpy(_scatter_filter_var._type, "Arm", 16384);
-  _scatter_filter_var._index=10;
-  int current_setpos_index = 10;
+  _scatter_filter_var._index=9;
+  int current_setpos_index = 9;
   /* component scatter_filter=Arm() AT ROTATED */
   {
     Coords tc1, tc2;
@@ -16988,16 +16896,16 @@ int _scatter_filter_setpos(void)
     _scatter_filter_var._position_relative = rot_apply(_scatter_filter_var._rotation_absolute, tc1);
   } /* scatter_filter=Arm() AT ROTATED */
   DEBUG_COMPONENT("scatter_filter", _scatter_filter_var._position_absolute, _scatter_filter_var._rotation_absolute);
-  instrument->_position_absolute[10] = _scatter_filter_var._position_absolute;
-  instrument->_position_relative[10] = _scatter_filter_var._position_relative;
+  instrument->_position_absolute[9] = _scatter_filter_var._position_absolute;
+  instrument->_position_relative[9] = _scatter_filter_var._position_relative;
     _scatter_filter_var._position_relative_is_zero =  coords_test_zero(_scatter_filter_var._position_relative);
-  instrument->counter_N[10]  = instrument->counter_P[10] = instrument->counter_P2[10] = 0;
-  instrument->counter_AbsorbProp[10]= 0;
+  instrument->counter_N[9]  = instrument->counter_P[9] = instrument->counter_P2[9] = 0;
+  instrument->counter_AbsorbProp[9]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0009_scatter_filter", _scatter_filter_var._position_absolute, _scatter_filter_var._rotation_absolute, "Arm");
+        mccomp_placement_type_nexus(nxhandle,"0008_scatter_filter", _scatter_filter_var._position_absolute, _scatter_filter_var._rotation_absolute, "Arm");
       );
     }
   } else {
@@ -17013,8 +16921,8 @@ int _mon_4pi_setpos(void)
   SIG_MESSAGE("[_mon_4pi_setpos] component mon_4pi=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_var._name, "mon_4pi", 16384);
   stracpy(_mon_4pi_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_var._index=11;
-  int current_setpos_index = 11;
+  _mon_4pi_var._index=10;
+  int current_setpos_index = 10;
   _mon_4pi_var._parameters.nx = 180;
   _mon_4pi_var._parameters.ny = 90;
   if("cylinder_scattered.dat" && strlen("cylinder_scattered.dat"))
@@ -17044,22 +16952,22 @@ int _mon_4pi_setpos(void)
     _mon_4pi_var._position_relative = rot_apply(_mon_4pi_var._rotation_absolute, tc1);
   } /* mon_4pi=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute);
-  instrument->_position_absolute[11] = _mon_4pi_var._position_absolute;
-  instrument->_position_relative[11] = _mon_4pi_var._position_relative;
+  instrument->_position_absolute[10] = _mon_4pi_var._position_absolute;
+  instrument->_position_relative[10] = _mon_4pi_var._position_relative;
     _mon_4pi_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_var._position_relative);
-  instrument->counter_N[11]  = instrument->counter_P[11] = instrument->counter_P2[11] = 0;
-  instrument->counter_AbsorbProp[11]= 0;
+  instrument->counter_N[10]  = instrument->counter_P[10] = instrument->counter_P2[10] = 0;
+  instrument->counter_AbsorbProp[10]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0010_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "nx", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "ny", "90", "90","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "filename", 0, "cylinder_scattered.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0010_mon_4pi", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0009_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "nx", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "ny", "90", "90","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "filename", 0, "cylinder_scattered.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0009_mon_4pi", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -17068,50 +16976,6 @@ int _mon_4pi_setpos(void)
   #endif
   return(0);
 } /* _mon_4pi_setpos */
-
-_class_Progress_bar *class_Progress_bar_init(_class_Progress_bar *_comp
-) {
-  #define profile (_comp->_parameters.profile)
-  #define percent (_comp->_parameters.percent)
-  #define flag_save (_comp->_parameters.flag_save)
-  #define minutes (_comp->_parameters.minutes)
-  #define IntermediateCnts (_comp->_parameters.IntermediateCnts)
-  #define StartTime (_comp->_parameters.StartTime)
-  #define EndTime (_comp->_parameters.EndTime)
-  #define CurrentTime (_comp->_parameters.CurrentTime)
-  #define infostring (_comp->_parameters.infostring)
-  SIG_MESSAGE("[_Origin_init] component Origin=Progress_bar() INITIALISE [Progress_bar:0]");
-
-IntermediateCnts=0;
-StartTime=0;
-EndTime=0;
-CurrentTime=0;
-
-fprintf(stdout, "[%s] Initialize\n", instrument_name);
-  if (percent*mcget_ncount()/100 < 1e5) {
-    percent=1e5*100.0/mcget_ncount();
-  }
-  #ifdef OPENACC
-  time(&StartTime);
-  #endif
-
-#ifdef USE_MPI
-  sprintf(infostring, "(%i MPI processes) ", mpi_node_count);
-#else
-  sprintf(infostring, "(single process) ");
-#endif
-
-  #undef profile
-  #undef percent
-  #undef flag_save
-  #undef minutes
-  #undef IntermediateCnts
-  #undef StartTime
-  #undef EndTime
-  #undef CurrentTime
-  #undef infostring
-  return(_comp);
-} /* class_Progress_bar_init */
 
 _class_Source_simple *class_Source_simple_init(_class_Source_simple *_comp
 ) {
@@ -18728,7 +18592,6 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
   #undef cylinder_height
   #undef thickness
   #undef margin
-  _Origin_setpos(); /* type Progress_bar */
   _src_setpos(); /* type Source_simple */
   _init_setpos(); /* type Union_init */
   _sample_inc_setpos(); /* type Incoherent_process */
@@ -18741,8 +18604,6 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
   _mon_4pi_setpos(); /* type PSD_monitor_4PI */
 
   /* call iteratively all components INITIALISE */
-  class_Progress_bar_init(&_Origin_var);
-
   class_Source_simple_init(&_src_var);
 
   class_Union_init_init(&_init_var);
@@ -18766,7 +18627,6 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
 
 #ifdef OPENACC
 #include <openacc.h>
-#pragma acc update device(_Origin_var)
 #pragma acc update device(_src_var)
 #pragma acc update device(_init_var)
 #pragma acc update device(_sample_inc_var)
@@ -18821,96 +18681,6 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
 #define ABSORBED (_particle->_absorbed)
 #define mcget_run_num() _particle->_uid
 #define ABSORB ABSORB0
-#pragma acc routine
-void class_Progress_bar_trace(_class_Progress_bar *_comp
-  , _class_particle *_particle) {
-  ABSORBED=SCATTERED=RESTORE=0;
-  #define profile (_comp->_parameters.profile)
-  #define percent (_comp->_parameters.percent)
-  #define flag_save (_comp->_parameters.flag_save)
-  #define minutes (_comp->_parameters.minutes)
-  #define IntermediateCnts (_comp->_parameters.IntermediateCnts)
-  #define StartTime (_comp->_parameters.StartTime)
-  #define EndTime (_comp->_parameters.EndTime)
-  #define CurrentTime (_comp->_parameters.CurrentTime)
-  #define infostring (_comp->_parameters.infostring)
-  SIG_MESSAGE("[_Origin_trace] component Origin=Progress_bar() TRACE [Progress_bar:0]");
-
-#ifndef OPENACC
-  double ncount;
-  ncount = mcget_run_num();
-  if (!StartTime) {
-    time(&StartTime); /* compute starting time */
-    IntermediateCnts = 1e3;
-  }
-  time_t NowTime;
-  time(&NowTime);
-  /* compute initial estimate of computation duration */
-  if (!EndTime && ncount >= IntermediateCnts) {
-    CurrentTime = NowTime;
-    if (difftime(NowTime,StartTime) > 10 && ncount) { /* wait 10 sec before writing ETA */
-      EndTime = StartTime + (time_t)(difftime(NowTime,StartTime)
-				     *(double)mcget_ncount()/ncount);
-      IntermediateCnts = 0;
-      MPI_MASTER(
-        fprintf(stdout, "\nTrace ETA ");
-	fprintf(stdout, "%s", infostring);
-        if (difftime(EndTime,StartTime) < 60.0)
-          fprintf(stdout, "%g [s] ", difftime(EndTime,StartTime));
-        else if (difftime(EndTime,StartTime) > 3600.0)
-          fprintf(stdout, "%g [h] ", difftime(EndTime,StartTime)/3600.0);
-        else
-          fprintf(stdout, "%g [min] ", difftime(EndTime,StartTime)/60.0);
-	fprintf(stdout, "\n");
-      );
-    } else IntermediateCnts += 1e3;
-    fflush(stdout);
-  }
-
-  /* display percentage when percent or minutes have reached step */
-  if (EndTime && mcget_ncount() &&
-    (    (minutes && difftime(NowTime,CurrentTime) > minutes*60)
-      || (percent && !minutes && ncount >= IntermediateCnts))   )
-  {
-    MPI_MASTER(
-      fprintf(stdout, "%llu %%\n", (unsigned long long)(ncount*100.0/mcget_ncount())); fflush(stdout);
-    );
-    CurrentTime = NowTime;
-
-    IntermediateCnts = ncount + percent*mcget_ncount()/100;
-    /* check that next intermediate ncount check is a multiple of the desired percentage */
-    IntermediateCnts = floor(IntermediateCnts*100/percent/mcget_ncount())*percent*mcget_ncount()/100;
-    /* raise flag to indicate that we did something */
-    SCATTER;
-    if (flag_save) save(NULL);
-  }
-#endif
-#ifndef NOABSORB_INF_NAN
-  /* Check for nan or inf particle parms */ 
-  if(isnan(p + t + vx + vy + vz + x + y + z)) ABSORB;
-  if(isinf(fabs(p) + fabs(t) + fabs(vx) + fabs(vy) + fabs(vz) + fabs(x) + fabs(y) + fabs(z))) ABSORB;
-#else
-  if(isnan(p)  ||  isinf(p)) printf("NAN or INF found in p,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(t)  ||  isinf(t)) printf("NAN or INF found in t,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vx) || isinf(vx)) printf("NAN or INF found in vx, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vy) || isinf(vy)) printf("NAN or INF found in vy, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vz) || isinf(vz)) printf("NAN or INF found in vz, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(x)  ||  isinf(x)) printf("NAN or INF found in x,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(y)  ||  isinf(y)) printf("NAN or INF found in y,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(z)  ||  isinf(z)) printf("NAN or INF found in z,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-#endif
-  #undef profile
-  #undef percent
-  #undef flag_save
-  #undef minutes
-  #undef IntermediateCnts
-  #undef StartTime
-  #undef EndTime
-  #undef CurrentTime
-  #undef infostring
-  return;
-} /* class_Progress_bar_trace */
-
 #pragma acc routine
 void class_Source_simple_trace(_class_Source_simple *_comp
   , _class_particle *_particle) {
@@ -20508,7 +20278,7 @@ void class_Arm_trace(_class_Arm *_comp
   if(isnan(z)  ||  isinf(z)) printf("NAN or INF found in z,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
 #endif
 
-if (_comp->_index == 10) { // EXTEND 'scatter_filter'
+if (_comp->_index == 9) { // EXTEND 'scatter_filter'
   /* horizontal longitude in degrees, from outgoing direction */
   theta_deg = RAD2DEG * atan2(vx, vz);
 
@@ -20618,28 +20388,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
   /* the main iteration loop for one incoming event */
   while (!ABSORBED) { /* iterate event until absorbed */
     /* send particle event to component instance, one after the other */
-    /* begin component Origin=Progress_bar() [1] */
-    if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
-      if (_Origin_var._rotation_is_identity) {
-        if(!_Origin_var._position_relative_is_zero) {
-          coords_get(coords_add(coords_set(x,y,z), _Origin_var._position_relative),&x, &y, &z);
-        }
-      } else {
-          mccoordschange(_Origin_var._position_relative, _Origin_var._rotation_relative, _particle);
-      }
-    }
-    if (!ABSORBED && _particle->_index == 1) {
-      _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
-      _particle_save = *_particle;
-      DEBUG_COMP(_Origin_var._name);
-      DEBUG_STATE();
-      class_Progress_bar_trace(&_Origin_var, _particle);
-      if (_particle->_restore)
-        particle_restore(_particle, &_particle_save);
-      _particle->_index++;
-      if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component Origin [1] */
-    /* begin component src=Source_simple() [2] */
+    /* begin component src=Source_simple() [1] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_src_var._rotation_is_identity) {
         if(!_src_var._position_relative_is_zero) {
@@ -20649,7 +20398,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_src_var._position_relative, _src_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 2) {
+    if (!ABSORBED && _particle->_index == 1) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_src_var._name);
@@ -20659,33 +20408,33 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component src [2] */
-    /* begin component init=Union_init() [3] */
+    } /* end component src [1] */
+    /* begin component init=Union_init() [2] */
+    if (!ABSORBED && _particle->_index == 2) {
+      _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
+      _particle->_index++;
+    } /* end component init [2] */
+    /* begin component sample_inc=Incoherent_process() [3] */
     if (!ABSORBED && _particle->_index == 3) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle->_index++;
-    } /* end component init [3] */
-    /* begin component sample_inc=Incoherent_process() [4] */
+    } /* end component sample_inc [3] */
+    /* begin component sample_mat=Union_make_material() [4] */
     if (!ABSORBED && _particle->_index == 4) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle->_index++;
-    } /* end component sample_inc [4] */
-    /* begin component sample_mat=Union_make_material() [5] */
+    } /* end component sample_mat [4] */
+    /* begin component hollow_cylinder_shell=Union_cylinder() [5] */
     if (!ABSORBED && _particle->_index == 5) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle->_index++;
-    } /* end component sample_mat [5] */
-    /* begin component hollow_cylinder_shell=Union_cylinder() [6] */
+    } /* end component hollow_cylinder_shell [5] */
+    /* begin component inner_vacuum=Union_cylinder() [6] */
     if (!ABSORBED && _particle->_index == 6) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle->_index++;
-    } /* end component hollow_cylinder_shell [6] */
-    /* begin component inner_vacuum=Union_cylinder() [7] */
-    if (!ABSORBED && _particle->_index == 7) {
-      _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
-      _particle->_index++;
-    } /* end component inner_vacuum [7] */
-    /* begin component master=Union_master() [8] */
+    } /* end component inner_vacuum [6] */
+    /* begin component master=Union_master() [7] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_master_var._rotation_is_identity) {
         if(!_master_var._position_relative_is_zero) {
@@ -20695,7 +20444,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_master_var._position_relative, _master_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 8) {
+    if (!ABSORBED && _particle->_index == 7) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_master_var._name);
@@ -20705,13 +20454,13 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component master [8] */
-    /* begin component stop=Union_stop() [9] */
-    if (!ABSORBED && _particle->_index == 9) {
+    } /* end component master [7] */
+    /* begin component stop=Union_stop() [8] */
+    if (!ABSORBED && _particle->_index == 8) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle->_index++;
-    } /* end component stop [9] */
-    /* begin component scatter_filter=Arm() [10] */
+    } /* end component stop [8] */
+    /* begin component scatter_filter=Arm() [9] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_scatter_filter_var._rotation_is_identity) {
         if(!_scatter_filter_var._position_relative_is_zero) {
@@ -20721,7 +20470,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_scatter_filter_var._position_relative, _scatter_filter_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 10) {
+    if (!ABSORBED && _particle->_index == 9) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_scatter_filter_var._name);
@@ -20731,8 +20480,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component scatter_filter [10] */
-    /* begin component mon_4pi=PSD_monitor_4PI() [11] */
+    } /* end component scatter_filter [9] */
+    /* begin component mon_4pi=PSD_monitor_4PI() [10] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_var._rotation_is_identity) {
         if(!_mon_4pi_var._position_relative_is_zero) {
@@ -20742,7 +20491,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_var._position_relative, _mon_4pi_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 11) {
+    if (!ABSORBED && _particle->_index == 10) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_var._name);
@@ -20752,8 +20501,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi [11] */
-    if (_particle->_index > 11)
+    } /* end component mon_4pi [10] */
+    if (_particle->_index > 10)
       ABSORBED++; /* absorbed when passed all components */
   } /* while !ABSORBED */
 
@@ -20904,23 +20653,8 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       _class_particle* _particle = &particles[pidx];
       _class_particle _particle_save;
 
-      // Origin
-    if (!ABSORBED && _particle->_index == 1) {
-#ifndef MULTICORE
-        if (_Origin_var._rotation_is_identity)
-          coords_get(coords_add(coords_set(x,y,z), _Origin_var._position_relative),&x, &y, &z);
-        else
-#endif
-          mccoordschange(_Origin_var._position_relative, _Origin_var._rotation_relative, _particle);
-        _particle_save = *_particle;
-        class_Progress_bar_trace(&_Origin_var, _particle);
-        if (_particle->_restore)
-        particle_restore(_particle, &_particle_save);
-        _particle->_index++;
-      }
-
       // src
-    if (!ABSORBED && _particle->_index == 2) {
+    if (!ABSORBED && _particle->_index == 1) {
 #ifndef MULTICORE
         if (_src_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _src_var._position_relative),&x, &y, &z);
@@ -20935,27 +20669,27 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       }
 
       // init
-    if (!ABSORBED && _particle->_index == 3) {
+    if (!ABSORBED && _particle->_index == 2) {
         _particle->_index++;
       }
 
       // sample_inc
-    if (!ABSORBED && _particle->_index == 4) {
+    if (!ABSORBED && _particle->_index == 3) {
         _particle->_index++;
       }
 
       // sample_mat
-    if (!ABSORBED && _particle->_index == 5) {
+    if (!ABSORBED && _particle->_index == 4) {
         _particle->_index++;
       }
 
       // hollow_cylinder_shell
-    if (!ABSORBED && _particle->_index == 6) {
+    if (!ABSORBED && _particle->_index == 5) {
         _particle->_index++;
       }
 
       // inner_vacuum
-    if (!ABSORBED && _particle->_index == 7) {
+    if (!ABSORBED && _particle->_index == 6) {
         _particle->_index++;
       }
         #define JUMP_FUNNEL
@@ -20969,7 +20703,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       _class_particle _particle_save;
 
       // master
-    if (!ABSORBED && _particle->_index == 8) {
+    if (!ABSORBED && _particle->_index == 7) {
 #ifndef MULTICORE
         if (_master_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _master_var._position_relative),&x, &y, &z);
@@ -20990,12 +20724,12 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       _class_particle _particle_save;
 
       // stop
-    if (!ABSORBED && _particle->_index == 9) {
+    if (!ABSORBED && _particle->_index == 8) {
         _particle->_index++;
       }
 
       // scatter_filter
-    if (!ABSORBED && _particle->_index == 10) {
+    if (!ABSORBED && _particle->_index == 9) {
 #ifndef MULTICORE
         if (_scatter_filter_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _scatter_filter_var._position_relative),&x, &y, &z);
@@ -21010,7 +20744,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
       }
 
       // mon_4pi
-    if (!ABSORBED && _particle->_index == 11) {
+    if (!ABSORBED && _particle->_index == 10) {
 #ifndef MULTICORE
         if (_mon_4pi_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_var._position_relative),&x, &y, &z);
@@ -21073,45 +20807,6 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
 * instrument 'hollow_cylinder' and components SAVE
 ***************************************************************************** */
 
-_class_Progress_bar *class_Progress_bar_save(_class_Progress_bar *_comp
-) {
-  #define profile (_comp->_parameters.profile)
-  #define percent (_comp->_parameters.percent)
-  #define flag_save (_comp->_parameters.flag_save)
-  #define minutes (_comp->_parameters.minutes)
-  #define IntermediateCnts (_comp->_parameters.IntermediateCnts)
-  #define StartTime (_comp->_parameters.StartTime)
-  #define EndTime (_comp->_parameters.EndTime)
-  #define CurrentTime (_comp->_parameters.CurrentTime)
-  #define infostring (_comp->_parameters.infostring)
-  SIG_MESSAGE("[_Origin_save] component Origin=Progress_bar() SAVE [Progress_bar:0]");
-
-  MPI_MASTER(fprintf(stdout, "\nSave [%s]\n", instrument_name););
-  if (profile && strlen(profile) && strcmp(profile,"NULL") && strcmp(profile,"0")) {
-    char filename[256];
-    if (!strlen(profile) || !strcmp(profile,"NULL") || !strcmp(profile,"0")) strcpy(filename, instrument_name);
-    else strcpy(filename, profile);
-    DETECTOR_OUT_1D(
-        "Intensity profiler",
-        "Component index [1]",
-        "Intensity",
-        "prof", 1, mcNUMCOMP, mcNUMCOMP-1,
-        &(instrument->counter_N[1]),&(instrument->counter_P[1]),&(instrument->counter_P2[1]),
-        filename);
-
-  }
-  #undef profile
-  #undef percent
-  #undef flag_save
-  #undef minutes
-  #undef IntermediateCnts
-  #undef StartTime
-  #undef EndTime
-  #undef CurrentTime
-  #undef infostring
-  return(_comp);
-} /* class_Progress_bar_save */
-
 _class_PSD_monitor_4PI *class_PSD_monitor_4PI_save(_class_PSD_monitor_4PI *_comp
 ) {
   #define nx (_comp->_parameters.nx)
@@ -21153,8 +20848,6 @@ int save(FILE *handle) { /* called by mccode_main for hollow_cylinder:SAVE */
   if (!handle) siminfo_init(NULL);
 
   /* call iteratively all components SAVE */
-  class_Progress_bar_save(&_Origin_var);
-
 
 
 
@@ -21174,41 +20867,6 @@ int save(FILE *handle) { /* called by mccode_main for hollow_cylinder:SAVE */
 /* *****************************************************************************
 * instrument 'hollow_cylinder' and components FINALLY
 ***************************************************************************** */
-
-_class_Progress_bar *class_Progress_bar_finally(_class_Progress_bar *_comp
-) {
-  #define profile (_comp->_parameters.profile)
-  #define percent (_comp->_parameters.percent)
-  #define flag_save (_comp->_parameters.flag_save)
-  #define minutes (_comp->_parameters.minutes)
-  #define IntermediateCnts (_comp->_parameters.IntermediateCnts)
-  #define StartTime (_comp->_parameters.StartTime)
-  #define EndTime (_comp->_parameters.EndTime)
-  #define CurrentTime (_comp->_parameters.CurrentTime)
-  #define infostring (_comp->_parameters.infostring)
-  SIG_MESSAGE("[_Origin_finally] component Origin=Progress_bar() FINALLY [Progress_bar:0]");
-
-  time_t NowTime;
-  time(&NowTime);
-  fprintf(stdout, "\nFinally [%s: %s]. Time: ", instrument_name, dirname ? dirname : ".");
-  if (difftime(NowTime,StartTime) < 60.0)
-    fprintf(stdout, "%g [s] ", difftime(NowTime,StartTime));
-  else if (difftime(NowTime,StartTime) > 3600.0)
-    fprintf(stdout, "%g [h] ", difftime(NowTime,StartTime)/3600.0);
-  else
-    fprintf(stdout, "%g [min] ", difftime(NowTime,StartTime)/60.0);
-  fprintf(stdout, "\n");
-  #undef profile
-  #undef percent
-  #undef flag_save
-  #undef minutes
-  #undef IntermediateCnts
-  #undef StartTime
-  #undef EndTime
-  #undef CurrentTime
-  #undef infostring
-  return(_comp);
-} /* class_Progress_bar_finally */
 
 _class_Incoherent_process *class_Incoherent_process_finally(_class_Incoherent_process *_comp
 ) {
@@ -21820,7 +21478,6 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_finally(_class_PSD_monitor_4PI *_c
 
 
 int finally(void) { /* called by mccode_main for hollow_cylinder:FINALLY */
-#pragma acc update host(_Origin_var)
 #pragma acc update host(_src_var)
 #pragma acc update host(_init_var)
 #pragma acc update host(_sample_inc_var)
@@ -21837,8 +21494,6 @@ int finally(void) { /* called by mccode_main for hollow_cylinder:FINALLY */
   save(siminfo_file); /* save data when simulation ends */
 
   /* call iteratively all components FINALLY */
-  class_Progress_bar_finally(&_Origin_var);
-
 
 
   class_Incoherent_process_finally(&_sample_inc_var);
@@ -21874,33 +21529,6 @@ int finally(void) { /* called by mccode_main for hollow_cylinder:FINALLY */
   #define cone        mcdis_cone
   #define polygon     mcdis_polygon
   #define polyhedron  mcdis_polyhedron
-_class_Progress_bar *class_Progress_bar_display(_class_Progress_bar *_comp
-) {
-  #define profile (_comp->_parameters.profile)
-  #define percent (_comp->_parameters.percent)
-  #define flag_save (_comp->_parameters.flag_save)
-  #define minutes (_comp->_parameters.minutes)
-  #define IntermediateCnts (_comp->_parameters.IntermediateCnts)
-  #define StartTime (_comp->_parameters.StartTime)
-  #define EndTime (_comp->_parameters.EndTime)
-  #define CurrentTime (_comp->_parameters.CurrentTime)
-  #define infostring (_comp->_parameters.infostring)
-  SIG_MESSAGE("[_Origin_display] component Origin=Progress_bar() DISPLAY [Progress_bar:0]");
-
-  printf("MCDISPLAY: component %s\n", _comp->_name);
-
-  #undef profile
-  #undef percent
-  #undef flag_save
-  #undef minutes
-  #undef IntermediateCnts
-  #undef StartTime
-  #undef EndTime
-  #undef CurrentTime
-  #undef infostring
-  return(_comp);
-} /* class_Progress_bar_display */
-
 _class_Source_simple *class_Source_simple_display(_class_Source_simple *_comp
 ) {
   #define radius (_comp->_parameters.radius)
@@ -22363,8 +21991,6 @@ int display(void) { /* called by mccode_main for hollow_cylinder:DISPLAY */
   printf("MCDISPLAY: start\n");
 
   /* call iteratively all components DISPLAY */
-  class_Progress_bar_display(&_Origin_var);
-
   class_Source_simple_display(&_src_var);
 
 
@@ -22390,7 +22016,6 @@ void* _getvar_parameters(char* compname)
   #ifdef OPENACC
     #define strcmp(a,b) str_comp(a,b)
   #endif
-  if (!strcmp(compname, "Origin")) return (void *) &(_Origin_var._parameters);
   if (!strcmp(compname, "src")) return (void *) &(_src_var._parameters);
   if (!strcmp(compname, "init")) return (void *) &(_init_var._parameters);
   if (!strcmp(compname, "sample_inc")) return (void *) &(_sample_inc_var._parameters);
@@ -22414,17 +22039,16 @@ int _getcomp_index(char* compname)
 /* Enables retrieving the component position & rotation when the index is not known.
  * Component indexing into MACROS, e.g., POS_A_COMP_INDEX, are 1-based! */
 {
-  if (!strcmp(compname, "Origin")) return 1;
-  if (!strcmp(compname, "src")) return 2;
-  if (!strcmp(compname, "init")) return 3;
-  if (!strcmp(compname, "sample_inc")) return 4;
-  if (!strcmp(compname, "sample_mat")) return 5;
-  if (!strcmp(compname, "hollow_cylinder_shell")) return 6;
-  if (!strcmp(compname, "inner_vacuum")) return 7;
-  if (!strcmp(compname, "master")) return 8;
-  if (!strcmp(compname, "stop")) return 9;
-  if (!strcmp(compname, "scatter_filter")) return 10;
-  if (!strcmp(compname, "mon_4pi")) return 11;
+  if (!strcmp(compname, "src")) return 1;
+  if (!strcmp(compname, "init")) return 2;
+  if (!strcmp(compname, "sample_inc")) return 3;
+  if (!strcmp(compname, "sample_mat")) return 4;
+  if (!strcmp(compname, "hollow_cylinder_shell")) return 5;
+  if (!strcmp(compname, "inner_vacuum")) return 6;
+  if (!strcmp(compname, "master")) return 7;
+  if (!strcmp(compname, "stop")) return 8;
+  if (!strcmp(compname, "scatter_filter")) return 9;
+  if (!strcmp(compname, "mon_4pi")) return 10;
   return -1;
 }
 
