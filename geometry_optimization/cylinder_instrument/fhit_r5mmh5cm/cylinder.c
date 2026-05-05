@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: cylinder.instr (hollow_cylinder)
- * Date:       Tue Apr 28 13:54:25 2026
+ * Date:       Sat May  2 10:16:07 2026
  * File:       ./cylinder.c
  * CFLAGS= -DFUNNEL 
  */
@@ -6977,1635 +6977,6 @@ int num_metadata = 0;
 /* ************************************************************************** */
 /*             SHARE user declarations for all components                     */
 /* ************************************************************************** */
-
-/* Shared user declarations for all components types 'Source_gen'. */
-/*******************************************************************************
-*
-* McStas, neutron ray-tracing package
-*         Copyright 1997-2002, All rights reserved
-*         Risoe National Laboratory, Roskilde, Denmark
-*         Institut Laue Langevin, Grenoble, France
-*
-* Library: share/read_table-lib.h
-*
-* %Identification
-* Written by: EF
-* Date: Aug 28, 2002
-* Origin: ILL
-* Release: McStas 1.6
-* Version: $Revision$
-*
-* This file is to be imported by components that may read data from table files
-* It handles some shared functions.
-*
-* This library may be used directly as an external library. It has no dependency
-*
-* Usage: within SHARE
-* %include "read_table-lib"
-*
-*******************************************************************************/
-
-#ifndef READ_TABLE_LIB_H
-#define READ_TABLE_LIB_H "$Revision$"
-
-#define READ_TABLE_STEPTOL  0.04 /* tolerancy for constant step approx */
-
-#ifndef MC_PATHSEP_C
-#ifdef WIN32
-#define MC_PATHSEP_C '\\'
-#define MC_PATHSEP_S "\\"
-#else  /* !WIN32 */
-#ifdef MAC
-#define MC_PATHSEP_C ':'
-#define MC_PATHSEP_S ":"
-#else  /* !MAC */
-#define MC_PATHSEP_C '/'
-#define MC_PATHSEP_S "/"
-#endif /* !MAC */
-#endif /* !WIN32 */
-#endif /* !MC_PATHSEP_C */
-
-#ifndef MCSTAS
-#ifdef WIN32
-#define MCSTAS "C:\\mcstas\\lib"
-#else  /* !WIN32 */
-#ifdef MAC
-#define MCSTAS ":mcstas:lib" /* ToDo: What to put here? */
-#else  /* !MAC */
-#define MCSTAS "/usr/local/lib/mcstas"
-#endif /* !MAC */
-#endif /* !WIN32 */
-#endif /* !MCSTAS */
-
-#include <sys/stat.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifndef _MSC_EXTENSIONS
-#include <strings.h>
-#else
-#  include <string.h>
-#  define strcasecmp _stricmp
-#  define strncasecmp _strnicmp
-#endif
-
-  typedef struct struct_table
-  {
-    char    filename[1024];
-    long    filesize;
-    char   *header;  /* text header, e.g. comments */
-    double *data;    /* vector { x[0], y[0], ... x[n-1], y[n-1]... } */
-    double  min_x;   /* min value of first column */
-    double  max_x;   /* max value of first column */
-    double  step_x;  /* minimal step value of first column */
-    long    rows;    /* number of rows in matrix block */
-    long    columns; /* number of columns in matrix block */
-
-    long    begin;   /* start fseek index of block */
-    long    end;     /* stop  fseek index of block */
-    long    block_number;  /* block index. 0 is catenation of all */
-    long    array_length;  /* number of elements in the t_Table array */
-    char    monotonic;     /* true when 1st column/vector data is monotonic */
-    char    constantstep;  /* true when 1st column/vector data has constant step */
-    char    method[32];    /* interpolation method: nearest, linear */
-    char    quiet;   /*output level for messages to the console 0: print all messages, 1:only print some/including errors, 2: never print anything.*/
-  } t_Table;
-
-/*maximum number of rows to rebin a table = 1M*/
-enum { mcread_table_rebin_maxsize = 1000000 };
-
-typedef struct t_Read_table_file_item {
-    int ref_count;
-    t_Table *table_ref;
-} t_Read_table_file_item;
-
-typedef enum enum_Read_table_file_actions {STORE,FIND,GC}  t_Read_table_file_actions;
-
-/* read_table-lib function prototypes */
-/* ========================================================================= */
-
-/* 'public' functions */
-long     Table_Read              (t_Table *Table, char *File, long block_number);
-long     Table_Read_Offset       (t_Table *Table, char *File, long block_number,
-                                  long *offset, long max_lines);
-long     Table_Read_Offset_Binary(t_Table *Table, char *File, char *Type,
-                                  long *Offset, long Rows, long Columns);
-long     Table_Rebin(t_Table *Table); /* rebin table with regular 1st column and interpolate all columns 2:end */
-long     Table_Info (t_Table Table);
-#pragma acc routine
-double   Table_Index(t_Table Table,   long i, long j); /* get indexed value */
-#pragma acc routine
-double   Table_Value(t_Table Table, double X, long j); /* search X in 1st column and return interpolated value in j-column */
-t_Table *Table_Read_Array(char *File, long *blocks);
-void     Table_Free_Array(t_Table *Table);
-long     Table_Info_Array(t_Table *Table);
-int      Table_SetElement(t_Table *Table, long i, long j, double value);
-long     Table_Init(t_Table *Table, long rows, long columns); /* create a Table */
-#pragma acc routine
-double   Table_Value2d(t_Table Table, double X, double Y);    /* same as Table_Index with non-integer indices and 2d interpolation */
-MCDETECTOR Table_Write(t_Table Table, char*file, char*xl, char*yl, 
-           double x1, double x2, double y1, double y2); /* write Table to disk */
-void * Table_File_List_Handler(t_Read_table_file_actions action, void *item, void *item_modifier);
-t_Table *Table_File_List_find(char *name, int block, int offset);
-int Table_File_List_gc(t_Table *tab);
-void *Table_File_List_store(t_Table *tab);
-
-#define Table_ParseHeader(header, ...) \
-  Table_ParseHeader_backend(header,__VA_ARGS__,NULL);
-
-char **Table_ParseHeader_backend(char *header, ...);
-FILE *Open_File(char *name, const char *Mode, char *path);
-
-
-/* private functions */
-void Table_Free(t_Table *Table);
-long Table_Read_Handle(t_Table *Table, FILE *fid, long block_number, long max_lines, char *name);
-static void Table_Stat(t_Table *Table);
-#pragma acc routine
-double Table_Interp1d(double x, double x1, double y1, double x2, double y2);
-#pragma acc routine
-double Table_Interp1d_nearest(double x, double x1, double y1, double x2, double y2);
-#pragma acc routine
-double Table_Interp2d(double x, double y, double x1, double y1, double x2, double y2,
-double z11, double z12, double z21, double z22);
-
-
-#endif
-
-/* end of read_table-lib.h */
-/*******************************************************************************
-*
-* McStas, neutron ray-tracing package
-*         Copyright (C) 1997-2009, All rights reserved
-*         Risoe National Laboratory, Roskilde, Denmark
-*         Institut Laue Langevin, Grenoble, France
-*
-* Library: share/read_table-lib.c
-*
-* %Identification
-* Written by: EF
-* Date: Aug 28, 2002
-* Origin: ILL
-* Release: McStas CVS_090504
-* Version: $Revision$
-*
-* This file is to be imported by components that may read data from table files
-* It handles some shared functions. Embedded within instrument in runtime mode.
-*
-* Usage: within SHARE
-* %include "read_table-lib"
-*
-*******************************************************************************/
-
-#ifndef READ_TABLE_LIB_H
-#include "read_table-lib.h"
-#endif
-
-#ifndef READ_TABLE_LIB_C
-#define READ_TABLE_LIB_C "$Revision$"
-
-
-/*******************************************************************************
- * void *Table_File_List_Handler(action, item, item_modifier)
- *   ACTION: handle file entries in the read_table-lib file list. If a file is read - it is supposed to be
- *   stored in a list such that we can avoid reading the same file many times.
- *   input  action: FIND, STORE, GC. check if file exists in the list, store an item in the list, or check if it can be garbage collected.
- *   input item: depends on the action.
- *    FIND)  item is a filename, and item_modifier is the block number
- *    STORE) item is the Table to store - item_modifier is ignored
- *    GC)    item is the Table to check. If it has a ref_count >1 then this is simply decremented.
- *   return  depends on the action
- *    FIND)  return a reference to a table+ref_count item if found - NULL otherwise. I.e. NULL means the file has not been read before and must be read again.
- *    STORE) return NULL always
- *    GC)    return NULL if no garbage collection is needed, return an adress to the t_Table which should be garbage collected. 0x1 is returned if
- *           the item is not found in the list
-*******************************************************************************/
-void * Table_File_List_Handler(t_Read_table_file_actions action, void *item, void *item_modifier){
-
-    /* logic here is Read_Table should include a call to FIND. If found the return value should just be used as
-     * if the table had been read from disk. If not found then read the table and STORE.
-     * Table_Free should include a call to GC. If this returns non-NULL then we should proceed with freeing the memory
-     * associated with the table item - otherwise only decrement the reference counter since there are more references
-     * that may need it.*/
-
-    static t_Read_table_file_item read_table_file_list[1024];  
-    static int read_table_file_count=0;
-
-    t_Read_table_file_item *tr;
-    switch(action){
-        case FIND:
-            /*interpret data item as a filename, if it is found return a pointer to the table and increment refcount.
-             * if not found return the item itself*/
-            tr=read_table_file_list;
-            while ( tr->table_ref!=NULL ){
-                int i=*((int*) item_modifier);
-                int j=*( ((int*) item_modifier)+1);
-                if ( !strcmp(tr->table_ref->filename,(char *) item) &&
-                        tr->table_ref->block_number==i && tr->table_ref->begin==j ){
-                    tr->ref_count++;
-                    return (void *) tr;
-                }
-                tr++;
-            }
-            return NULL;
-        case STORE:
-            /*find an available slot and store references to table there*/
-            tr=&(read_table_file_list[read_table_file_count++]);
-            tr->table_ref = ((t_Table *) item);
-            tr->ref_count++;
-            return NULL;
-        case GC:
-            /* Should this item be garbage collected (freed) - if so scratch the entry and return the address of the item - 
-             * else decrement ref_count and return NULL.
-             * A non-NULL return expects the item to actually be freed afterwards.*/
-            tr=read_table_file_list;
-            while ( tr->table_ref!=NULL ){
-                if ( tr->table_ref->data ==((t_Table *)item)->data && 
-                        tr->table_ref->block_number == ((t_Table *)item)->block_number){
-                    /*matching item found*/
-                    if (tr->ref_count>1){
-                        /*the item is found and no garbage collection needed*/
-                        tr->ref_count--;
-                        return NULL;
-                    }else{
-                        /* The item is found and the reference counter is 1.
-                         * This means we should garbage collect. Move remaining list items up one slot,
-                         * and return the table for garbage collection by caller*/
-                        while (tr->table_ref!=NULL){
-                            *tr=*(tr+1);
-                            tr++;
-                        }
-                        read_table_file_count--;
-                        return (t_Table *) item;
-                    }
-                }
-                tr++;
-            }
-            /* item not found, and so should be garbage collected. This could be the case if freeing a
-             * Table that has been constructed from code - not read from file. Return 0x1 to flag it for
-             * collection.*/
-            return (void *) 0x1 ;
-    }
-    /* If we arrive here, nothing worked, return NULL */
-    return NULL;
-}
-
-/* Access functions to the handler*/
-
-/********************************************
- * t_Table *Table_File_List_find(char *name, int block, int offset)
- * input name: filename to search for in the file list
- * input block: data block in the file as each file may contain more than 1 data block.
- * return a ref. to a table if it is found (you may use this pointer and skip reading the file), NULL otherwise (i.e. go ahead and read the file)
-*********************************************/
-t_Table *Table_File_List_find(char *name, int block, int offset){
-    int vars[2]={block,offset};
-    t_Read_table_file_item *item = Table_File_List_Handler(FIND,name, vars);
-    if (item == NULL){
-        return NULL;
-    }else{
-        return item->table_ref;
-    }
-}
-/********************************************
- * int Table_File_List_gc(t_Table *tab)
- * input tab: the table to check for references.
- * return 0: no garbage collection needed
- *        1: Table's data and header (at least) should be freed.
-*********************************************/
-int Table_File_List_gc(t_Table *tab){
-    void *rval=Table_File_List_Handler(GC,tab,0);
-    if (rval==NULL) return 0;
-    else return 1;
-}
-
-
-/*****************************************************************************
- * void *Table_File_List_store(t_Table *tab)
- * input tab: pointer to table to store.
- * return None. 
-*******************************************************************************/
-void *Table_File_List_store(t_Table *tab){
-    return Table_File_List_Handler(STORE,tab,0);
-}
-
-
-/*******************************************************************************
-* FILE *Open_File(char *name, char *Mode, char *path)
-*   ACTION: search for a file and open it. Optionally return the opened path.
-*   input   name:  file name from which table should be extracted
-*           mode: "r", "w", "a" or any valid fopen mode
-*           path:  NULL or a pointer to at least 1024 allocated chars
-*   return  initialized file handle or NULL in case of error
-*******************************************************************************/
-
-  FILE *Open_File(char *File, const char *Mode, char *Path)
-  {
-    char path[1024];
-    FILE *hfile = NULL;
-    
-    if (!File || File[0]=='\0')                     return(NULL);
-    if (!strcmp(File,"NULL") || !strcmp(File,"0"))  return(NULL);
-    
-    /* search in current or full path */
-    strncpy(path, File, 1024);
-    hfile = fopen(path, Mode);
-    if(!hfile)
-    {
-      char dir[1024];
-
-      if (!hfile && instrument_source[0] != '\0' && strlen(instrument_source)) /* search in instrument source location */
-      {
-        char *path_pos   = NULL;
-        /* extract path: searches for last file separator */
-        path_pos    = strrchr(instrument_source, MC_PATHSEP_C);  /* last PATHSEP */
-        if (path_pos) {
-          long path_length = path_pos +1 - instrument_source;  /* from start to path+sep */
-          if (path_length) {
-            strncpy(dir, instrument_source, path_length);
-            dir[path_length] = '\0';
-            snprintf(path, 1024, "%s%c%s", dir, MC_PATHSEP_C, File);
-            hfile = fopen(path, Mode);
-          }
-        }
-      }
-      if (!hfile && instrument_exe[0] != '\0' && strlen(instrument_exe)) /* search in PWD instrument executable location */
-      {
-        char *path_pos   = NULL;
-        /* extract path: searches for last file separator */
-        path_pos    = strrchr(instrument_exe, MC_PATHSEP_C);  /* last PATHSEP */
-        if (path_pos) {
-          long path_length = path_pos +1 - instrument_exe;  /* from start to path+sep */
-          if (path_length) {
-            strncpy(dir, instrument_exe, path_length);
-            dir[path_length] = '\0';
-            snprintf(path, 1024, "%s%c%s", dir, MC_PATHSEP_C, File);
-            hfile = fopen(path, Mode);
-          }
-        }
-      }
-      if (!hfile) /* search in HOME or . */
-      {
-        strcpy(dir, getenv("HOME") ? getenv("HOME") : ".");
-        snprintf(path, 1024, "%s%c%s", dir, MC_PATHSEP_C, File);
-        hfile = fopen(path, Mode);
-      }
-      if (!hfile) /* search in MCSTAS/data */
-      {
-        strcpy(dir, getenv(FLAVOR_UPPER) ? getenv(FLAVOR_UPPER) : MCSTAS);
-        snprintf(path, 1024, "%s%c%s%c%s", dir, MC_PATHSEP_C, "data", MC_PATHSEP_C, File);
-        hfile = fopen(path, Mode);
-      }
-      if (!hfile) /* search in MVCSTAS/contrib */
-      {
-        strcpy(dir, getenv(FLAVOR_UPPER) ? getenv(FLAVOR_UPPER) : MCSTAS);
-        snprintf(path, 1024, "%s%c%s%c%s", dir, MC_PATHSEP_C, "contrib", MC_PATHSEP_C, File);
-        hfile = fopen(path, Mode);
-      }
-      if(!hfile)
-      {
-        // fprintf(stderr, "Warning: Could not open input file '%s' (Open_File)\n", File);
-        return (NULL);
-      }
-    }
-    if (Path) strncpy(Path, path, 1024);
-    return(hfile);
-  } /* end Open_File */
-
-/*******************************************************************************
-* long Read_Table(t_Table *Table, char *name, int block_number)
-*   ACTION: read a single Table from a text file
-*   input   Table: pointer to a t_Table structure
-*           name:  file name from which table should be extracted
-*           block_number: if the file does contain more than one
-*                 data block, then indicates which one to get (from index 1)
-*                 a 0 value means append/catenate all
-*   return  initialized single Table t_Table structure containing data, header, ...
-*           number of read elements (-1: error, 0:header only)
-* The routine stores any line starting with '#', '%' and ';' into the header
-* File is opened, read and closed
-* Other lines are interpreted as numerical data, and stored.
-* Data block should be a rectangular matrix or vector.
-* Data block may be rebinned with Table_Rebin (also sort in ascending order)
-*******************************************************************************/
-  long Table_Read(t_Table *Table, char *File, long block_number)
-  { /* reads all or a single data block from 'file' and returns a Table structure  */
-    return(Table_Read_Offset(Table, File, block_number, NULL, 0));
-  } /* end Table_Read */
-
-/*******************************************************************************
-* long Table_Read_Offset(t_Table *Table, char *name, int block_number, long *offset
-*                        long max_rows)
-*   ACTION: read a single Table from a text file, starting at offset
-*     Same as Table_Read(..) except:
-*   input   offset:    pointer to an offset (*offset should be 0 at start)
-*           max_rows: max number of data rows to read from file (0 means all)
-*   return  initialized single Table t_Table structure containing data, header, ...
-*           number of read elements (-1: error, 0:header only)
-*           updated *offset position (where end of reading occured)
-*******************************************************************************/
-  long Table_Read_Offset(t_Table *Table, char *File,
-                         long block_number, long *offset,
-                         long max_rows)
-  { /* reads all/a data block in 'file' and returns a Table structure  */
-    FILE *hfile;
-    long  nelements=0;
-    long  begin=0;
-    long  filesize=0;
-    char  name[1024];
-    char  path[1024];
-    struct stat stfile;
-
-    /*Need to be able to store the pointer*/
-    if (!Table) return(-1);
-
-    /*TK: Valgrind flags it as usage of uninitialised variable: */
-    Table->quiet = 0;
-
-    //if (offset && *offset) snprintf(name, 1024, "%s@%li", File, *offset);
-    //else                   
-    strncpy(name, File, 1024);
-    if(offset && *offset){
-        begin=*offset;
-    }
-    /* Check if the table has already been read from file.
-     * If so just reuse the table, if not (this is flagged by returning NULL
-     * set up a new table and read the data into it */
-    t_Table *tab_p= Table_File_List_find(name,block_number,begin);
-    if ( tab_p!=NULL ){
-        /*table was found in the Table_File_List*/
-        *Table=*tab_p;
-        MPI_MASTER(
-            if(Table->quiet<1)
-              printf("Reusing input file '%s' (Table_Read_Offset)\n", name);
-            );
-        return Table->rows*Table->columns;
-    }
-
-    /* open the file */
-    hfile = Open_File(File, "r", path);
-    if (!hfile) return(-1);
-    else {
-      MPI_MASTER(
-          if(Table->quiet<1)
-            printf("Opening input file '%s' (Table_Read_Offset)\n", path);
-          );
-    }
-    
-    /* read file state */
-    stat(path,&stfile); filesize = stfile.st_size;
-    if (offset && *offset) fseek(hfile, *offset, SEEK_SET);
-    begin     = ftell(hfile);
-    
-    Table_Init(Table, 0, 0);
-
-    /* read file content and set the Table */
-    nelements = Table_Read_Handle(Table, hfile, block_number, max_rows, name);
-    Table->begin = begin;
-    Table->end   = ftell(hfile);
-    Table->filesize = (filesize>0 ? filesize : 0);
-    Table_Stat(Table);
-    
-    Table_File_List_store(Table);
-
-    if (offset) *offset=Table->end;
-    fclose(hfile);
-    return(nelements);
-
-  } /* end Table_Read_Offset */
-
-/*******************************************************************************
-* long Table_Read_Offset_Binary(t_Table *Table, char *File, char *type,
-*                               long *offset, long rows, long columns)
-*   ACTION: read a single Table from a binary file, starting at offset
-*     Same as Table_Read_Offset(..) except that it handles binary files.
-*   input   type: may be "float"/NULL or "double"
-*           offset: pointer to an offset (*offset should be 0 at start)
-*           rows   : number of rows (0 means read all)
-*           columns: number of columns
-*   return  initialized single Table t_Table structure containing data, header, ...
-*           number of read elements (-1: error, 0:header only)
-*           updated *offset position (where end of reading occured)
-*******************************************************************************/
-  long Table_Read_Offset_Binary(t_Table *Table, char *File, char *type,
-                                long *offset, long rows, long columns)
-  { /* reads all/a data block in binary 'file' and returns a Table structure  */
-    long    nelements, sizeofelement;
-    long    filesize;
-    FILE   *hfile;
-    char    path[1024];
-    struct stat stfile;
-    double *data    = NULL;
-    double *datatmp = NULL;
-    long    i;
-    long    begin;
-
-    if (!Table) return(-1);
-
-    Table_Init(Table, 0, 0);
-    
-    /* open the file */
-    hfile = Open_File(File, "r", path);
-    if (!hfile) return(-1);
-    else {
-      MPI_MASTER(
-          if(Table->quiet<1)
-            printf("Opening input file '%s' (Table_Read, Binary)\n", path);
-      );
-    }
-    
-    /* read file state */
-    stat(File,&stfile);
-    filesize = stfile.st_size;
-    Table->filesize=filesize;
-    
-    /* read file content */
-    if (type && !strcmp(type,"double")) sizeofelement = sizeof(double);
-    else  sizeofelement = sizeof(float);
-    if (offset && *offset) fseek(hfile, *offset, SEEK_SET);
-    begin     = ftell(hfile);
-    if (rows && filesize > sizeofelement*columns*rows)
-      nelements = columns*rows;
-    else nelements = (long)(filesize/sizeofelement);
-    if (!nelements || filesize <= *offset) return(0);
-    data    = (double*)malloc(nelements*sizeofelement);
-    if (!data) {
-      if(!(Table->quiet>1))
-        fprintf(stderr,"Error: allocating %ld elements for %s file '%s'. Too big (Table_Read_Offset_Binary).\n", nelements, type, File);
-      exit(-1);
-    }
-    nelements = fread(data, sizeofelement, nelements, hfile);
-
-    if (!data || !nelements)
-    {
-      if(!(Table->quiet>1))
-        fprintf(stderr,"Error: reading %ld elements from %s file '%s' (Table_Read_Offset_Binary)\n", nelements, type, File);
-      exit(-1);
-    }
-    Table->begin   = begin;
-    Table->end     = ftell(hfile);
-    if (offset) *offset=Table->end;
-    fclose(hfile);
-
-    datatmp = (double*)realloc(data, (double)nelements*sizeofelement);
-    if (!datatmp) {
-      free(data);
-      fprintf(stderr,"Error: reallocating %ld elements for %s file '%s'. Too big (Table_Read_Offset_Binary).\n", nelements, type, File);
-      exit(-1);
-    } else {
-      data = datatmp;
-    }
-    /* copy file data into Table */
-    if (type && !strcmp(type,"double")) Table->data = data;
-    else {
-      float  *s;
-      double *dataf;
-      s     = (float*)data;
-      dataf = (double*)malloc(sizeof(double)*nelements);
-      if (!dataf) {
-	fprintf(stderr, "Could not allocate data block of size %i\n", nelements);
-	exit(-1);
-      }
-      for (i=0; i<nelements; i++)
-        dataf[i]=s[i];
-      free(data);
-      Table->data = dataf;
-    }
-    strncpy(Table->filename, File, 1024);
-    Table->rows    = nelements/columns;
-    Table->columns = columns;
-    Table->array_length = 1;
-    Table->block_number = 1;
-
-    Table_Stat(Table);
-
-    return(nelements);
-  } /* end Table_Read_Offset_Binary */
-
-/*******************************************************************************
-* long Table_Read_Handle(t_Table *Table, FILE *fid, int block_number, long max_rows, char *name)
-*   ACTION: read a single Table from a text file handle (private)
-*   input   Table:pointer to a t_Table structure
-*           fid:  pointer to FILE handle
-*           block_number: if the file does contain more than one
-*                 data block, then indicates which one to get (from index 1)
-*                 a 0 value means append/catenate all
-*           max_rows: if non 0, only reads that number of lines
-*   return  initialized single Table t_Table structure containing data, header, ...
-*           modified Table t_Table structure containing data, header, ...
-*           number of read elements (-1: error, 0:header only)
-* The routine stores any line starting with '#', '%' and ';' into the header
-* Other lines are interpreted as numerical data, and stored.
-* Data block should be a rectangular matrix or vector.
-* Data block may be rebined with Table_Rebin (also sort in ascending order)
-*******************************************************************************/
-  long Table_Read_Handle(t_Table *Table, FILE *hfile,
-                         long block_number, long max_rows, char *name)
-  { /* reads all/a data block from 'file' handle and returns a Table structure  */
-    double *Data              = NULL;
-    double *Datatmp           = NULL;
-    char *Header              = NULL;
-    char *Headertmp           = NULL;
-    long  malloc_size         = CHAR_BUF_LENGTH;
-    long  malloc_size_h       = 4096;
-    long  Rows = 0,   Columns = 0;
-    long  count_in_array      = 0;
-    long  count_in_header     = 0;
-    long  count_invalid       = 0;
-    long  block_Current_index = 0;
-    char  flag_End_row_loop   = 0;
-
-    if (!Table) return(-1);
-    Table_Init(Table, 0, 0);
-    if (name && name[0]!='\0') strncpy(Table->filename, name, 1024);
-
-    if(!hfile) {
-       fprintf(stderr, "Error: File handle is NULL (Table_Read_Handle).\n");
-       return (-1);
-    }
-    Header = (char*)  calloc(malloc_size_h, sizeof(char));
-    Data   = (double*)calloc(malloc_size,   sizeof(double));
-    if ((Header == NULL) || (Data == NULL)) {
-       fprintf(stderr, "Error: Could not allocate Table and Header (Table_Read_Handle).\n");
-       return (-1);
-    }
-
-    int flag_In_array = 0;
-    do { /* while (!flag_End_row_loop) */
-      char  *line=malloc(1024*CHAR_BUF_LENGTH*sizeof(char));
-      long  back_pos=0;   /* ftell start of line */
-
-      if (!line) {
-	fprintf(stderr,"Could not allocate line buffer\n");
-	exit(-1);
-      }
-      back_pos = ftell(hfile);
-      if (fgets(line, 1024*CHAR_BUF_LENGTH, hfile) != NULL) { /* analyse line */
-        /* first skip blank and tabulation characters */
-        int i = strspn(line, " \t");
-
-        /* handle comments: stored in header */
-        if (NULL != strchr("#%;/", line[i]))
-        { /* line is a comment */
-          count_in_header += strlen(line);
-          if (count_in_header >= malloc_size_h) {
-            /* if succeed and in array : add (and realloc if necessary) */
-            malloc_size_h = count_in_header+4096;
-            char *Headertmp = (char*)realloc(Header, malloc_size_h*sizeof(char));
-	    if(!Headertmp) {
-	      free(Header);
-	             fprintf(stderr, "Error: Could not reallocate Header (Table_Read_Handle).\n");
-		     free(Header);
-		     return (-1);
-	    } else {
-	      Header = Headertmp;
-	    }
-          }
-          strncat(Header, line, 4096);
-          flag_In_array=0;
-          /* exit line and file if passed desired block */
-          if (block_number > 0 && block_number == block_Current_index) {
-            flag_End_row_loop = 1;
-          }
-
-          /* Continue with next line */
-          continue;
-        }
-        if (strstr(line, "***"))
-        {
-          count_invalid++;
-          /* Continue with next line */
-          continue;
-        }
-
-        /* get the number of columns splitting line with strtok */
-        char  *lexeme;
-        char  flag_End_Line = 0;
-        long  block_Num_Columns = 0;
-        const char seps[] = " ,;\t\n\r";
-
-        lexeme = strtok(line, seps);
-        while (!flag_End_Line) {
-          if ((lexeme != NULL) && (lexeme[0] != '\0')) {
-            /* reading line: the token is not empty */
-            double X;
-            int    count=1;
-            /* test if we have 'NaN','Inf' */
-            if (!strncasecmp(lexeme,"NaN",3))
-              X = 0;
-            else if (!strncasecmp(lexeme,"Inf",3) || !strncasecmp(lexeme,"+Inf",4))
-              X = FLT_MAX;
-            else if (!strncasecmp(lexeme,"-Inf",4))
-              X = -FLT_MAX;
-            else
-              count = sscanf(lexeme,"%lg",&X);
-            if (count == 1) {
-              /* reading line: the token is a number in the line */
-              if (!flag_In_array) {
-                /* reading num: not already in a block: starts a new data block */
-                block_Current_index++;
-                flag_In_array    = 1;
-                block_Num_Columns= 0;
-                if (block_number > 0) {
-                  /* initialise a new data block */
-                  Rows = 0;
-                  count_in_array = 0;
-                } /* else append */
-              }
-              /* reading num: all blocks or selected block */
-              if (flag_In_array && (block_number == 0 ||
-                  block_number == block_Current_index)) {
-                /* starting block: already the desired number of rows ? */
-                if (block_Num_Columns == 0 &&
-                    max_rows > 0 && Rows >= max_rows) {
-                  flag_End_Line      = 1;
-                  flag_End_row_loop  = 1;
-                  flag_In_array      = 0;
-                  /* reposition to begining of line (ignore line) */
-                  fseek(hfile, back_pos, SEEK_SET);
-                } else { /* store into data array */
-                  if (count_in_array >= malloc_size) {
-                    /* realloc data buffer if necessary */
-                    malloc_size = count_in_array*1.5;
-                    Datatmp = (double*) realloc(Data, malloc_size*sizeof(double));
-                    if (Datatmp == NULL) {
-                      fprintf(stderr, "Error: Can not re-allocate memory %zi (Table_Read_Handle).\n",
-                              malloc_size*sizeof(double));
-		      free(Data);
-                      return (-1);
-                    } else {
-                      Data=Datatmp;
-                    }
-                  }
-                  if (0 == block_Num_Columns) Rows++;
-                  Data[count_in_array] = X;
-                  count_in_array++;
-                  block_Num_Columns++;
-                }
-              } /* reading num: end if flag_In_array */
-            } /* end reading num: end if sscanf lexeme -> numerical */
-            else {
-              /* reading line: the token is not numerical in that line. end block */
-              if (block_Current_index == block_number) {
-                flag_End_Line = 1;
-                flag_End_row_loop = 1;
-              } else {
-                flag_In_array = 0;
-                flag_End_Line = 1;
-              }
-            }
-          }
-          else {
-            /* no more tokens in line */
-            flag_End_Line = 1;
-            if (block_Num_Columns > 0) Columns = block_Num_Columns;
-          }
-
-          // parse next token
-          lexeme = strtok(NULL, seps);
-
-        } /* while (!flag_End_Line) */
-      } /* end: if fgets */
-      else flag_End_row_loop = 1; /* else fgets : end of file */
-      free(line);
-    } while (!flag_End_row_loop); /* end while flag_End_row_loop */
-
-    Table->block_number = block_number;
-    Table->array_length = 1;
-
-    // shrink header to actual size (plus terminating 0-byte)
-    if (count_in_header) {
-      Headertmp = (char*)realloc(Header, count_in_header*sizeof(char) + 1);
-      if(!Headertmp) {
-	fprintf(stderr, "Error: Could not shrink Header (Table_Read_Handle).\n");
-	free(Header);
-	return (-1);
-      } else {
-        Header = Headertmp;
-      }
-    }
-    Table->header = Header;
-
-    if (count_in_array*Rows*Columns == 0)
-    {
-      Table->rows         = 0;
-      Table->columns      = 0;
-      free(Data);
-      return (0);
-    }
-    if (Rows * Columns != count_in_array)
-    {
-      fprintf(stderr, "Warning: Read_Table :%s %s Data has %li values that should be %li x %li\n",
-        (Table->filename[0] != '\0' ? Table->filename : ""),
-        (!block_number ? " catenated" : ""),
-        count_in_array, Rows, Columns);
-      Columns = count_in_array; Rows = 1;
-    }
-    if (count_invalid)
-    {
-      fprintf(stderr,"Warning: Read_Table :%s %s Data has %li invalid lines (*****). Ignored.\n",
-      (Table->filename[0] != '\0' ? Table->filename : ""),
-        (!block_number ? " catenated" : ""),
-        count_invalid);
-    }
-    Datatmp     = (double*)realloc(Data, count_in_array*sizeof(double));
-    if(!Datatmp) {
-      fprintf(stderr, "Error: Could reallocate Data block to %li doubles (Table_Read_Handle).\n", count_in_array);
-      free(Data);
-      return (-1);
-    } else {
-      Data = Datatmp;
-    }
-    Table->data         = Data;
-    Table->rows         = Rows;
-    Table->columns      = Columns;
-
-    return (count_in_array);
-
-  } /* end Table_Read_Handle */
-
-/*******************************************************************************
-* long Table_Rebin(t_Table *Table)
-*   ACTION: rebin a single Table, sorting 1st column in ascending order
-*   input   Table: single table containing data.
-*                  The data block is reallocated in this process
-*   return  updated Table with increasing, evenly spaced first column (index 0)
-*           number of data elements (-1: error, 0:empty data)
-*******************************************************************************/
-  long Table_Rebin(t_Table *Table)
-  {
-    double new_step=0;
-    long   i;
-    /* performs linear interpolation on X axis (0-th column) */
-
-    if (!Table) return(-1);
-    if (!Table->data 
-    || Table->rows*Table->columns == 0 || !Table->step_x)
-      return(0);
-    Table_Stat(Table); /* recompute statitstics and minimal step */
-    new_step = Table->step_x; /* minimal step in 1st column */
-
-    if (!(Table->constantstep)) /* not already evenly spaced */
-    {
-      long Length_Table;
-      double *New_Table;
-
-      Length_Table = ceil(fabs(Table->max_x - Table->min_x)/new_step)+1;
-      /*return early if the rebinned table will become too large*/
-      if (Length_Table > mcread_table_rebin_maxsize){
-        fprintf(stderr,"WARNING: (Table_Rebin): Rebinning table from %s would exceed 1M rows. Skipping.\n", Table->filename); 
-        return(Table->rows*Table->columns);
-      }
-      New_Table    = (double*)malloc(Length_Table*Table->columns*sizeof(double));
-      if (!New_Table) {
-	fprintf(stderr,"Could not allocate New_Table of size %i x %i\n", Length_Table, Table->columns);
-	exit(-1);
-      }
-      for (i=0; i < Length_Table; i++)
-      {
-        long   j;
-        double X;
-        X = Table->min_x + i*new_step;
-        New_Table[i*Table->columns] = X;
-        for (j=1; j < Table->columns; j++)
-          New_Table[i*Table->columns+j]
-                = Table_Value(*Table, X, j);
-      } /* end for i */
-
-      Table->rows = Length_Table;
-      Table->step_x = new_step;
-      Table->max_x = Table->min_x + (Length_Table-1)*new_step; 
-      /*max might not be the same anymore
-       * Use Length_Table -1 since the first and laset rows are the limits of the defined interval.*/
-      free(Table->data);
-      Table->data = New_Table;
-      Table->constantstep=1;
-    } /* end else (!constantstep) */
-    return (Table->rows*Table->columns);
-  } /* end Table_Rebin */
-
-/*******************************************************************************
-* double Table_Index(t_Table Table, long i, long j)
-*   ACTION: read an element [i,j] of a single Table
-*   input   Table: table containing data
-*           i : index of row      (0:Rows-1)
-*           j : index of column   (0:Columns-1)
-*   return  Value = data[i][j]
-* Returns Value from the i-th row, j-th column of Table
-* Tests are performed on indexes i,j to avoid errors
-*******************************************************************************/
-
-#ifndef MIN
-#define MIN(a, b)  (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef MAX
-#define MAX(a, b)  (((a) > (b)) ? (a) : (b))
-#endif
-
-double Table_Index(t_Table Table, long i, long j)
-{
-  long AbsIndex;
-
-  if (Table.rows == 1 || Table.columns == 1) {
-    /* vector */
-    j = MIN(MAX(0, i+j), Table.columns*Table.rows - 1);
-    i = 0;
-  } else {
-    /* matrix */
-    i = MIN(MAX(0, i), Table.rows - 1);
-    j = MIN(MAX(0, j), Table.columns - 1);
-  }
-
-  /* handle vectors specifically */
-  AbsIndex = i*(Table.columns)+j;
-
-  if (Table.data != NULL)
-    return (Table.data[AbsIndex]);
-  else
-    return 0;
-} /* end Table_Index */
-
-/*******************************************************************************
-* void Table_SetElement(t_Table *Table, long i, long j, double value)
-*   ACTION: set an element [i,j] of a single Table
-*   input   Table: table containing data
-*           i : index of row      (0:Rows-1)
-*           j : index of column   (0:Columns-1)
-*           value = data[i][j]
-* Returns 0 in case of error
-* Tests are performed on indexes i,j to avoid errors
-*******************************************************************************/
-int Table_SetElement(t_Table *Table, long i, long j,
-                     double value)
-{
-  long AbsIndex;
-
-  if (Table->rows == 1 || Table->columns == 1) {
-    /* vector */
-    j = MIN(MAX(0, i+j), Table->columns*Table->rows - 1); i=0;
-  } else {
-    /* matrix */
-    i = MIN(MAX(0, i), Table->rows - 1);
-    j = MIN(MAX(0, j), Table->columns - 1);
-  }
-
-  AbsIndex = i*(Table->columns)+j;
-  if (Table->data != NULL) {
-    Table->data[AbsIndex] = value;
-    return 1;
-  }
-
-  return 0;
-} /* end Table_SetElement */
-
-/*******************************************************************************
-* double Table_Value(t_Table Table, double X, long j)
-*   ACTION: read column [j] of a single Table at row which 1st column is X
-*   input   Table: table containing data.
-*           X : data value in the first column (index 0)
-*           j : index of column from which is extracted the Value (0:Columns-1)
-*   return  Value = data[index for X][j] with linear interpolation
-* Returns Value from the j-th column of Table corresponding to the
-* X value for the 1st column (index 0)
-* Tests are performed (within Table_Index) on indexes i,j to avoid errors
-* NOTE: data should rather be monotonic, and evenly sampled.
-*******************************************************************************/
-double Table_Value(t_Table Table, double X, long j)
-{
-  long   Index = -1;
-  double X1=0, Y1=0, X2=0, Y2=0;
-  double ret=0;
-
-  if (X > Table.max_x) return Table_Index(Table,Table.rows-1  ,j);
-  if (X < Table.min_x) return Table_Index(Table,0  ,j);
-
-  // Use constant-time lookup when possible
-  if(Table.constantstep) {
-    Index = (long)floor(
-              (X - Table.min_x) / (Table.max_x - Table.min_x) * (Table.rows-1));
-    X1 = Table_Index(Table,Index-1,0);
-    X2 = Table_Index(Table,Index  ,0);
-  }
-  // Use binary search on large, monotonic tables
-  else if(Table.monotonic && Table.rows > 100) {
-    long left = Table.min_x;
-    long right = Table.max_x;
-
-    while (!((X1 <= X) && (X < X2)) && (right - left > 1)) {
-      Index = (left + right) / 2;
-
-      X1 = Table_Index(Table, Index-1, 0);
-      X2 = Table_Index(Table, Index,   0);
-
-      if (X < X1) {
-        right = Index;
-      } else {
-        left  = Index;
-      }
-    }
-  }
-
-  // Fall back to linear search, if no-one else has set X1, X2 correctly
-  if (!((X1 <= X) && (X < X2))) {
-    /* look for index surrounding X in the table -> Index */
-    for (Index=1; Index <= Table.rows-1; Index++) {
-        X1 = Table_Index(Table, Index-1,0);
-        X2 = Table_Index(Table, Index  ,0);
-        if ((X1 <= X) && (X < X2)) break;
-      } /* end for Index */
-  }
-
-  Y1 = Table_Index(Table,Index-1, j);
-  Y2 = Table_Index(Table,Index  , j);
-
-#ifdef OPENACC
-#define strcmp(a,b) str_comp(a,b)
-#endif
-
-  if (!strcmp(Table.method,"linear")) {
-    ret = Table_Interp1d(X, X1,Y1, X2,Y2);
-  }
-  else if (!strcmp(Table.method,"nearest")) {
-    ret = Table_Interp1d_nearest(X, X1,Y1, X2,Y2);
-  }
-
-#ifdef OPENACC
-#ifdef strcmp
-#undef strcmp
-#endif
-#endif
-
-  return ret;
-} /* end Table_Value */
-
-/*******************************************************************************
-* double Table_Value2d(t_Table Table, double X, double Y)
-*   ACTION: read element [X,Y] of a matrix Table
-*   input   Table: table containing data.
-*           X : row index, may be non integer
-*           Y : column index, may be non integer
-*   return  Value = data[index X][index Y] with bi-linear interpolation
-* Returns Value for the indices [X,Y]
-* Tests are performed (within Table_Index) on indexes i,j to avoid errors
-* NOTE: data should rather be monotonic, and evenly sampled.
-*******************************************************************************/
-double Table_Value2d(t_Table Table, double X, double Y)
-  {
-    long   x1,x2,y1,y2;
-    double z11,z12,z21,z22;
-    double ret=0;
-
-    x1 = (long)floor(X);
-    y1 = (long)floor(Y);
-
-    if (x1 > Table.rows-1 || x1 < 0) {
-      x2 = x1;
-    } else {
-      x2 = x1 + 1;
-    }
-
-    if (y1 > Table.columns-1 || y1 < 0) {
-      y2 = y1;
-    } else {
-      y2 = y1 + 1;
-    }
-
-    z11 = Table_Index(Table, x1, y1);
-
-    if (y2 != y1) z12=Table_Index(Table, x1, y2); else z12 = z11;
-    if (x2 != x1) z21=Table_Index(Table, x2, y1); else z21 = z11;
-    if (y2 != y1) z22=Table_Index(Table, x2, y2); else z22 = z21;
-
-#ifdef OPENACC
-#define strcmp(a,b) str_comp(a,b)
-#endif
-
-    if (!strcmp(Table.method,"linear"))
-      ret = Table_Interp2d(X,Y, x1,y1,x2,y2, z11,z12,z21,z22);
-#ifdef OPENACC
-#ifdef strcmp
-#undef strcmp
-#endif
-#endif
-    else {
-      if (fabs(X-x1) < fabs(X-x2)) {
-        if (fabs(Y-y1) < fabs(Y-y2)) ret = z11; else ret = z12;
-      } else {
-        if (fabs(Y-y1) < fabs(Y-y2)) ret = z21; else ret = z22;
-      }
-    }
-    return ret;
-  } /* end Table_Value2d */
-
-
-/*******************************************************************************
-* void Table_Free(t_Table *Table)
-*   ACTION: free a single Table. First Call Table_File_list_gc. If this returns
-*   non-zero it means there are more refernces to the table, and so the table
-*   should not bee freed.
-*   return: empty Table
-*******************************************************************************/
-  void Table_Free(t_Table *Table)
-  {
-    if( !Table_File_List_gc(Table) ){
-       return;
-    } 
-    if (!Table) return;
-    if (Table->data   != NULL) free(Table->data);
-    if (Table->header != NULL) free(Table->header);
-    Table->data   = NULL;
-    Table->header = NULL;
-  } /* end Table_Free */
-
-/******************************************************************************
-* void Table_Info(t_Table Table)
-*    ACTION: print informations about a single Table
-*******************************************************************************/
-  long Table_Info(t_Table Table)
-  {
-    char buffer[256];
-    long ret=0;
-
-    if (!Table.block_number) strcpy(buffer, "catenated");
-    else sprintf(buffer, "block %li", Table.block_number);
-    printf("Table from file '%s' (%s)",
-        Table.filename[0] != '\0' ? Table.filename : "", buffer);
-    if ((Table.data != NULL) && (Table.rows*Table.columns))
-    {
-      printf(" is %li x %li ", Table.rows, Table.columns);
-      if (Table.rows*Table.columns > 1)
-        printf("(x=%g:%g)", Table.min_x, Table.max_x);
-      else printf("(x=%g) ", Table.min_x);
-      ret = Table.rows*Table.columns;
-      if (Table.monotonic)    printf(", monotonic");
-      if (Table.constantstep) printf(", constant step");
-      printf(". interpolation: %s\n", Table.method);
-    }
-    else printf(" is empty.\n");
-
-    if (Table.header && strlen(Table.header)) {
-      char *header;
-      int  i;
-      header = malloc(80);
-      if (!header) return(ret);
-      for (i=0; i<80; header[i++]=0);
-      strncpy(header, Table.header, 75);
-      if (strlen(Table.header) > 75) {
-        strcat( header, " ...");
-      }
-      for (i=0; i<strlen(header); i++)
-        if (header[i] == '\n' || header[i] == '\r') header[i] = ';';
-      printf("  '%s'\n", header);
-      free(header);
-    }
-
-    return(ret);
-  } /* end Table_Info */
-
-/******************************************************************************
-* long Table_Init(t_Table *Table, m, n)
-*   ACTION: initialise a Table to empty m by n table
-*   return: empty Table
-******************************************************************************/
-long Table_Init(t_Table *Table, long rows, long columns)
-{
-  double *data=NULL;
-  long   i;
-
-  if (!Table) return(0);
-
-  Table->header  = NULL;
-  Table->filename[0]= '\0';
-  Table->filesize= 0;
-  Table->min_x   = 0;
-  Table->max_x   = 0;
-  Table->step_x  = 0;
-  Table->block_number = 0;
-  Table->array_length = 0;
-  Table->monotonic    = 0;
-  Table->constantstep = 0;
-  Table->begin   = 0;
-  Table->end     = 0;
-  strcpy(Table->method,"linear");
-
-  if (rows*columns >= 1) {
-    data    = (double*)malloc(rows*columns*sizeof(double));
-    if (data) for (i=0; i < rows*columns; data[i++]=0);
-    else {
-      if(Table->quiet<2)
-        fprintf(stderr,"Error: allocating %ld double elements."
-            "Too big (Table_Init).\n", rows*columns);
-      rows = columns = 0;
-    }
-  }
-  Table->rows    = (rows >= 1 ? rows : 0);
-  Table->columns = (columns >= 1 ? columns : 0);
-  Table->data    = data;
-  return(Table->rows*Table->columns);
-} /* end Table_Init */
-
-/******************************************************************************
-* long Table_Write(t_Table Table, char *file, x1,x2, y1,y2)
-*   ACTION: write a Table to disk (ascii).
-*     when x1=x2=0 or y1=y2=0, the table default limits are used.
-*   return: 0=all is fine, non-0: error
-*******************************************************************************/
-MCDETECTOR Table_Write(t_Table Table, char *file, char *xl, char *yl, 
-  double x1, double x2, double y1, double y2)
-{
-  MCDETECTOR detector;
-
-  if ((Table.data == NULL) && (Table.rows*Table.columns)) {
-    detector.m = 0;
-    detector.xmin = 0;
-    detector.xmax = 0;
-    detector.ymin = 0;
-    detector.ymax = 0;
-    detector.zmin = 0;
-    detector.zmax = 0; 
-    detector.intensity = 0;
-    detector.error = 0;
-    detector.events = 0;
-    detector.min = 0;
-    detector.max = 0;
-    detector.mean = 0;
-    detector.centerX = 0;
-    detector.halfwidthX = 0;
-    detector.centerY = 0;
-    detector.halfwidthY = 0;
-    detector.rank = 0;
-    detector.istransposed = 0;
-    detector.n = 0;
-    detector.p = 0;
-    detector.date_l = 0;
-    detector.p0 = NULL;
-    detector.p1 = NULL;
-    detector.p2 = NULL;
-    return(detector); /* Table is empty - nothing to do */
-  }
-  if (!x1 && !x2) {
-    x1 = Table.min_x;
-    x2 = Table.max_x;
-  }
-  if (!y1 && !y2) {
-    y1 = 1;
-    y2 = Table.columns;
-  }
-
-  /* transfer content of the Table into a 2D detector */
-  Coords coords = { 0, 0, 0};
-  Rotation rot;
-  rot_set_rotation(rot, 0, 0, 0);
-  
-  if (Table.rows == 1 || Table.columns == 1) {
-    detector = mcdetector_out_1D(Table.filename,
-                      xl ? xl : "", yl ? yl : "",
-                      "x", x1, x2,
-                      Table.rows * Table.columns,
-                      NULL, Table.data, NULL,
-		      file, file, coords, rot,9999);
-  } else {
-    detector = mcdetector_out_2D(Table.filename,
-                      xl ? xl : "", yl ? yl : "",
-                      x1, x2, y1, y2,
-                      Table.rows, Table.columns,
-                      NULL, Table.data, NULL,
-		      file, file, coords, rot,9999);
-  }
-  return(detector);
-}
-
-/******************************************************************************
-* void Table_Stat(t_Table *Table)
-*   ACTION: computes min/max/mean step of 1st column for a single table (private)
-*   return: updated Table
-*******************************************************************************/
-  static void Table_Stat(t_Table *Table)
-  {
-    long   i;
-    double max_x, min_x;
-    double row=1;
-    char   monotonic=1;
-    char   constantstep=1;
-    double step=0;
-    long n;
-
-    if (!Table) return;
-    if (!Table->rows || !Table->columns) return;
-    if (Table->rows == 1) row=0; // single row
-    max_x = -FLT_MAX;
-    min_x =  FLT_MAX;
-    n     = (row ? Table->rows : Table->columns);
-    /* get min and max of first column/vector */
-    for (i=0; i < n; i++)
-    {
-      double X;
-      X = (row ? Table_Index(*Table,i  ,0)
-                               : Table_Index(*Table,0, i));
-      if (X < min_x) min_x = X;
-      if (X > max_x) max_x = X;
-    } /* for */
-    
-    /* test for monotonicity and constant step if the table is an XY or single vector */
-    if (n > 1) {
-      /* mean step */
-      step = (max_x - min_x)/(n-1);
-      /* now test if table is monotonic on first column, and get minimal step size */
-      for (i=0; i < n-1; i++) {
-        double X, diff;;
-        X    = (row ? Table_Index(*Table,i  ,0)
-                    : Table_Index(*Table,0,  i));
-        diff = (row ? Table_Index(*Table,i+1,0)
-                    : Table_Index(*Table,0,  i+1)) - X;
-        if (diff && fabs(diff) < fabs(step)) step = diff;
-        /* change sign ? */
-        if ((max_x - min_x)*diff < 0 && monotonic)
-          monotonic = 0;
-      } /* end for */
-      
-      /* now test if steps are constant within READ_TABLE_STEPTOL */
-      if(!step){
-        /*means there's a disconitnuity -> not constantstep*/
-        constantstep=0;
-      }else if (monotonic) {
-        for (i=0; i < n-1; i++) {
-          double X, diff;
-          X    = (row ? Table_Index(*Table,i  ,0)
-              : Table_Index(*Table,0,  i));
-          diff = (row ? Table_Index(*Table,i+1,0)
-              : Table_Index(*Table,0,  i+1)) - X;
-          if ( fabs(step)*(1+READ_TABLE_STEPTOL) < fabs(diff) ||
-                fabs(diff) < fabs(step)*(1-READ_TABLE_STEPTOL) )
-          { constantstep = 0; break; }
-        }
-      }
-
-    }
-    Table->step_x= step;
-    Table->max_x = max_x;
-    Table->min_x = min_x;
-    Table->monotonic = monotonic;
-    Table->constantstep = constantstep;
-  } /* end Table_Stat */
-
-/******************************************************************************
-* t_Table *Table_Read_Array(char *File, long *blocks)
-*   ACTION: read as many data blocks as available, iteratively from file
-*   return: initialized t_Table array, last element is an empty Table.
-*           the number of extracted blocks in non NULL pointer *blocks
-*******************************************************************************/
-  t_Table *Table_Read_Array(char *File, long *blocks)
-  {
-    t_Table *Table_Array    = NULL;
-    t_Table *Table_Arraytmp = NULL;
-    long offset=0;
-    long block_number=0;
-    long allocated=256;
-    long nelements=1;
-
-    /* first allocate an initial empty t_Table array */
-    Table_Array = (t_Table *)malloc(allocated*sizeof(t_Table));
-    if (!Table_Array) {
-      fprintf(stderr, "Error: Can not allocate memory %zi (Table_Read_Array).\n",
-         allocated*sizeof(t_Table));
-      *blocks = 0;
-      return (NULL);
-    }
-
-    while (nelements > 0)
-    {
-      t_Table Table;
-
-      /* if ok, set t_Table block number else exit loop */
-      block_number++;
-      Table.block_number = block_number;
-      
-      /* access file at offset and get following block. Block number is from the set offset
-       * hence the hardcoded 1 - i.e. the next block counted from offset.*/
-      nelements = Table_Read_Offset(&Table, File, 1, &offset,0);
-      /*if the block is empty - don't store it*/
-      if (nelements>0){
-          /* if t_Table array is not long enough, expand and realocate */
-          if (block_number >= allocated-1) {
-              allocated += 256;
-              Table_Arraytmp = (t_Table *)realloc(Table_Array,
-                      allocated*sizeof(t_Table));
-              if (!Table_Arraytmp) {
-                  fprintf(stderr, "Error: Can not re-allocate memory %zi (Table_Read_Array).\n",
-                          allocated*sizeof(t_Table));
-                  free(Table_Array);
-                  *blocks = 0;
-                  return (NULL);
-              } else {
-                Table_Array = Table_Arraytmp;
-              }
-          }
-          /* store it into t_Table array */
-          //snprintf(Table.filename, 1024, "%s#%li", File, block_number-1);
-          Table_Array[block_number-1] = Table;
-      }
-      /* continues until we find an empty block */
-    }
-    /* send back number of extracted blocks */
-    if (blocks) *blocks = block_number-1;
-
-    /* now store total number of elements in Table array */
-    for (offset=0; offset < block_number;
-      Table_Array[offset++].array_length = block_number-1);
-
-    return(Table_Array);
-  } /* end Table_Read_Array */
-/*******************************************************************************
-* void Table_Free_Array(t_Table *Table)
-*   ACTION: free a Table array
-*******************************************************************************/
-  void Table_Free_Array(t_Table *Table)
-  {
-    long index;
-    if (!Table) return;
-    for (index=0;index < Table[0].array_length; index++){
-            Table_Free(&Table[index]);
-    }
-    free(Table);
-  } /* end Table_Free_Array */
-
-/******************************************************************************
-* long Table_Info_Array(t_Table *Table)
-*    ACTION: print informations about a Table array
-*    return: number of elements in the Table array
-*******************************************************************************/
-  long Table_Info_Array(t_Table *Table)
-  {
-    long index=0;
-
-    if (!Table) return(-1);
-    while (index < Table[index].array_length
-       && (Table[index].data || Table[index].header)
-       && (Table[index].rows*Table[index].columns) ) {
-      Table_Info(Table[index]);
-      index++;
-    }
-    printf("This Table array contains %li elements\n", index);
-    return(index);
-  } /* end Table_Info_Array */
-
-/******************************************************************************
-* char **Table_ParseHeader(char *header, symbol1, symbol2, ..., NULL)
-*    ACTION: search for char* symbols in header and return their value or NULL
-*            the search is not case sensitive.
-*            Last argument MUST be NULL
-*    return: array of char* with line following each symbol, or NULL if not found
-*******************************************************************************/
-#ifndef MyNL_ARGMAX
-#define MyNL_ARGMAX 50
-#endif
-
-char **Table_ParseHeader_backend(char *header, ...){
-  va_list ap;
-  char exit_flag=0;
-  int counter   =0;
-  char **ret    =NULL;
-  if (!header || header[0]=='\0') return(NULL);
-
-  ret = (char**)calloc(MyNL_ARGMAX, sizeof(char*));
-  if (!ret) {
-    printf("Table_ParseHeader: Cannot allocate %i values array for Parser (Table_ParseHeader).\n",
-      MyNL_ARGMAX);
-    return(NULL);
-  }
-  for (counter=0; counter < MyNL_ARGMAX; ret[counter++] = NULL);
-  counter=0;
-
-  va_start(ap, header);
-  while(!exit_flag && counter < MyNL_ARGMAX-1)
-  {
-    char *arg_char=NULL;
-    char *pos     =NULL;
-    /* get variable argument value as a char */
-    arg_char = va_arg(ap, char *);
-    if (!arg_char || arg_char[0]=='\0'){
-      exit_flag = 1; break;
-    }
-    /* search for the symbol in the header */
-    pos = (char*)strcasestr(header, arg_char);
-    if (pos) {
-      char *eol_pos;
-      eol_pos = strchr(pos+strlen(arg_char), '\n');
-      if (!eol_pos)
-        eol_pos = strchr(pos+strlen(arg_char), '\r');
-      if (!eol_pos)
-        eol_pos = pos+strlen(pos)-1;
-      ret[counter] = (char*)malloc(eol_pos - pos);
-      if (!ret[counter]) {
-        printf("Table_ParseHeader: Cannot allocate value[%i] array for Parser searching for %s (Table_ParseHeader).\n",
-          counter, arg_char);
-        exit_flag = 1; break;
-      }
-      strncpy(ret[counter], pos+strlen(arg_char), eol_pos - pos - strlen(arg_char));
-      ret[counter][eol_pos - pos - strlen(arg_char)]='\0';
-    }
-    counter++;
-  }
-  va_end(ap);
-  return(ret);
-} /* Table_ParseHeader */
-
-/******************************************************************************
-* double Table_Interp1d(x, x1, y1, x2, y2)
-*    ACTION: interpolates linearly at x between y1=f(x1) and y2=f(x2)
-*    return: y=f(x) value
-*******************************************************************************/
-double Table_Interp1d(double x,
-  double x1, double y1,
-  double x2, double y2)
-{
-  double slope;
-  if (x2 == x1) return (y1+y2)/2;
-  if (y1 == y2) return  y1;
-  slope = (y2 - y1)/(x2 - x1);
-  return y1+slope*(x - x1);
-} /* Table_Interp1d */
-
-/******************************************************************************
-* double Table_Interp1d_nearest(x, x1, y1, x2, y2)
-*    ACTION: table lookup with nearest method at x between y1=f(x1) and y2=f(x2)
-*    return: y=f(x) value
-*******************************************************************************/
-double Table_Interp1d_nearest(double x,
-  double x1, double y1,
-  double x2, double y2)
-{
-  if (fabs(x-x1) < fabs(x-x2)) return (y1);
-  else return(y2);
-} /* Table_Interp1d_nearest */
-
-/******************************************************************************
-* double Table_Interp2d(x,y, x1,y1, x2,y2, z11,z12,z21,z22)
-*    ACTION: interpolates bi-linearly at (x,y) between z1=f(x1,y1) and z2=f(x2,y2)
-*    return: z=f(x,y) value
-*    x,y |   x1   x2
-*    ----------------
-*     y1 |   z11  z21
-*     y2 |   z12  z22
-*******************************************************************************/
-double Table_Interp2d(double x, double y,
-  double x1, double y1,
-  double x2, double y2,
-  double z11, double z12, double z21, double z22)
-{
-  double ratio_x, ratio_y;
-  if (x2 == x1) return Table_Interp1d(y, y1,z11, y2,z12);
-  if (y1 == y2) return Table_Interp1d(x, x1,z11, x2,z21);
-
-  ratio_y = (y - y1)/(y2 - y1);
-  ratio_x = (x - x1)/(x2 - x1);
-  return (1-ratio_x)*(1-ratio_y)*z11 + ratio_x*(1-ratio_y)*z21
-    + ratio_x*ratio_y*z22         + (1-ratio_x)*ratio_y*z12;
-} /* Table_Interp2d */
-
-/* end of read_table-lib.c */
-#endif // READ_TABLE_LIB_C
-
-
-#ifndef SOURCE_GEN_DEF
-#define SOURCE_GEN_DEF
-/*******************************************************************************
-* str_dup_numeric: replaces non 'valid name' chars with spaces
-*******************************************************************************/
-char *str_dup_numeric(char *orig)
-  {
-    long i;
-
-    if (!orig || !strlen(orig)) return(NULL);
-
-    for (i=0; i < strlen(orig); i++)
-    {
-      if ( (orig[i] > 122)
-        || (orig[i] < 32)
-        || (strchr("!\"#$%&'()*,:;<=>?@[\\]^`/ ", orig[i]) != NULL) )
-      {
-        orig[i] = ' ';
-      }
-    }
-    orig[i] = '\0';
-    /* now skip spaces */
-    for (i=0; i < strlen(orig); i++) {
-      if (*orig == ' ') orig++;
-      else break;
-    }
-
-    return(orig);
-  } /* str_dup_numeric */
-
-  /* A normalised Maxwellian distribution : Integral over all l = 1 */
-#pragma acc routine seq
-  double SG_Maxwell(double l, double temp)
-  {
-    double a=949.0/temp;
-    return 2*a*a*exp(-a/(l*l))/(l*l*l*l*l);
-  }
-#endif
-
 
 /* Shared user declarations for all components types 'Union_init'. */
 
@@ -17485,65 +15856,37 @@ typedef struct _struct_Progress_bar _class_Progress_bar;
 _class_Progress_bar _origin_var;
 #pragma acc declare create ( _origin_var )
 
-/* component src=Source_gen() [2] DECLARE */
-/* Parameter definition for component type 'Source_gen' */
-struct _struct_Source_gen_parameters {
-  /* Component type 'Source_gen' setting parameters */
-  char flux_file[16384];
-  char xdiv_file[16384];
-  char ydiv_file[16384];
+/* component src=Source_simple() [2] DECLARE */
+/* Parameter definition for component type 'Source_simple' */
+struct _struct_Source_simple_parameters {
+  /* Component type 'Source_simple' setting parameters */
   MCNUM radius;
+  MCNUM yheight;
+  MCNUM xwidth;
   MCNUM dist;
   MCNUM focus_xw;
   MCNUM focus_yh;
-  MCNUM focus_aw;
-  MCNUM focus_ah;
   MCNUM E0;
   MCNUM dE;
   MCNUM lambda0;
   MCNUM dlambda;
-  MCNUM I1;
-  MCNUM yheight;
-  MCNUM xwidth;
-  MCNUM verbose;
-  MCNUM T1;
-  MCNUM flux_file_perAA;
-  MCNUM flux_file_log;
-  MCNUM Lmin;
-  MCNUM Lmax;
-  MCNUM Emin;
-  MCNUM Emax;
-  MCNUM T2;
-  MCNUM I2;
-  MCNUM T3;
-  MCNUM I3;
-  MCNUM zdepth;
+  MCNUM flux;
+  MCNUM gauss;
   int target_index;
-  /* Component type 'Source_gen' private parameters */
-  double  p_in;
-  double  lambda1;
-  double  lambda2;
-  double  lambda3;
-  t_Table  pTable;
-  t_Table  pTable_x;
-  t_Table  pTable_y;
-  double  pTable_xmin;
-  double  pTable_xmax;
-  double  pTable_xsum;
-  double  pTable_ymin;
-  double  pTable_ymax;
-  double  pTable_ysum;
-  double  pTable_dxmin;
-  double  pTable_dxmax;
-  double  pTable_dymin;
-  double  pTable_dymax;
-}; /* _struct_Source_gen_parameters */
-typedef struct _struct_Source_gen_parameters _class_Source_gen_parameters;
+  /* Component type 'Source_simple' private parameters */
+  double  pmul;
+  double  srcArea;
+  int  square;
+  double  tx;
+  double  ty;
+  double  tz;
+}; /* _struct_Source_simple_parameters */
+typedef struct _struct_Source_simple_parameters _class_Source_simple_parameters;
 
-/* Parameters for component type 'Source_gen' */
-struct _struct_Source_gen {
+/* Parameters for component type 'Source_simple' */
+struct _struct_Source_simple {
   char     _name[256]; /* e.g. src */
-  char     _type[256]; /* Source_gen */
+  char     _type[256]; /* Source_simple */
   long     _index; /* e.g. 2 index in TRACE list */
   Coords   _position_absolute;
   Coords   _position_relative; /* wrt PREVIOUS */
@@ -17551,10 +15894,10 @@ struct _struct_Source_gen {
   Rotation _rotation_relative; /* wrt PREVIOUS */
   int      _rotation_is_identity;
   int      _position_relative_is_zero;
-  _class_Source_gen_parameters _parameters;
+  _class_Source_simple_parameters _parameters;
 };
-typedef struct _struct_Source_gen _class_Source_gen;
-_class_Source_gen _src_var;
+typedef struct _struct_Source_simple _class_Source_simple;
+_class_Source_simple _src_var;
 #pragma acc declare create ( _src_var )
 
 /* component before=PSD_monitor() [3] DECLARE */
@@ -18096,56 +16439,30 @@ int _origin_setpos(void)
   return(0);
 } /* _origin_setpos */
 
-/* component src=Source_gen() SETTING, POSITION/ROTATION */
+/* component src=Source_simple() SETTING, POSITION/ROTATION */
 int _src_setpos(void)
 { /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_src_setpos] component src=Source_gen() SETTING [Source_gen:0]");
+  SIG_MESSAGE("[_src_setpos] component src=Source_simple() SETTING [Source_simple:0]");
   stracpy(_src_var._name, "src", 16384);
-  stracpy(_src_var._type, "Source_gen", 16384);
+  stracpy(_src_var._type, "Source_simple", 16384);
   _src_var._index=2;
   int current_setpos_index = 2;
-  if("NULL" && strlen("NULL"))
-    stracpy(_src_var._parameters.flux_file, "NULL" ? "NULL" : "", 16384);
-  else 
-  _src_var._parameters.flux_file[0]='\0';
-  if("NULL" && strlen("NULL"))
-    stracpy(_src_var._parameters.xdiv_file, "NULL" ? "NULL" : "", 16384);
-  else 
-  _src_var._parameters.xdiv_file[0]='\0';
-  if("NULL" && strlen("NULL"))
-    stracpy(_src_var._parameters.ydiv_file, "NULL" ? "NULL" : "", 16384);
-  else 
-  _src_var._parameters.ydiv_file[0]='\0';
   _src_var._parameters.radius = _instrument_var._parameters.cylinder_height / 2;
+  _src_var._parameters.yheight = 0;
+  _src_var._parameters.xwidth = 0;
   _src_var._parameters.dist = 1.0;
   _src_var._parameters.focus_xw = 2 * _instrument_var._parameters.cylinder_radius + _instrument_var._parameters.margin / 2;
   _src_var._parameters.focus_yh = _instrument_var._parameters.cylinder_height + _instrument_var._parameters.margin;
-  _src_var._parameters.focus_aw = 0;
-  _src_var._parameters.focus_ah = 0;
   _src_var._parameters.E0 = 0;
   _src_var._parameters.dE = 0;
-  _src_var._parameters.lambda0 = 0;
-  _src_var._parameters.dlambda = 0;
-  _src_var._parameters.I1 = 1e12;
-  _src_var._parameters.yheight = 0.1;
-  _src_var._parameters.xwidth = 0.1;
-  _src_var._parameters.verbose = 0;
-  _src_var._parameters.T1 = 0;
-  _src_var._parameters.flux_file_perAA = 0;
-  _src_var._parameters.flux_file_log = 0;
-  _src_var._parameters.Lmin = 1.0;
-  _src_var._parameters.Lmax = 10.0;
-  _src_var._parameters.Emin = 0;
-  _src_var._parameters.Emax = 0;
-  _src_var._parameters.T2 = 0;
-  _src_var._parameters.I2 = 0;
-  _src_var._parameters.T3 = 0;
-  _src_var._parameters.I3 = 0;
-  _src_var._parameters.zdepth = 0;
+  _src_var._parameters.lambda0 = _instrument_var._parameters.lambda0;
+  _src_var._parameters.dlambda = _instrument_var._parameters.dlambda;
+  _src_var._parameters.flux = 1;
+  _src_var._parameters.gauss = 0;
   _src_var._parameters.target_index = + 1;
 
 
-  /* component src=Source_gen() AT ROTATED */
+  /* component src=Source_simple() AT ROTATED */
   {
     Coords tc1, tc2;
     tc1 = coords_set(0,0,0);
@@ -18161,7 +16478,7 @@ int _src_setpos(void)
       0, 0, -0.2);
     tc1 = coords_sub(_origin_var._position_absolute, _src_var._position_absolute);
     _src_var._position_relative = rot_apply(_src_var._rotation_absolute, tc1);
-  } /* src=Source_gen() AT ROTATED */
+  } /* src=Source_simple() AT ROTATED */
   DEBUG_COMPONENT("src", _src_var._position_absolute, _src_var._rotation_absolute);
   instrument->_position_absolute[2] = _src_var._position_absolute;
   instrument->_position_relative[2] = _src_var._position_relative;
@@ -18172,36 +16489,19 @@ int _src_setpos(void)
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0001_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_gen");
-        mccomp_param_nexus(nxhandle,"0001_src", "flux_file", "NULL", "NULL", "char*");
-        mccomp_param_nexus(nxhandle,"0001_src", "xdiv_file", "NULL", "NULL", "char*");
-        mccomp_param_nexus(nxhandle,"0001_src", "ydiv_file", "NULL", "NULL", "char*");
-        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.0", "_instrument_var._parameters.cylinder_height / 2","MCNUM");
+        mccomp_placement_type_nexus(nxhandle,"0001_src", _src_var._position_absolute, _src_var._rotation_absolute, "Source_simple");
+        mccomp_param_nexus(nxhandle,"0001_src", "radius", "0.1", "_instrument_var._parameters.cylinder_height / 2","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "yheight", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "xwidth", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "dist", "0", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_xw", "0.045", "2 * _instrument_var._parameters.cylinder_radius + _instrument_var._parameters.margin / 2","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", "0.12", "_instrument_var._parameters.cylinder_height + _instrument_var._parameters.margin","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_aw", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "focus_ah", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "focus_xw", ".045", "2 * _instrument_var._parameters.cylinder_radius + _instrument_var._parameters.margin / 2","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "focus_yh", ".12", "_instrument_var._parameters.cylinder_height + _instrument_var._parameters.margin","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "E0", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "dE", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "I1", "1", "1e12","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "yheight", "0.1", "0.1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "xwidth", "0.1", "0.1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "verbose", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "T1", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "flux_file_perAA", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "flux_file_log", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "Lmin", "0", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "Lmax", "0", "10.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "Emin", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "Emax", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "T2", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "I2", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "T3", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "I3", "0", "0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0001_src", "zdepth", "0", "0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "lambda0", "0", "_instrument_var._parameters.lambda0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "dlambda", "0", "_instrument_var._parameters.dlambda","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "flux", "1", "1","MCNUM");
+        mccomp_param_nexus(nxhandle,"0001_src", "gauss", "0", "0","MCNUM");
         mccomp_param_nexus(nxhandle,"0001_src", "target_index", "+ 1", "+ 1","int");
       );
     }
@@ -18924,375 +17224,106 @@ fprintf(stdout, "[%s] Initialize\n", instrument_name);
   return(_comp);
 } /* class_Progress_bar_init */
 
-_class_Source_gen *class_Source_gen_init(_class_Source_gen *_comp
+_class_Source_simple *class_Source_simple_init(_class_Source_simple *_comp
 ) {
-  #define flux_file (_comp->_parameters.flux_file)
-  #define xdiv_file (_comp->_parameters.xdiv_file)
-  #define ydiv_file (_comp->_parameters.ydiv_file)
   #define radius (_comp->_parameters.radius)
+  #define yheight (_comp->_parameters.yheight)
+  #define xwidth (_comp->_parameters.xwidth)
   #define dist (_comp->_parameters.dist)
   #define focus_xw (_comp->_parameters.focus_xw)
   #define focus_yh (_comp->_parameters.focus_yh)
-  #define focus_aw (_comp->_parameters.focus_aw)
-  #define focus_ah (_comp->_parameters.focus_ah)
   #define E0 (_comp->_parameters.E0)
   #define dE (_comp->_parameters.dE)
   #define lambda0 (_comp->_parameters.lambda0)
   #define dlambda (_comp->_parameters.dlambda)
-  #define I1 (_comp->_parameters.I1)
-  #define yheight (_comp->_parameters.yheight)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define verbose (_comp->_parameters.verbose)
-  #define T1 (_comp->_parameters.T1)
-  #define flux_file_perAA (_comp->_parameters.flux_file_perAA)
-  #define flux_file_log (_comp->_parameters.flux_file_log)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define Emin (_comp->_parameters.Emin)
-  #define Emax (_comp->_parameters.Emax)
-  #define T2 (_comp->_parameters.T2)
-  #define I2 (_comp->_parameters.I2)
-  #define T3 (_comp->_parameters.T3)
-  #define I3 (_comp->_parameters.I3)
-  #define zdepth (_comp->_parameters.zdepth)
+  #define flux (_comp->_parameters.flux)
+  #define gauss (_comp->_parameters.gauss)
   #define target_index (_comp->_parameters.target_index)
-  #define p_in (_comp->_parameters.p_in)
-  #define lambda1 (_comp->_parameters.lambda1)
-  #define lambda2 (_comp->_parameters.lambda2)
-  #define lambda3 (_comp->_parameters.lambda3)
-  #define pTable (_comp->_parameters.pTable)
-  #define pTable_x (_comp->_parameters.pTable_x)
-  #define pTable_y (_comp->_parameters.pTable_y)
-  #define pTable_xmin (_comp->_parameters.pTable_xmin)
-  #define pTable_xmax (_comp->_parameters.pTable_xmax)
-  #define pTable_xsum (_comp->_parameters.pTable_xsum)
-  #define pTable_ymin (_comp->_parameters.pTable_ymin)
-  #define pTable_ymax (_comp->_parameters.pTable_ymax)
-  #define pTable_ysum (_comp->_parameters.pTable_ysum)
-  #define pTable_dxmin (_comp->_parameters.pTable_dxmin)
-  #define pTable_dxmax (_comp->_parameters.pTable_dxmax)
-  #define pTable_dymin (_comp->_parameters.pTable_dymin)
-  #define pTable_dymax (_comp->_parameters.pTable_dymax)
-  SIG_MESSAGE("[_src_init] component src=Source_gen() INITIALISE [Source_gen:0]");
+  #define pmul (_comp->_parameters.pmul)
+  #define srcArea (_comp->_parameters.srcArea)
+  #define square (_comp->_parameters.square)
+  #define tx (_comp->_parameters.tx)
+  #define ty (_comp->_parameters.ty)
+  #define tz (_comp->_parameters.tz)
+  SIG_MESSAGE("[_src_init] component src=Source_simple() INITIALISE [Source_simple:0]");
 
-  pTable_xsum=0;
-  pTable_ysum=0;
+square = 0;
+/* Determine source area */
+if (radius && !yheight && !xwidth ) {
+    square = 0;
+    srcArea = PI*radius*radius;
+  } else if(yheight && xwidth) {
+    square = 1;
+    srcArea = xwidth * yheight;
+  }
 
-
-  double source_area, k;
+  if (flux) {
+    pmul=flux*1e4*srcArea/mcget_ncount();
+    if (dlambda)
+      pmul *= 2*dlambda;
+    else if (dE)
+      pmul *= 2*dE;
+  } else {
+    gauss = 0;
+    pmul=1.0/(mcget_ncount()*4*PI);
+  }
 
   if (target_index && !dist)
   {
     Coords ToTarget;
-    double tx,ty,tz;
     ToTarget = coords_sub(POS_A_COMP_INDEX(INDEX_CURRENT_COMP+target_index),POS_A_CURRENT_COMP);
     ToTarget = rot_apply(ROT_A_CURRENT_COMP, ToTarget);
     coords_get(ToTarget, &tx, &ty, &tz);
     dist=sqrt(tx*tx+ty*ty+tz*tz);
+  } else if (dist) {
+    tx = 0;
+    ty = 0;
+    tz = dist;
   }
 
-  /* spectrum characteristics */
-  if (flux_file && strlen(flux_file) && strcmp(flux_file,"NULL") && strcmp(flux_file,"0")) {
-    if (Table_Read(&pTable, flux_file, 1) <= 0) /* read 1st block data from file into pTable */
-      exit(fprintf(stderr, "Source_gen: %s: can not read flux file %s\n", NAME_CURRENT_COMP, flux_file));
-    /* put table in Log scale */
-    int i;
-    if (pTable.columns < 2) exit(fprintf(stderr, "Source_gen: %s: Flux file %s should contain at least 2 columns [wavelength in Angs,flux].\n", NAME_CURRENT_COMP, flux_file));
-    double table_lmin=FLT_MAX, table_lmax=-FLT_MAX;
-    double tmin=FLT_MAX, tmax=-FLT_MAX;
-    for (i=0; i<pTable.rows; i++) {
-      double val = Table_Index(pTable, i,1);
-      val = Table_Index(pTable, i,0); /* lambda */
-      if (val > tmax) tmax=val;
-      if (val < tmin) tmin=val;
-    }
-    for (i=0; i<pTable.rows; i++) {
-      double val = Table_Index(pTable, i,1);
-      if (val < 0) fprintf(stderr, "Source_gen: %s: File %s has negative flux at row %i.\n", NAME_CURRENT_COMP, flux_file, i+1);
-      if (flux_file_log)
-        val = log(val > 0 ? val : tmin/10);
-      Table_SetElement(&pTable, i, 1, val);
-      val = Table_Index(pTable, i,0); /* lambda */
-      if (val > table_lmax) table_lmax=val;
-      if (val < table_lmin) table_lmin=val;
-    }
-    if (!Lmin && !Lmax && !lambda0 && !dlambda && !E0 && !dE && !Emin && !Emax) {
-      Lmin = table_lmin; Lmax = table_lmax;
-    }
-    if (Lmax > table_lmax) {
-      if (verbose) fprintf(stderr, "Source_gen: %s: Maximum wavelength %g is beyond table range upper limit %g. Constraining.\n", NAME_CURRENT_COMP, Lmax, table_lmax);
-      Lmax = table_lmax;
-    }
-    if (Lmin < table_lmin) {
-      if (verbose) fprintf(stderr, "Source_gen: %s: Minimum wavelength %g is below table range lower limit %g. Constraining.\n", NAME_CURRENT_COMP, Lmin, table_lmin);
-      Lmin = table_lmin;
-    }
-  }  /* end flux file */
-  else
-  {
-    k  = 1.38066e-23; /* k_B */
-    if (T1 > 0)
-    {
-      lambda1  = 1.0e10*sqrt(HBAR*HBAR*4.0*PI*PI/2.0/MNEUTRON/k/T1);
-    }
-    else
-      { lambda1 = lambda0; }
-
-    if (T2 > 0)
-    {
-      lambda2  = 1.0e10*sqrt(HBAR*HBAR*4.0*PI*PI/2.0/MNEUTRON/k/T2);
-    }
-    else
-      { lambda2 = lambda0; }
-
-    if (T3 > 0)
-    {
-      lambda3  = 1.0e10*sqrt(HBAR*HBAR*4.0*PI*PI/2.0/MNEUTRON/k/T3);
-    }
-    else
-      { lambda3 = lambda0; }
+  if (srcArea <= 0) {
+    printf("Source_simple: %s: Source area is <= 0 !\n ERROR - Exiting\n",
+           NAME_CURRENT_COMP);
+    exit(0);
+  }
+  if (dist <= 0 || focus_xw <= 0 || focus_yh <= 0) {
+    printf("Source_simple: %s: Target area unmeaningful! (negative dist / focus_xw / focus_yh)\n ERROR - Exiting\n",
+           NAME_CURRENT_COMP);
+    exit(0);
   }
 
-  /* now read position-divergence files, if any */
-  if (xdiv_file && strlen(xdiv_file) && strcmp(xdiv_file,"NULL") && strcmp(xdiv_file,"0")) {
-    int i,j;
-    if (Table_Read(&pTable_x, xdiv_file, 1) <= 0) /* read 1st block data from file into pTable */
-      exit(fprintf(stderr, "Source_gen: %s: can not read XDiv file %s\n", NAME_CURRENT_COMP, xdiv_file));
-    pTable_xsum = 0;
-    for (i=0; i<pTable_x.rows; i++)
-      for (j=0; j<pTable_x.columns; j++)
-        pTable_xsum += Table_Index(pTable_x, i,j);
-
-    /* now extract limits */
-    char **parsing;
-    char xylimits[1024];
-    strcpy(xylimits, "");
-    parsing = Table_ParseHeader(pTable_x.header,
-      "xlimits", "xylimits",
-      NULL);
-
-    if (parsing) {
-      if (parsing[0])  strcpy(xylimits, str_dup_numeric(parsing[0]));
-      if (parsing[1] && !strlen(xylimits))
-                       strcpy(xylimits, str_dup_numeric(parsing[1]));
-      for (i=0; i<=1; i++) {
-        if (parsing[i]) free(parsing[i]);
-      }
-      free(parsing);
-    }
-    i = sscanf(xylimits, "%lg %lg %lg %lg",
-      &(pTable_xmin),  &(pTable_xmax),
-      &(pTable_dxmin), &(pTable_dxmax));
-    if (i != 2 && i != 4 && verbose)
-      fprintf(stderr, "Source_gen: %s: invalid xylimits '%s' from file %s. extracted %i values\n",
-        NAME_CURRENT_COMP, xylimits, xdiv_file, i);
-
-    if (!xwidth) xwidth=pTable_xmax-pTable_xmin;
-    if (!focus_xw && !dist) focus_xw=fabs(pTable_dxmax-pTable_dxmin);
-  } /* end xdiv file */
-
-  if (ydiv_file && strlen(ydiv_file) && strcmp(ydiv_file,"NULL") && strcmp(ydiv_file,"0")) {
-    int i,j;
-    if (Table_Read(&pTable_y, ydiv_file, 1) <= 0) /* read 1st block data from file into pTable */
-      exit(fprintf(stderr, "Source_gen: %s: can not read YDiv file %s\n", NAME_CURRENT_COMP, ydiv_file));
-    pTable_ysum = 0;
-    for (i=0; i<pTable_y.rows; i++)
-      for (j=0; j<pTable_y.columns; j++)
-        pTable_ysum += Table_Index(pTable_y, i,j);
-
-    /* now extract limits */
-    char **parsing;
-    char xylimits[1024];
-    strcpy(xylimits, "");
-    parsing = Table_ParseHeader(pTable_y.header,
-      "xlimits", "xylimits",
-      NULL);
-
-    if (parsing) {
-      if (parsing[0])  strcpy(xylimits,str_dup_numeric(parsing[0]));
-      if (parsing[1] && !strlen(xylimits))
-                       strcpy(xylimits,str_dup_numeric(parsing[1]));
-      for (i=0; i<=1; i++) {
-        if (parsing[i]) free(parsing[i]);
-      }
-      free(parsing);
-    }
-    i = sscanf(xylimits, "%lg %lg %lg %lg",
-      &(pTable_ymin),  &(pTable_ymax),
-      &(pTable_dymin), &(pTable_dymax));
-    if (i != 2 && i != 4 && verbose)
-      fprintf(stderr, "Source_gen: %s: invalid xylimits '%s' from file %s. extracted %i values\n",
-        NAME_CURRENT_COMP, xylimits, ydiv_file, i);
-    if (!yheight)  yheight=pTable_ymax-pTable_ymin;
-    if (!focus_yh && !dist) focus_yh=fabs(pTable_dymax-pTable_dymin);
-  } /* end ydiv file */
-
-  /* tests for parameter values */
-  if (Emin < 0 || Emax < 0 || Lmin < 0 || Lmax < 0 || E0 < 0 || dE < 0 || lambda0 < 0 || dlambda < 0)
-  {
-    fprintf(stderr,"Source_gen: %s: Error: Negative average\n"
-                   "            or range values for wavelength or energy encountered\n",
-                   NAME_CURRENT_COMP);
-    exit(-1);
+  if ((!lambda0 && !E0 && !dE && !dlambda)) {
+    printf("Source_simple: %s: You must specify either a wavelength or energy range!\n ERROR - Exiting\n",
+           NAME_CURRENT_COMP);
+    exit(0);
   }
-  if ((Emin == 0 && Emax > 0) || (dE > 0 && dE >= E0))
-  {
-    fprintf(stderr,"Source_gen: %s: Error: minimal energy cannot be less or equal zero\n",
-      NAME_CURRENT_COMP);
-    exit(-1);
+  if ((!lambda0 && !dlambda && (E0 <= 0 || dE < 0 || E0-dE <= 0))
+    || (!E0 && !dE && (lambda0 <= 0 || dlambda < 0 || lambda0-dlambda <= 0))) {
+    printf("Source_simple: %s: Unmeaningful definition of wavelength or energy range!\n ERROR - Exiting\n",
+           NAME_CURRENT_COMP);
+      exit(0);
   }
-  if ((Emax >= Emin) && (Emin > 0))
-  { E0 = (Emax+Emin)/2;
-    dE = (Emax-Emin)/2;
-  }
-  if ((E0 > dE) && (dE >= 0))
-  {
-    Lmin = sqrt(81.81/(E0+dE)); /* Angstroem */
-    Lmax = sqrt(81.81/(E0-dE));
-  }
-  if (Lmax > 0)
-  { lambda0 = (Lmax+Lmin)/2;
-    dlambda = (Lmax-Lmin)/2;
-  }
-  if (lambda0 <= 0 || (lambda0 < dlambda) || (dlambda < 0))
-  { fprintf(stderr,"Source_gen: %s: Error: Wavelength range %.3f +/- %.3f AA calculated \n",
-      NAME_CURRENT_COMP, lambda0, dlambda);
-    fprintf(stderr,"- whole wavelength range must be >= 0 \n");
-    fprintf(stderr,"- range must be > 0; otherwise intensity gets zero, use other sources in this case \n\n");
-    exit(-1);
-  }
-
-  radius = fabs(radius); xwidth=fabs(xwidth); yheight=fabs(yheight);  I1=fabs(I1);
-  lambda0=fabs(lambda0); dlambda=fabs(dlambda);
-  focus_xw = fabs(focus_xw); focus_yh=fabs(focus_yh); dist=fabs(dist);
-
-  if ((!focus_ah && !focus_aw) && (!focus_xw && !focus_yh))
-  {
-    fprintf(stderr,"Source_gen: %s: Error: No focusing information.\n"
-                   "            Specify focus_xw, focus_yh or focus_aw, focus_ah\n",
-                   NAME_CURRENT_COMP);
-    exit(-1);
-  }
-  Lmin = lambda0 - dlambda; /* Angstroem */
-  Lmax = lambda0 + dlambda;
-
-  /* compute initial weight factor p_in to get [n/s] */
-  if ((I1 > 0  && T1 >= 0)
-     || (flux_file && strlen(flux_file) && strcmp(flux_file,"NULL") && strcmp(flux_file,"0")))
-  { /* the I1,2,3 are usually in [n/s/cm2/st/AA] */
-    if (radius)
-      source_area = radius*radius*PI*1e4; /* circular cm^2 */
-    else
-      source_area = yheight*xwidth*1e4; /* square cm^2 */
-    p_in  = source_area; /* cm2 */
-    p_in *= (Lmax-Lmin); /* AA. 1 bin=AA/n */
-    if (flux_file && strlen(flux_file) && strcmp(flux_file,"NULL") && strcmp(flux_file,"0")
-      && !flux_file_perAA)  p_in *= pTable.rows/(Lmax-Lmin);
-  }
-  else
-    p_in = 1.0/4/PI; /* Small angle approx. */
-  p_in /= mcget_ncount();
-  if (!T1 && I1) p_in *= I1;
-
-  if (radius == 0 && yheight == 0 && xwidth == 0)
-  {
-    fprintf(stderr,"Source_gen: %s: Error: Please specify source geometry (radius, yheight, xwidth)\n",
-      NAME_CURRENT_COMP);
-    exit(-1);
-  }
-  if (focus_xw*focus_yh == 0)
-  {
-    fprintf(stderr,"Source_gen: %s: Error: Please specify source target (focus_xw, focus_yh)\n",
-      NAME_CURRENT_COMP);
-    exit(-1);
-  }
-  MPI_MASTER(
-  if (verbose)
-  {
-    printf("Source_gen: component %s ", NAME_CURRENT_COMP);
-    if ((yheight == 0) || (xwidth == 0))
-      printf("(disk, radius=%g)", radius);
-    else
-      printf("(square %g x %g)",xwidth,yheight);
-    if (dist) printf("\n            focusing distance dist=%g area=%g x %g\n", dist, focus_xw, focus_yh);
-    printf("            spectra ");
-    printf("%.3f to %.3f AA (%.3f to %.3f meV)", Lmin, Lmax, 81.81/Lmax/Lmax, 81.81/Lmin/Lmin);
-    printf("\n");
-    if (flux_file && strlen(flux_file) && strcmp(flux_file,"NULL") && strcmp(flux_file,"0"))
-    { printf("  File %s for flux distribution used. Flux is dPhi/dlambda in [n/s/AA]. \n", flux_file);
-      Table_Info(pTable);
-    }
-    else if (T1>=0 && I1)
-    { if (T1 != 0)
-        printf("            T1=%.1f K (%.3f AA)", T1, lambda1);
-      if (T2*I2 != 0)
-        printf(", T2=%.1f K (%.3f AA)", T2, lambda2);
-      if (T3*I3 != 0)
-        printf(", T3=%.1f K (%.3f AA)", T3, lambda3);
-      if (T1) printf("\n");
-      printf("  Flux is dPhi/dlambda in [n/s/cm2].\n");
-    }
-    else
-    { printf("  Flux is Phi in [n/s].\n");
-    }
-    if (xdiv_file && strlen(xdiv_file) && strcmp(xdiv_file,"NULL") && strcmp(xdiv_file,"0"))
-      printf("  File %s x=[%g:%g] [m] xdiv=[%g:%g] [deg] used as horizontal phase space distribution.\n", xdiv_file, pTable_xmin, pTable_xmax, pTable_dxmin, pTable_dxmax);
-    if (ydiv_file && strlen(ydiv_file) && strcmp(ydiv_file,"NULL") && strcmp(ydiv_file,"0"))
-      printf("  File %s y=[%g:%g] [m] ydiv=[%g:%g] [deg] used as vertical phase space distribution.\n", ydiv_file, pTable_ymin, pTable_ymax, pTable_dymin, pTable_dymax);
-  }
-  else
-    if (verbose == -1)
-      printf("Source_gen: component %s inactivated", NAME_CURRENT_COMP);
-  );
-  #undef flux_file
-  #undef xdiv_file
-  #undef ydiv_file
   #undef radius
+  #undef yheight
+  #undef xwidth
   #undef dist
   #undef focus_xw
   #undef focus_yh
-  #undef focus_aw
-  #undef focus_ah
   #undef E0
   #undef dE
   #undef lambda0
   #undef dlambda
-  #undef I1
-  #undef yheight
-  #undef xwidth
-  #undef verbose
-  #undef T1
-  #undef flux_file_perAA
-  #undef flux_file_log
-  #undef Lmin
-  #undef Lmax
-  #undef Emin
-  #undef Emax
-  #undef T2
-  #undef I2
-  #undef T3
-  #undef I3
-  #undef zdepth
+  #undef flux
+  #undef gauss
   #undef target_index
-  #undef p_in
-  #undef lambda1
-  #undef lambda2
-  #undef lambda3
-  #undef pTable
-  #undef pTable_x
-  #undef pTable_y
-  #undef pTable_xmin
-  #undef pTable_xmax
-  #undef pTable_xsum
-  #undef pTable_ymin
-  #undef pTable_ymax
-  #undef pTable_ysum
-  #undef pTable_dxmin
-  #undef pTable_dxmax
-  #undef pTable_dymin
-  #undef pTable_dymax
+  #undef pmul
+  #undef srcArea
+  #undef square
+  #undef tx
+  #undef ty
+  #undef tz
   return(_comp);
-} /* class_Source_gen_init */
+} /* class_Source_simple_init */
 
 _class_PSD_monitor *class_PSD_monitor_init(_class_PSD_monitor *_comp
 ) {
@@ -20860,7 +18891,7 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
   #undef thickness
   #undef margin
   _origin_setpos(); /* type Progress_bar */
-  _src_setpos(); /* type Source_gen */
+  _src_setpos(); /* type Source_simple */
   _before_setpos(); /* type PSD_monitor */
   _init_setpos(); /* type Union_init */
   _sample_inc_setpos(); /* type Incoherent_process */
@@ -20875,7 +18906,7 @@ int init(void) { /* called by mccode_main for hollow_cylinder:INITIALISE */
   /* call iteratively all components INITIALISE */
   class_Progress_bar_init(&_origin_var);
 
-  class_Source_gen_init(&_src_var);
+  class_Source_simple_init(&_src_var);
 
   class_PSD_monitor_init(&_before_var);
 
@@ -21048,150 +19079,72 @@ void class_Progress_bar_trace(_class_Progress_bar *_comp
 } /* class_Progress_bar_trace */
 
 #pragma acc routine
-void class_Source_gen_trace(_class_Source_gen *_comp
+void class_Source_simple_trace(_class_Source_simple *_comp
   , _class_particle *_particle) {
   ABSORBED=SCATTERED=RESTORE=0;
-  #define flux_file (_comp->_parameters.flux_file)
-  #define xdiv_file (_comp->_parameters.xdiv_file)
-  #define ydiv_file (_comp->_parameters.ydiv_file)
   #define radius (_comp->_parameters.radius)
+  #define yheight (_comp->_parameters.yheight)
+  #define xwidth (_comp->_parameters.xwidth)
   #define dist (_comp->_parameters.dist)
   #define focus_xw (_comp->_parameters.focus_xw)
   #define focus_yh (_comp->_parameters.focus_yh)
-  #define focus_aw (_comp->_parameters.focus_aw)
-  #define focus_ah (_comp->_parameters.focus_ah)
   #define E0 (_comp->_parameters.E0)
   #define dE (_comp->_parameters.dE)
   #define lambda0 (_comp->_parameters.lambda0)
   #define dlambda (_comp->_parameters.dlambda)
-  #define I1 (_comp->_parameters.I1)
-  #define yheight (_comp->_parameters.yheight)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define verbose (_comp->_parameters.verbose)
-  #define T1 (_comp->_parameters.T1)
-  #define flux_file_perAA (_comp->_parameters.flux_file_perAA)
-  #define flux_file_log (_comp->_parameters.flux_file_log)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define Emin (_comp->_parameters.Emin)
-  #define Emax (_comp->_parameters.Emax)
-  #define T2 (_comp->_parameters.T2)
-  #define I2 (_comp->_parameters.I2)
-  #define T3 (_comp->_parameters.T3)
-  #define I3 (_comp->_parameters.I3)
-  #define zdepth (_comp->_parameters.zdepth)
+  #define flux (_comp->_parameters.flux)
+  #define gauss (_comp->_parameters.gauss)
   #define target_index (_comp->_parameters.target_index)
-  #define p_in (_comp->_parameters.p_in)
-  #define lambda1 (_comp->_parameters.lambda1)
-  #define lambda2 (_comp->_parameters.lambda2)
-  #define lambda3 (_comp->_parameters.lambda3)
-  #define pTable (_comp->_parameters.pTable)
-  #define pTable_x (_comp->_parameters.pTable_x)
-  #define pTable_y (_comp->_parameters.pTable_y)
-  #define pTable_xmin (_comp->_parameters.pTable_xmin)
-  #define pTable_xmax (_comp->_parameters.pTable_xmax)
-  #define pTable_xsum (_comp->_parameters.pTable_xsum)
-  #define pTable_ymin (_comp->_parameters.pTable_ymin)
-  #define pTable_ymax (_comp->_parameters.pTable_ymax)
-  #define pTable_ysum (_comp->_parameters.pTable_ysum)
-  #define pTable_dxmin (_comp->_parameters.pTable_dxmin)
-  #define pTable_dxmax (_comp->_parameters.pTable_dxmax)
-  #define pTable_dymin (_comp->_parameters.pTable_dymin)
-  #define pTable_dymax (_comp->_parameters.pTable_dymax)
-  SIG_MESSAGE("[_src_trace] component src=Source_gen() TRACE [Source_gen:0]");
+  #define pmul (_comp->_parameters.pmul)
+  #define srcArea (_comp->_parameters.srcArea)
+  #define square (_comp->_parameters.square)
+  #define tx (_comp->_parameters.tx)
+  #define ty (_comp->_parameters.ty)
+  #define tz (_comp->_parameters.tz)
+  SIG_MESSAGE("[_src_trace] component src=Source_simple() TRACE [Source_simple:0]");
 
-  double dx=0,dy=0,xf,yf,rf,pdir,chi,v,r, lambda;
-  double Maxwell;
+ double chi,E,lambda,v,r, xf, yf, rf, dx, dy, pdir;
 
-  if (verbose >= 0)
-  {
+ t=0;
+ z=0;
 
-    z=0;
+ if (square == 1) {
+   x = xwidth * (rand01() - 0.5);
+   y = yheight * (rand01() - 0.5);
+ } else {
+   chi=2*PI*rand01();                          /* Choose point on source */
+   r=sqrt(rand01())*radius;                    /* with uniform distribution. */
+   x=r*cos(chi);
+   y=r*sin(chi);
+ }
+ randvec_target_rect_real(&xf, &yf, &rf, &pdir,
+			  tx, ty, tz, focus_xw, focus_yh, ROT_A_CURRENT_COMP, x, y, z, 2);
 
-    if (radius)
-    {
-      chi=2*PI*rand01();                          /* Choose point on source */
-      r=sqrt(rand01())*radius;                    /* with uniform distribution. */
-      x=r*cos(chi);
-      y=r*sin(chi);
-    }
-    else
-    {
-      x = xwidth*randpm1()/2;   /* select point on source (uniform) */
-      y = yheight*randpm1()/2;
-    }
-    if (zdepth != 0)
-      z = zdepth*randpm1()/2;
-  /* Assume linear wavelength distribution */
-    lambda = lambda0+dlambda*randpm1();
-    if (lambda <= 0) ABSORB;
-    v = K2V*(2*PI/lambda);
+ dx = xf-x;
+ dy = yf-y;
+ rf = sqrt(dx*dx+dy*dy+rf*rf);
 
-    if (!focus_ah && !focus_aw) {
-      randvec_target_rect_real(&xf, &yf, &rf, &pdir,
-       0, 0, dist, focus_xw, focus_yh, ROT_A_CURRENT_COMP, x, y, z, 2);
+ p = pdir*pmul;
 
-      dx = xf-x;
-      dy = yf-y;
-      rf = sqrt(dx*dx+dy*dy+dist*dist);
+ if(lambda0==0) {
+   if (!gauss) {
+     E=E0+dE*randpm1();              /*  Choose from uniform distribution */
+   } else {
+     E=E0+randnorm()*dE;
+   }
+   v=sqrt(E)*SE2V;
+ } else {
+   if (!gauss) {
+     lambda=lambda0+dlambda*randpm1();
+   } else {
+     lambda=lambda0+randnorm()*dlambda;
+   }
+   v = K2V*(2*PI/lambda);
+ }
 
-      vz=v*dist/rf;
-      vy=v*dy/rf;
-      vx=v*dx/rf;
-    } else {
-
-      randvec_target_rect_angular(&vx, &vy, &vz, &pdir,
-          0, 0, 1, focus_aw*DEG2RAD, focus_ah*DEG2RAD, ROT_A_CURRENT_COMP);
-      dx = vx; dy = vy; /* from unit vector */
-      vx *= v; vy *= v; vz *= v;
-    }
-    p = p_in*pdir;
-
-    /* spectral dependency from files or Maxwellians */
-
-    if (flux_file && strlen(flux_file) && strcmp(flux_file,"NULL") && strcmp(flux_file,"0"))
-    {
-       double binwidth=Table_Value(pTable, lambda, 1);
-       if (flux_file_log) binwidth=exp(binwidth);
-       p *= binwidth;
-    }
-    else 
-
-if (T1 > 0 && I1 > 0)
-    {
-      Maxwell = I1 * SG_Maxwell(lambda, T1);;  /* 1/AA */
-
-      if ((T2 > 0) && (I2 > 0))
-      {
-        Maxwell += I2 * SG_Maxwell(lambda, T2);
-      }
-      if ((T3 > 0) && (I3 > 0))
-      {
-        Maxwell += I3 * SG_Maxwell(lambda, T3);;
-      }
-      p *= Maxwell;
-    }
-
-    /* optional x-xdiv and y-ydiv weightening: position=along columns, div=along rows */
-    if (xdiv_file && strlen(xdiv_file)
-      && strcmp(xdiv_file,"NULL") && strcmp(xdiv_file,"0") && pTable_xsum > 0) {
-      double i,j;
-      j = (x-            pTable_xmin) /(pTable_xmax -pTable_xmin) *pTable_x.columns;
-      i = (atan2(dx,rf)*RAD2DEG-pTable_dxmin)/(pTable_dxmax-pTable_dxmin)*pTable_x.rows;
-      r = Table_Value2d(pTable_x, i,j); /* row, column */
-      p *= r/pTable_xsum;
-    }
-    if (ydiv_file && strlen(ydiv_file)
-       && strcmp(ydiv_file,"NULL") && strcmp(ydiv_file,"0") && pTable_ysum > 0) {
-      double i,j;
-      j = (y-            pTable_ymin) /(pTable_ymax -pTable_ymin) *pTable_y.columns;
-      i = (atan2(dy,rf)*RAD2DEG-  pTable_dymin)/(pTable_dymax-pTable_dymin)*pTable_y.rows;
-      r = Table_Value2d(pTable_y, i,j);
-      p *= r/pTable_ysum;
-    }
-
-    SCATTER;
-  }
+ vz=v*dist/rf;
+ vy=v*dy/rf;
+ vx=v*dx/rf;
 #ifndef NOABSORB_INF_NAN
   /* Check for nan or inf particle parms */ 
   if(isnan(p + t + vx + vy + vz + x + y + z)) ABSORB;
@@ -21206,55 +19159,27 @@ if (T1 > 0 && I1 > 0)
   if(isnan(y)  ||  isinf(y)) printf("NAN or INF found in y,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
   if(isnan(z)  ||  isinf(z)) printf("NAN or INF found in z,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
 #endif
-  #undef flux_file
-  #undef xdiv_file
-  #undef ydiv_file
   #undef radius
+  #undef yheight
+  #undef xwidth
   #undef dist
   #undef focus_xw
   #undef focus_yh
-  #undef focus_aw
-  #undef focus_ah
   #undef E0
   #undef dE
   #undef lambda0
   #undef dlambda
-  #undef I1
-  #undef yheight
-  #undef xwidth
-  #undef verbose
-  #undef T1
-  #undef flux_file_perAA
-  #undef flux_file_log
-  #undef Lmin
-  #undef Lmax
-  #undef Emin
-  #undef Emax
-  #undef T2
-  #undef I2
-  #undef T3
-  #undef I3
-  #undef zdepth
+  #undef flux
+  #undef gauss
   #undef target_index
-  #undef p_in
-  #undef lambda1
-  #undef lambda2
-  #undef lambda3
-  #undef pTable
-  #undef pTable_x
-  #undef pTable_y
-  #undef pTable_xmin
-  #undef pTable_xmax
-  #undef pTable_xsum
-  #undef pTable_ymin
-  #undef pTable_ymax
-  #undef pTable_ysum
-  #undef pTable_dxmin
-  #undef pTable_dxmax
-  #undef pTable_dymin
-  #undef pTable_dymax
+  #undef pmul
+  #undef srcArea
+  #undef square
+  #undef tx
+  #undef ty
+  #undef tz
   return;
-} /* class_Source_gen_trace */
+} /* class_Source_simple_trace */
 
 #pragma acc routine
 void class_PSD_monitor_trace(_class_PSD_monitor *_comp
@@ -22924,7 +20849,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
     } /* end component origin [1] */
-    /* begin component src=Source_gen() [2] */
+    /* begin component src=Source_simple() [2] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_src_var._rotation_is_identity) {
         if(!_src_var._position_relative_is_zero) {
@@ -22939,7 +20864,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle_save = *_particle;
       DEBUG_COMP(_src_var._name);
       DEBUG_STATE();
-      class_Source_gen_trace(&_src_var, _particle);
+      class_Source_simple_trace(&_src_var, _particle);
       if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
@@ -23235,7 +21160,7 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
 #endif
           mccoordschange(_src_var._position_relative, _src_var._rotation_relative, _particle);
         _particle_save = *_particle;
-        class_Source_gen_trace(&_src_var, _particle);
+        class_Source_simple_trace(&_src_var, _particle);
         if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
         _particle->_index++;
@@ -23580,110 +21505,6 @@ _class_Progress_bar *class_Progress_bar_finally(_class_Progress_bar *_comp
   #undef infostring
   return(_comp);
 } /* class_Progress_bar_finally */
-
-_class_Source_gen *class_Source_gen_finally(_class_Source_gen *_comp
-) {
-  #define flux_file (_comp->_parameters.flux_file)
-  #define xdiv_file (_comp->_parameters.xdiv_file)
-  #define ydiv_file (_comp->_parameters.ydiv_file)
-  #define radius (_comp->_parameters.radius)
-  #define dist (_comp->_parameters.dist)
-  #define focus_xw (_comp->_parameters.focus_xw)
-  #define focus_yh (_comp->_parameters.focus_yh)
-  #define focus_aw (_comp->_parameters.focus_aw)
-  #define focus_ah (_comp->_parameters.focus_ah)
-  #define E0 (_comp->_parameters.E0)
-  #define dE (_comp->_parameters.dE)
-  #define lambda0 (_comp->_parameters.lambda0)
-  #define dlambda (_comp->_parameters.dlambda)
-  #define I1 (_comp->_parameters.I1)
-  #define yheight (_comp->_parameters.yheight)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define verbose (_comp->_parameters.verbose)
-  #define T1 (_comp->_parameters.T1)
-  #define flux_file_perAA (_comp->_parameters.flux_file_perAA)
-  #define flux_file_log (_comp->_parameters.flux_file_log)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define Emin (_comp->_parameters.Emin)
-  #define Emax (_comp->_parameters.Emax)
-  #define T2 (_comp->_parameters.T2)
-  #define I2 (_comp->_parameters.I2)
-  #define T3 (_comp->_parameters.T3)
-  #define I3 (_comp->_parameters.I3)
-  #define zdepth (_comp->_parameters.zdepth)
-  #define target_index (_comp->_parameters.target_index)
-  #define p_in (_comp->_parameters.p_in)
-  #define lambda1 (_comp->_parameters.lambda1)
-  #define lambda2 (_comp->_parameters.lambda2)
-  #define lambda3 (_comp->_parameters.lambda3)
-  #define pTable (_comp->_parameters.pTable)
-  #define pTable_x (_comp->_parameters.pTable_x)
-  #define pTable_y (_comp->_parameters.pTable_y)
-  #define pTable_xmin (_comp->_parameters.pTable_xmin)
-  #define pTable_xmax (_comp->_parameters.pTable_xmax)
-  #define pTable_xsum (_comp->_parameters.pTable_xsum)
-  #define pTable_ymin (_comp->_parameters.pTable_ymin)
-  #define pTable_ymax (_comp->_parameters.pTable_ymax)
-  #define pTable_ysum (_comp->_parameters.pTable_ysum)
-  #define pTable_dxmin (_comp->_parameters.pTable_dxmin)
-  #define pTable_dxmax (_comp->_parameters.pTable_dxmax)
-  #define pTable_dymin (_comp->_parameters.pTable_dymin)
-  #define pTable_dymax (_comp->_parameters.pTable_dymax)
-  SIG_MESSAGE("[_src_finally] component src=Source_gen() FINALLY [Source_gen:0]");
-
-  Table_Free(&pTable);
-  Table_Free(&pTable_x);
-  Table_Free(&pTable_y);
-  #undef flux_file
-  #undef xdiv_file
-  #undef ydiv_file
-  #undef radius
-  #undef dist
-  #undef focus_xw
-  #undef focus_yh
-  #undef focus_aw
-  #undef focus_ah
-  #undef E0
-  #undef dE
-  #undef lambda0
-  #undef dlambda
-  #undef I1
-  #undef yheight
-  #undef xwidth
-  #undef verbose
-  #undef T1
-  #undef flux_file_perAA
-  #undef flux_file_log
-  #undef Lmin
-  #undef Lmax
-  #undef Emin
-  #undef Emax
-  #undef T2
-  #undef I2
-  #undef T3
-  #undef I3
-  #undef zdepth
-  #undef target_index
-  #undef p_in
-  #undef lambda1
-  #undef lambda2
-  #undef lambda3
-  #undef pTable
-  #undef pTable_x
-  #undef pTable_y
-  #undef pTable_xmin
-  #undef pTable_xmax
-  #undef pTable_xsum
-  #undef pTable_ymin
-  #undef pTable_ymax
-  #undef pTable_ysum
-  #undef pTable_dxmin
-  #undef pTable_dxmax
-  #undef pTable_dymin
-  #undef pTable_dymax
-  return(_comp);
-} /* class_Source_gen_finally */
 
 _class_PSD_monitor *class_PSD_monitor_finally(_class_PSD_monitor *_comp
 ) {
@@ -24353,7 +22174,6 @@ int finally(void) { /* called by mccode_main for hollow_cylinder:FINALLY */
   /* call iteratively all components FINALLY */
   class_Progress_bar_finally(&_origin_var);
 
-  class_Source_gen_finally(&_src_var);
 
   class_PSD_monitor_finally(&_before_var);
 
@@ -24419,153 +22239,64 @@ _class_Progress_bar *class_Progress_bar_display(_class_Progress_bar *_comp
   return(_comp);
 } /* class_Progress_bar_display */
 
-_class_Source_gen *class_Source_gen_display(_class_Source_gen *_comp
+_class_Source_simple *class_Source_simple_display(_class_Source_simple *_comp
 ) {
-  #define flux_file (_comp->_parameters.flux_file)
-  #define xdiv_file (_comp->_parameters.xdiv_file)
-  #define ydiv_file (_comp->_parameters.ydiv_file)
   #define radius (_comp->_parameters.radius)
+  #define yheight (_comp->_parameters.yheight)
+  #define xwidth (_comp->_parameters.xwidth)
   #define dist (_comp->_parameters.dist)
   #define focus_xw (_comp->_parameters.focus_xw)
   #define focus_yh (_comp->_parameters.focus_yh)
-  #define focus_aw (_comp->_parameters.focus_aw)
-  #define focus_ah (_comp->_parameters.focus_ah)
   #define E0 (_comp->_parameters.E0)
   #define dE (_comp->_parameters.dE)
   #define lambda0 (_comp->_parameters.lambda0)
   #define dlambda (_comp->_parameters.dlambda)
-  #define I1 (_comp->_parameters.I1)
-  #define yheight (_comp->_parameters.yheight)
-  #define xwidth (_comp->_parameters.xwidth)
-  #define verbose (_comp->_parameters.verbose)
-  #define T1 (_comp->_parameters.T1)
-  #define flux_file_perAA (_comp->_parameters.flux_file_perAA)
-  #define flux_file_log (_comp->_parameters.flux_file_log)
-  #define Lmin (_comp->_parameters.Lmin)
-  #define Lmax (_comp->_parameters.Lmax)
-  #define Emin (_comp->_parameters.Emin)
-  #define Emax (_comp->_parameters.Emax)
-  #define T2 (_comp->_parameters.T2)
-  #define I2 (_comp->_parameters.I2)
-  #define T3 (_comp->_parameters.T3)
-  #define I3 (_comp->_parameters.I3)
-  #define zdepth (_comp->_parameters.zdepth)
+  #define flux (_comp->_parameters.flux)
+  #define gauss (_comp->_parameters.gauss)
   #define target_index (_comp->_parameters.target_index)
-  #define p_in (_comp->_parameters.p_in)
-  #define lambda1 (_comp->_parameters.lambda1)
-  #define lambda2 (_comp->_parameters.lambda2)
-  #define lambda3 (_comp->_parameters.lambda3)
-  #define pTable (_comp->_parameters.pTable)
-  #define pTable_x (_comp->_parameters.pTable_x)
-  #define pTable_y (_comp->_parameters.pTable_y)
-  #define pTable_xmin (_comp->_parameters.pTable_xmin)
-  #define pTable_xmax (_comp->_parameters.pTable_xmax)
-  #define pTable_xsum (_comp->_parameters.pTable_xsum)
-  #define pTable_ymin (_comp->_parameters.pTable_ymin)
-  #define pTable_ymax (_comp->_parameters.pTable_ymax)
-  #define pTable_ysum (_comp->_parameters.pTable_ysum)
-  #define pTable_dxmin (_comp->_parameters.pTable_dxmin)
-  #define pTable_dxmax (_comp->_parameters.pTable_dxmax)
-  #define pTable_dymin (_comp->_parameters.pTable_dymin)
-  #define pTable_dymax (_comp->_parameters.pTable_dymax)
-  SIG_MESSAGE("[_src_display] component src=Source_gen() DISPLAY [Source_gen:0]");
+  #define pmul (_comp->_parameters.pmul)
+  #define srcArea (_comp->_parameters.srcArea)
+  #define square (_comp->_parameters.square)
+  #define tx (_comp->_parameters.tx)
+  #define ty (_comp->_parameters.ty)
+  #define tz (_comp->_parameters.tz)
+  SIG_MESSAGE("[_src_display] component src=Source_simple() DISPLAY [Source_simple:0]");
 
   printf("MCDISPLAY: component %s\n", _comp->_name);
-  double xmin;
-  double xmax;
-  double ymin;
-  double ymax;
-
-  if (radius)
-  {
+  if (square == 1) {
+    
+    rectangle("xy",0,0,0,xwidth,yheight);
+  } else {
     
     circle("xy",0,0,0,radius);
-    if (zdepth) {
-      circle("xy",0,0,-zdepth/2,radius);
-      circle("xy",0,0, zdepth/2,radius);
-    }
-  }
-  else
-  {
-    xmin = -xwidth/2; xmax = xwidth/2;
-    ymin = -yheight/2; ymax = yheight/2;
-
-    
-    multiline(5, (double)xmin, (double)ymin, 0.0,
-             (double)xmax, (double)ymin, 0.0,
-             (double)xmax, (double)ymax, 0.0,
-             (double)xmin, (double)ymax, 0.0,
-             (double)xmin, (double)ymin, 0.0);
-    if (zdepth) {
-      multiline(5, (double)xmin, (double)ymin, -zdepth/2,
-             (double)xmax, (double)ymin, -zdepth/2,
-             (double)xmax, (double)ymax, -zdepth/2,
-             (double)xmin, (double)ymax, -zdepth/2,
-             (double)xmin, (double)ymin, -zdepth/2);
-      multiline(5, (double)xmin, (double)ymin, zdepth/2,
-             (double)xmax, (double)ymin, zdepth/2,
-             (double)xmax, (double)ymax, zdepth/2,
-             (double)xmin, (double)ymax, zdepth/2,
-             (double)xmin, (double)ymin, zdepth/2);
-    }
   }
   if (dist) {
-    if (focus_aw) focus_xw=dist*tan(focus_aw*DEG2RAD);
-    if (focus_ah) focus_yh=dist*tan(focus_ah*DEG2RAD);
-    dashed_line(0,0,0, -focus_xw/2,-focus_yh/2,dist, 4);
-    dashed_line(0,0,0,  focus_xw/2,-focus_yh/2,dist, 4);
-    dashed_line(0,0,0,  focus_xw/2, focus_yh/2,dist, 4);
-    dashed_line(0,0,0, -focus_xw/2, focus_yh/2,dist, 4);
+    dashed_line(0,0,0, -focus_xw/2+tx,-focus_yh/2+ty,tz, 4);
+    dashed_line(0,0,0,  focus_xw/2+tx,-focus_yh/2+ty,tz, 4);
+    dashed_line(0,0,0,  focus_xw/2+tx, focus_yh/2+ty,tz, 4);
+    dashed_line(0,0,0, -focus_xw/2+tx, focus_yh/2+ty,tz, 4);
   }
-  #undef flux_file
-  #undef xdiv_file
-  #undef ydiv_file
   #undef radius
+  #undef yheight
+  #undef xwidth
   #undef dist
   #undef focus_xw
   #undef focus_yh
-  #undef focus_aw
-  #undef focus_ah
   #undef E0
   #undef dE
   #undef lambda0
   #undef dlambda
-  #undef I1
-  #undef yheight
-  #undef xwidth
-  #undef verbose
-  #undef T1
-  #undef flux_file_perAA
-  #undef flux_file_log
-  #undef Lmin
-  #undef Lmax
-  #undef Emin
-  #undef Emax
-  #undef T2
-  #undef I2
-  #undef T3
-  #undef I3
-  #undef zdepth
+  #undef flux
+  #undef gauss
   #undef target_index
-  #undef p_in
-  #undef lambda1
-  #undef lambda2
-  #undef lambda3
-  #undef pTable
-  #undef pTable_x
-  #undef pTable_y
-  #undef pTable_xmin
-  #undef pTable_xmax
-  #undef pTable_xsum
-  #undef pTable_ymin
-  #undef pTable_ymax
-  #undef pTable_ysum
-  #undef pTable_dxmin
-  #undef pTable_dxmax
-  #undef pTable_dymin
-  #undef pTable_dymax
+  #undef pmul
+  #undef srcArea
+  #undef square
+  #undef tx
+  #undef ty
+  #undef tz
   return(_comp);
-} /* class_Source_gen_display */
+} /* class_Source_simple_display */
 
 _class_PSD_monitor *class_PSD_monitor_display(_class_PSD_monitor *_comp
 ) {
@@ -24995,7 +22726,7 @@ int display(void) { /* called by mccode_main for hollow_cylinder:DISPLAY */
   /* call iteratively all components DISPLAY */
   class_Progress_bar_display(&_origin_var);
 
-  class_Source_gen_display(&_src_var);
+  class_Source_simple_display(&_src_var);
 
   class_PSD_monitor_display(&_before_var);
 

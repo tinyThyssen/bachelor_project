@@ -1,5 +1,5 @@
 mcstas simulation description file for hollow_cylinder.
-Date:    Tue Apr 28 13:54:29 2026
+Date:    Sat May  2 10:16:14 2026
 Program:  3.5.32, git
 
 begin instrument: hollow_cylinder
@@ -19,7 +19,7 @@ begin simulation: fhit
   Ncount: 1000000000
   Trace: no
   Gravitation: no
-  Seed: 1777377269657007
+  Seed: 1777709774078133
   Directory: fhit
   Nodes: 8
   Param: lambda0=4
@@ -31,7 +31,7 @@ begin simulation: fhit
 end simulation
 
 begin data
-  Date: Tue Apr 28 13:55:06 2026 (1777377306)
+  Date: Sat May  2 10:16:51 2026 (1777709811)
   type: array_2d(90, 90)
   Source: hollow_cylinder (cylinder.instr)
   component: before
@@ -39,9 +39,9 @@ begin data
   title: PSD monitor
   Ncount: 1000000000
   filename: before.dat
-  statistics: X0=3.15472e-05; dX=1.12707; Y0=1.11347e-05; dY=1.13792;
-  signal: Min=0; Max=3.77794e+08; Mean=1.49816e+07;
-  values: 1.21351e+11 3.83746e+06 1e+09
+  statistics: X0=3.11958e-05; dX=1.12703; Y0=1.58753e-05; dY=1.13789;
+  signal: Min=0; Max=8.38759e-06; Mean=3.32925e-07;
+  values: 0.00269669 8.52769e-08 1e+09
   xvar: X 
   yvar: Y 
   xlabel: X position [cm]
@@ -53,7 +53,7 @@ begin data
 end data
 
 begin data
-  Date: Tue Apr 28 13:55:06 2026 (1777377306)
+  Date: Sat May  2 10:16:51 2026 (1777709811)
   type: array_2d(90, 90)
   Source: hollow_cylinder (cylinder.instr)
   component: after
@@ -61,9 +61,9 @@ begin data
   title: PSD monitor
   Ncount: 1000000000
   filename: after.dat
-  statistics: X0=4.27011e-05; dX=1.05311; Y0=2.35184e-05; dY=0.943821;
-  signal: Min=0; Max=6.22886e+08; Mean=1.02666e+07;
-  values: 8.31598e+10 3.17659e+06 6.85338e+08
+  statistics: X0=4.28214e-05; dX=1.05309; Y0=3.33317e-05; dY=0.943723;
+  signal: Min=0; Max=1.38448e-05; Mean=2.28136e-07;
+  values: 0.0018479 7.05891e-08 6.85303e+08
   xvar: X 
   yvar: Y 
   xlabel: X position [cm]
@@ -75,7 +75,7 @@ begin data
 end data
 
 begin data
-  Date: Tue Apr 28 13:55:06 2026 (1777377306)
+  Date: Sat May  2 10:16:51 2026 (1777709811)
   type: array_2d(180, 90)
   Source: hollow_cylinder (cylinder.instr)
   component: mon_4pi
@@ -83,9 +83,9 @@ begin data
   title: 4PI PSD monitor
   Ncount: 1000000000
   filename: cylinder_scattered.dat
-  statistics: X0=0.000308415; dX=15.8775; Y0=1.0001; dY=5.77402;
-  signal: Min=23.0388; Max=2.87943e+10; Mean=6.87238e+06;
-  values: 1.11333e+11 3.64572e+06 1e+09
+  statistics: X0=6.54813e-05; dX=16.3594; Y0=1.00019; dY=5.97768;
+  signal: Min=8.23332e-13; Max=0.000650946; Mean=1.55611e-07;
+  values: 0.00252089 8.17349e-08 1e+09
   xvar: Lo
   yvar: La
   xlabel: Longitude [deg]

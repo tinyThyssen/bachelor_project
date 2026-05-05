@@ -34,26 +34,26 @@ COMPONENT origin = Progress_bar(
 AT (0,0,0) RELATIVE PREVIOUS
 
 
-// COMPONENT src = Source_simple(
-//   radius = cylinder_height/2,
-//   dist = 1.0,
-//   focus_xw = 2*cylinder_radius + margin/2,
-//   focus_yh = cylinder_height + margin,
-//   lambda0 = lambda0,
-//   dlambda = dlambda
-// )
-// AT (0,0,-0.2) ABSOLUTE
-
-COMPONENT src = Source_gen(
+COMPONENT src = Source_simple(
   radius = cylinder_height/2,
   dist = 1.0,
   focus_xw = 2*cylinder_radius + margin/2,
   focus_yh = cylinder_height + margin,
-  Lmin = 1.0,
-  Lmax = 10.0,
-  I1 = 1e12
+  lambda0 = lambda0,
+  dlambda = dlambda
 )
 AT (0,0,-0.2) ABSOLUTE
+
+// COMPONENT src = Source_gen(
+//   radius = cylinder_height/2,
+//   dist = 1.0,
+//   focus_xw = 2*cylinder_radius + margin/2,
+//   focus_yh = cylinder_height + margin,
+//   Lmin = 1.0,
+//   Lmax = 10.0,
+//   I1 = 1e12
+// )
+// AT (0,0,-0.2) ABSOLUTE
 
 
 COMPONENT before = PSD_monitor(
