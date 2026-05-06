@@ -1,0 +1,27 @@
+begin instrument:
+  Creator: mcstas 3.5.32
+  Source: cylinder.instr
+  Parameters:  thickness
+  Trace_enabled: no
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation
+Date: Tue May 05 19 50 2026
+Ncount: 1000000000
+Numpoints: 9
+Param: thickness = 0.001, thickness = 0.003
+end simulation
+
+begin data
+type: multiarray_1d(9)
+title: Scan of thickness
+xvars: thickness
+yvars: (before_I,before_ERR (after_I,after_ERR (mon_4pi_I,mon_4pi_ERR
+xlabel: 'thickness'
+ylabel: 'Intensity'
+xlimits: 0.001 0.003
+filename: mccode.dat
+variables: thicknessbefore_I before_ERR after_I after_ERR mon_4pi_I mon_4pi_ERR
+end data

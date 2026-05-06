@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: FullInstrument_v5.instr (PSI_CAMEA)
- * Date:       Tue May  5 11:28:17 2026
+ * Date:       Tue May  5 13:01:55 2026
  * File:       ./FullInstrument_v5.c
  * CFLAGS=
  */
