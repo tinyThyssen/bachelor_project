@@ -1,0 +1,27 @@
+begin instrument:
+  Creator: mcstas 3.6.14
+  Source: cylinder.instr
+  Parameters:  cylinder_radius, cylinder_height, thickness
+  Trace_enabled: no
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation
+Date: Wed May 06 18 44 2026
+Ncount: 1000000000
+Numpoints: 9
+Param: cylinder_radius = 0.005, cylinder_radius = 0.015, cylinder_height = 0.01, cylinder_height = 0.07, thickness = 0.0005, thickness = 0.005
+end simulation
+
+begin data
+type: multiarray_1d(9)
+title: Scan of cylinder_radius, cylinder_height, thickness
+xvars: cylinder_radius, cylinder_height, thickness
+yvars: (before_I,before_ERR (after_I,after_ERR (mon_4pi_I,mon_4pi_ERR
+xlabel: 'cylinder_radius, cylinder_height, thickness'
+ylabel: 'Intensity'
+xlimits: 0.005 0.015
+filename: mccode.dat
+variables: cylinder_radius cylinder_height thicknessbefore_I before_ERR after_I after_ERR mon_4pi_I mon_4pi_ERR
+end data

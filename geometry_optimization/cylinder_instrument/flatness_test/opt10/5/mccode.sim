@@ -1,0 +1,53 @@
+mcstas simulation description file for hollow_cylinder.
+Date:    Thu May  7 11:01:30 2026
+Program:  3.6.14, git
+
+begin instrument: hollow_cylinder
+  File: opt10/5/mccode
+  Source: cylinder.instr
+  Parameters:  lambda0(double) dlambda(double) cylinder_radius(double) cylinder_height(double) thickness(double) margin(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: opt10/5
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.6.14, git
+  Instrument: cylinder.instr
+  Ncount: 1000000000
+  Trace: no
+  Gravitation: no
+  Seed: 1778144490934314
+  Directory: opt10/5
+  Nodes: 8
+  Param: lambda0=4
+  Param: dlambda=0.1
+  Param: cylinder_radius=0.005
+  Param: cylinder_height=0.045
+  Param: thickness=0.001125
+  Param: margin=0.005
+end simulation
+
+begin data
+  Date: Thu May  7 11:02:20 2026 (1778144540)
+  type: array_2d(180, 90)
+  Source: hollow_cylinder (cylinder.instr)
+  component: mon_4pi
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 1000000000
+  filename: cylinder_scattered.dat
+  statistics: X0=6.90708e-05; dX=29.4649; Y0=1.00003; dY=10.567;
+  signal: Min=3.83116e-12; Max=0.000243858; Mean=5.63603e-08;
+  values: 0.000913036 3.11223e-08 1e+09
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data

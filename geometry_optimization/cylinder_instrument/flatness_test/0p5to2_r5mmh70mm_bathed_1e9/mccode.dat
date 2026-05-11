@@ -1,0 +1,19 @@
+# Instrument-source: 'cylinder.instr'
+# Date: Wed May 06 16 14 2026
+# Ncount: 1000000000
+# Numpoints: 4
+# Param: thickness = 0.0005
+# type: multiarray_1d(4)
+# title: Scan of thickness
+# xlabel: 'thickness'
+# ylabel: 'Intensity'
+# xvars: thickness
+# yvars: (before_I,before_ERR) (after_I,after_ERR) (mon_4pi_I,mon_4pi_ERR)
+# list: ['0.0005', '0.002']
+# xlimits: 0.0005 0.002
+# filename: mccode.dat
+# variables: thickness before_I before_ERR after_I after_ERR mon_4pi_I mon_4pi_ERR
+0.0005 0.0072001 2.27687e-07 0.00557198 2.00286e-07 0.00701342 2.23903e-07
+0.0010 0.0072001 2.27688e-07 0.00557199 2.00286e-07 0.00686291 2.20936e-07
+0.0015 0.0072001 2.27688e-07 0.00557198 2.00286e-07 0.00674232 2.18608e-07
+0.0020 0.0072001 2.27688e-07 0.00557186 2.00284e-07 0.00664664 2.16791e-07

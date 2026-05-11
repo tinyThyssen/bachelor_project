@@ -1,0 +1,97 @@
+mcstas simulation description file for hollow_cylinder.
+Date:    Wed May  6 16:17:28 2026
+Program:  3.5.32, git
+
+begin instrument: hollow_cylinder
+  File: 0p5to2_r7mmh70mm_bathed_1e9/1/mccode
+  Source: cylinder.instr
+  Parameters:  lambda0(double) dlambda(double) cylinder_radius(double) cylinder_height(double) thickness(double) margin(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: 0p5to2_r7mmh70mm_bathed_1e9/1
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.5.32, git
+  Instrument: cylinder.instr
+  Ncount: 1000000000
+  Trace: no
+  Gravitation: no
+  Seed: 1778077048611237
+  Directory: 0p5to2_r7mmh70mm_bathed_1e9/1
+  Nodes: 8
+  Param: lambda0=4
+  Param: dlambda=0.1
+  Param: cylinder_radius=0.007
+  Param: cylinder_height=0.07
+  Param: thickness=0.00116667
+  Param: margin=0.005
+end simulation
+
+begin data
+  Date: Wed May  6 16:18:07 2026 (1778077087)
+  type: array_2d(90, 90)
+  Source: hollow_cylinder (cylinder.instr)
+  component: before
+  position: 0 0 -0.1
+  title: PSD monitor
+  Ncount: 1000000000
+  filename: before.dat
+  statistics: X0=8.76066e-05; dX=1.57665; Y0=-1.05735e-05; dY=1.59116;
+  signal: Min=0; Max=1.51015e-05; Mean=1.17333e-06;
+  values: 0.00950395 3.00542e-07 1e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -10 10 -10 10
+  variables: I I_err N
+end data
+
+begin data
+  Date: Wed May  6 16:18:07 2026 (1778077087)
+  type: array_2d(90, 90)
+  Source: hollow_cylinder (cylinder.instr)
+  component: after
+  position: 0 0 0.1
+  title: PSD monitor
+  Ncount: 1000000000
+  filename: after.dat
+  statistics: X0=8.95253e-05; dX=1.47132; Y0=8.32477e-06; dY=1.31103;
+  signal: Min=0; Max=2.49195e-05; Mean=8.03896e-07;
+  values: 0.00651156 2.48748e-07 6.85253e+08
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -10 10 -10 10
+  variables: I I_err N
+end data
+
+begin data
+  Date: Wed May  6 16:18:07 2026 (1778077087)
+  type: array_2d(180, 90)
+  Source: hollow_cylinder (cylinder.instr)
+  component: mon_4pi
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 1000000000
+  filename: cylinder_scattered.dat
+  statistics: X0=-0.00047923; dX=17.3345; Y0=1.00013; dY=6.30676;
+  signal: Min=8.96955e-13; Max=0.00165945; Mean=5.4235e-07;
+  values: 0.00878607 2.86146e-07 1e+09
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data

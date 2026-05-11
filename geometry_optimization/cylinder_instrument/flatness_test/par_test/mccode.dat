@@ -1,0 +1,24 @@
+# Instrument-source: 'cylinder.instr'
+# Date: Wed May 06 18 44 2026
+# Ncount: 1000000000
+# Numpoints: 9
+# Param: cylinder_radius = 0.005, cylinder_height = 0.01, thickness = 0.0005
+# type: multiarray_1d(9)
+# title: Scan of cylinder_height, cylinder_radius, thickness
+# xlabel: 'cylinder_height, cylinder_radius, thickness'
+# ylabel: 'Intensity'
+# xvars: cylinder_height, cylinder_radius, thickness
+# yvars: (before_I,before_ERR) (after_I,after_ERR) (mon_4pi_I,mon_4pi_ERR)
+# list: ['0.005', '0.015']
+# xlimits: 0.005 0.015
+# filename: mccode.dat
+# variables: cylinder_height cylinder_radius thickness before_I before_ERR after_I after_ERR mon_4pi_I mon_4pi_ERR
+0.005 0.01 0.0005 2.94498e-05 9.31285e-10 1.20122e-07 5.9479e-11 2.651e-05 8.70053e-10
+0.00625 0.0175 0.0010625 0.000162324 5.13315e-09 1.04336e-05 1.30144e-09 0.000129416 4.43782e-09
+0.0075 0.025 0.001625 0.000515233 1.62931e-08 7.84405e-05 6.35733e-09 0.00037969 1.34185e-08
+0.00875 0.0325 0.0021875 0.00124366 3.93281e-08 0.000270915 1.83552e-08 0.000865664 3.13181e-08
+0.010 0.04 0.00275 0.0025426 8.04041e-08 0.000668764 4.12341e-08 0.00168868 6.23471e-08
+0.01125 0.0475 0.0033125 0.00464641 1.46932e-07 0.00137317 7.98714e-08 0.00296488 1.11467e-07
+0.0125 0.055 0.003875 0.00782864 2.47563e-07 0.00250397 1.39996e-07 0.00482503 1.84388e-07
+0.01375 0.0625 0.0044375 0.0124019 3.92182e-07 0.00420041 2.2821e-07 0.00741631 2.87615e-07
+0.015 0.07 0.0050 0.0187175 5.91899e-07 0.00662088 3.51975e-07 0.0109021 4.28443e-07

@@ -35,9 +35,10 @@ AT (0,0,0) RELATIVE PREVIOUS
 
 
 COMPONENT src = Source_simple(
-  radius = cylinder_height/2,
+  xwidth = 2*cylinder_radius + margin,
+  yheight = cylinder_height + margin,
   dist = 1.0,
-  focus_xw = 2*cylinder_radius + margin/2,
+  focus_xw = 2*cylinder_radius + margin,
   focus_yh = cylinder_height + margin,
   lambda0 = lambda0,
   dlambda = dlambda
@@ -102,9 +103,9 @@ AT (0,0,0) ABSOLUTE
 
 COMPONENT master = Union_master()
 AT (0,0,0) ABSOLUTE
-EXTEND %{
-  raw_scattered = SCATTERED;
-%}
+// EXTEND %{
+//   raw_scattered = SCATTERED;
+// %}
 
 COMPONENT stop = Union_stop()
 AT (0,0,0) ABSOLUTE
