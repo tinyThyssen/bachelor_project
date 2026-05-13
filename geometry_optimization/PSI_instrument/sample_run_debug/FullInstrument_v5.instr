@@ -941,40 +941,24 @@ AT (0,0,0.001) RELATIVE E3bEnd
 
 
 /********************************************************************************************/
-COMPONENT SlitGuideEnd = Slit(
-    xwidth = slitwidth, yheight = slitheight)
-  AT (0, 0,u) RELATIVE PREVIOUS
+// COMPONENT SlitGuideEnd = Slit(
+//     xwidth = slitwidth, yheight = slitheight)
+//   AT (0, 0,u) RELATIVE PREVIOUS
 
 
 
-COMPONENT Mono = Monochromator_curved(
-    zwidth = 0.015, yheight = 0.015, gap = 0.0001, NH =17,
-    NV = 11, DM=3.355, mosaich = 42, mosaicv = 42, r0 = 1, RV = RV_mono, RH = RH_mono)
-AT (0, 0, 1.6) RELATIVE SlitGuideEnd
-  ROTATED (0, thetaA1,0) RELATIVE SlitGuideEnd
 
-COMPONENT after_mono = PSD_monitor(
-    nx=200, ny=200,
-    xmin=-0.2, xmax=0.2,
-    ymin=-0.2, ymax=0.2,
-    filename="after_mono.dat",
-    restore_neutron=1
-)
-AT (0,0,0.01) RELATIVE Mono
+// COMPONENT Mono = Monochromator_curved(
+//     zwidth = 0.015, yheight = 0.015, gap = 0.0001, NH =17,
+//     NV = 11, DM=3.355, mosaich = 42, mosaicv = 42, r0 = 1, RV = RV_mono, RH = RH_mono)
+// AT (0, 0, 1.6) RELATIVE SlitGuideEnd
+//   ROTATED (0, thetaA1,0) RELATIVE SlitGuideEnd
 
 
-COMPONENT A2 = Arm()
-AT (0, 0, 0) RELATIVE Mono
-ROTATED (0, -thetaA2, 0) RELATIVE SlitGuideEnd
-
-COMPONENT after_A2 = PSD_monitor(
-    nx=200, ny=200,
-    xmin=-0.2, xmax=0.2,
-    ymin=-0.2, ymax=0.2,
-    filename="after_A2.dat",
-    restore_neutron=1
-)
-AT (0,0,0.01) RELATIVE A2
+// COMPONENT A2 = Arm(
+//     )
+//   AT (0, 0, 0) RELATIVE Mono
+//   ROTATED (0, thetaA2, 0) RELATIVE SlitGuideEnd
 
 
 // COMPONENT monochromatorShielding = Slit(
@@ -1001,12 +985,12 @@ AT (0,0,0.01) RELATIVE A2
 // AT (0, 0, u) RELATIVE PREVIOUS
 
 
-COMPONENT SamplePos = Arm()
-AT (0, 0, 0.2) RELATIVE A2
+// COMPONENT SamplePos = Arm() // Change to actual sample
+// AT (0, 0, 1.6) RELATIVE A2
 
-// /* redifined the sample pos to be directly after last known place that has signal */
-// COMPONENT SamplePos = Arm()
-// AT (0, 0, 0.001) RELATIVE E3bEnd
+/* redifined the sample pos to be directly after last known place that has signal */
+COMPONENT SamplePos = Arm()
+AT (0, 0, 0.001) RELATIVE E3bEnd
 
 
 
