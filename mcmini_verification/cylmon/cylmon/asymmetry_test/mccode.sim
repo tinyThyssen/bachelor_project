@@ -1,0 +1,48 @@
+mcstas simulation description file for cylmon.
+Date:    Fri May 22 14:02:41 2026
+Program:  3.6.14, git
+
+begin instrument: cylmon
+  File: asymmetry_test/mccode
+  Source: cylmon.instr
+  Parameters:  lambda0(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: asymmetry_test
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.6.14, git
+  Instrument: cylmon.instr
+  Ncount: 100000000000
+  Trace: no
+  Gravitation: no
+  Seed: 1779451361376089
+  Directory: asymmetry_test
+  Nodes: 8
+  Param: lambda0=4
+end simulation
+
+begin data
+  Date: Fri May 22 14:35:51 2026 (1779453351)
+  type: array_2d(360, 180)
+  Source: cylmon (cylmon.instr)
+  component: mon_cylindrical
+  position: 0 0 0
+  title: Cylindrical PSD monitor
+  Ncount: 100000000000
+  filename: cylmon_directbeam.dat
+  statistics: X0=-1.00006; dX=15.1126; Y0=9.86161e-07; dY=0.265538;
+  signal: Min=0; Max=0.0895467; Mean=0.00553804;
+  values: 358.865 0.00116541 1e+11
+  xvar: ra
+  yvar: y 
+  xlabel: radial position [deg]
+  ylabel: y [m]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -1 1
+  variables: I I_err N
+end data

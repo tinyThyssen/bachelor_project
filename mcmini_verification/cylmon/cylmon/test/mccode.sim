@@ -1,0 +1,48 @@
+mcstas simulation description file for cylmon.
+Date:    Fri May 22 13:57:57 2026
+Program:  3.6.14, git
+
+begin instrument: cylmon
+  File: test/mccode
+  Source: cylmon.instr
+  Parameters:  lambda0(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: test
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.6.14, git
+  Instrument: cylmon.instr
+  Ncount: 100000000
+  Trace: no
+  Gravitation: no
+  Seed: 1779451077692564
+  Directory: test
+  Nodes: 8
+  Param: lambda0=4
+end simulation
+
+begin data
+  Date: Fri May 22 13:58:00 2026 (1779451080)
+  type: array_2d(360, 180)
+  Source: cylmon (cylmon.instr)
+  component: mon_cylindrical
+  position: 0 0 0
+  title: Cylindrical PSD monitor
+  Ncount: 100000000
+  filename: cylmon_directbeam.dat
+  statistics: X0=-0.499254; dX=103.635; Y0=-0.000121366; dY=0.496391;
+  signal: Min=0; Max=1.699e-05; Mean=1.08822e-05;
+  values: 0.705165 8.39741e-05 7.05165e+07
+  xvar: ra
+  yvar: y 
+  xlabel: radial position [deg]
+  ylabel: y [m]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -1 1
+  variables: I I_err N
+end data

@@ -1,0 +1,20 @@
+# Instrument-source: 'FullInstrument_v5_working.instr'
+# Date: Fri May 22 11 42 2026
+# Ncount: 20000000
+# Numpoints: 5
+# Param: sampleThickness = 1e-6
+# type: multiarray_1d(5)
+# title: Scan of sampleThickness
+# xlabel: 'sampleThickness'
+# ylabel: 'Intensity'
+# xvars: sampleThickness
+# yvars: (StartOfGuideMonitor_I,StartOfGuideMonitor_ERR) (EndOfInsertPSD_I,EndOfInsertPSD_ERR) (E2PSD_I,E2PSD_ERR) (C1End_I,C1End_ERR) (E3aEnd_I,E3aEnd_ERR) (E3bEnd_I,E3bEnd_ERR) (SlitMonitor_I,SlitMonitor_ERR) (sample_flux_before_I,sample_flux_before_ERR) (sample_flux_after_unscattered_I,sample_flux_after_unscattered_ERR) (sample_cylinder_monitor_scattered_I,sample_cylinder_monitor_scattered_ERR) (sample_spherical_monitor_scattered_I,sample_spherical_monitor_scattered_ERR) (BackEndMonitor_I,BackEndMonitor_ERR)
+# list: ['1e-6', '1e-4']
+# xlimits: 1e-4 1e-6
+# filename: mccode.dat
+# variables: sampleThickness StartOfGuideMonitor_I StartOfGuideMonitor_ERR EndOfInsertPSD_I EndOfInsertPSD_ERR E2PSD_I E2PSD_ERR C1End_I C1End_ERR E3aEnd_I E3aEnd_ERR E3bEnd_I E3bEnd_ERR SlitMonitor_I SlitMonitor_ERR sample_flux_before_I sample_flux_before_ERR sample_flux_after_unscattered_I sample_flux_after_unscattered_ERR sample_cylinder_monitor_scattered_I sample_cylinder_monitor_scattered_ERR sample_spherical_monitor_scattered_I sample_spherical_monitor_scattered_ERR BackEndMonitor_I BackEndMonitor_ERR
+0.000001 1590670000.0 355740.0 849783000.0 239986.0 685685000.0 208338.0 475644000.0 172104.0 463681000.0 168773.0 331850000.0 135556.0 45930600.0 52078.0 45930600.0 52078.0 16334900.0 3098.82 3092.54 0.80649 3352.02 0.839871 66.5916 0.12206
+0.00002575 1590670000.0 355740.0 849955000.0 240011.0 685897000.0 208358.0 475782000.0 172122.0 463809000.0 168788.0 331859000.0 135550.0 45983600.0 52105.8 45983600.0 52105.8 16357800.0 3099.51 78394.4 17.42 84837.1 18.1065 1683.35 2.55588
+0.0000505 1590680000.0 355740.0 849812000.0 239996.0 685840000.0 208364.0 475782000.0 172135.0 463822000.0 168804.0 331949000.0 135574.0 45949200.0 52092.3 45949200.0 52092.3 16388600.0 3103.18 150871.0 32.1073 163098.0 33.3444 3251.09 4.73203
+0.00007525 1590680000.0 355742.0 849754000.0 239981.0 685672000.0 208325.0 475517000.0 172066.0 463562000.0 168736.0 331644000.0 135503.0 46023900.0 52132.8 46023900.0 52132.8 16357000.0 3101.23 222350.0 46.0072 240129.0 47.7415 4802.09 6.80093
+0.000100 1590670000.0 355739.0 849462000.0 239945.0 685490000.0 208307.0 475582000.0 172093.0 463630000.0 168763.0 331851000.0 135549.0 46001000.0 52120.0 46001000.0 52120.0 16327300.0 3097.04 290522.0 58.6352 313520.0 60.8155 6285.49 8.68153

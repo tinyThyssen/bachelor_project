@@ -10,6 +10,7 @@ SRC = \
   src/source_div.c \
   src/source_simple.c \
   src/monitor_sphere.c \
+  src/monitor_cylinder.c \
   src/monitor_flat.c \
   src/scatterer_cyl.c 
 OUT = disk_source

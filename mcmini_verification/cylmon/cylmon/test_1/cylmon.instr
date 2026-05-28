@@ -1,0 +1,31 @@
+DEFINE INSTRUMENT cylmon(
+  lambda0 = 4.0)
+TRACE
+
+COMPONENT origin = Progress_bar(
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT src = Source_simple(
+  yheight = 0.5,
+  xwidth = 0.5,
+  dist = 1.0,
+  focus_xw = 0.5,
+  focus_yh = 0.5,
+  flux = 1,
+  lambda0 = lambda0,
+  dlambda = 0.1
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_cylindrical = Cyl_monitor_PSD(
+    nr = 360,
+    ny = 180,
+    radius = 1.0,
+    yheight = 2.0,
+    restore_neutron = 1,
+    filename = "cylmon_directbeam.dat"
+)
+AT (0,0,0) ABSOLUTE
+
+END
