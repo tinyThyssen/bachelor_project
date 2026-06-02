@@ -1,0 +1,27 @@
+begin instrument:
+  Creator: mcstas 3.6.14
+  Source: FullInstrument_v5_working.instr
+  Parameters:  sampleThickness
+  Trace_enabled: no
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation
+Date: Mon Jun 01 16 14 2026
+Ncount: 100000000
+Numpoints: 9
+Param: sampleThickness = 0.001, sampleThickness = 0.004
+end simulation
+
+begin data
+type: multiarray_1d(9)
+title: Scan of sampleThickness
+xvars: sampleThickness
+yvars: (StartOfGuideMonitor_I,StartOfGuideMonitor_ERR (EndOfInsertPSD_I,EndOfInsertPSD_ERR (E2PSD_I,E2PSD_ERR (C1End_I,C1End_ERR (E3aEnd_I,E3aEnd_ERR (E3bEnd_I,E3bEnd_ERR (SlitMonitor_I,SlitMonitor_ERR (sample_flux_hitting_sample_I,sample_flux_hitting_sample_ERR (sample_flux_before_I,sample_flux_before_ERR (sample_flux_after_unscattered_I,sample_flux_after_unscattered_ERR (sample_cylinder_monitor_I,sample_cylinder_monitor_ERR (sample_cylinder_monitor_scattered_I,sample_cylinder_monitor_scattered_ERR (sample_spherical_monitor_I,sample_spherical_monitor_ERR (sample_spherical_monitor_scattered_I,sample_spherical_monitor_scattered_ERR (BackEndMonitor_I,BackEndMonitor_ERR
+xlabel: 'sampleThickness'
+ylabel: 'Intensity'
+xlimits: 0.001 0.004
+filename: mccode.dat
+variables: sampleThicknessStartOfGuideMonitor_I StartOfGuideMonitor_ERR EndOfInsertPSD_I EndOfInsertPSD_ERR E2PSD_I E2PSD_ERR C1End_I C1End_ERR E3aEnd_I E3aEnd_ERR E3bEnd_I E3bEnd_ERR SlitMonitor_I SlitMonitor_ERR sample_flux_hitting_sample_I sample_flux_hitting_sample_ERR sample_flux_before_I sample_flux_before_ERR sample_flux_after_unscattered_I sample_flux_after_unscattered_ERR sample_cylinder_monitor_I sample_cylinder_monitor_ERR sample_cylinder_monitor_scattered_I sample_cylinder_monitor_scattered_ERR sample_spherical_monitor_I sample_spherical_monitor_ERR sample_spherical_monitor_scattered_I sample_spherical_monitor_scattered_ERR BackEndMonitor_I BackEndMonitor_ERR
+end data
