@@ -1,0 +1,376 @@
+mcstas simulation description file for PSI_CAMEA.
+Date:    Thu Jun  4 22:22:21 2026
+Program:  3.6.14, git
+
+begin instrument: PSI_CAMEA
+  File: scan_h10mm_r10mm_t0.85mm_2e9/mccode
+  Source: FullInstrument_v5_working.instr
+  Parameters:  SourceE(double) DeltaSourceE(double) EI(double) A3(double) A4(double) SAMPLE(double) RV_mono_Bool(double) RH_mono_Bool(double) Lv(double) Lh(double) monoShieldingWidth(double) monoShieldingHeight(double) monoShieldingDistance(double) MonoShielding(double) Be_filter(double) sampleHeight(double) sampleRadius(double) sampleThickness(double) samplePosY(double) sampleFluxDiagnosticXWidth(double) sampleFluxDiagnosticYHeight(double)
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: scan_h10mm_r10mm_t0.85mm_2e9
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.6.14, git
+  Instrument: FullInstrument_v5_working.instr
+  Ncount: 2000000000
+  Trace: no
+  Gravitation: no
+  Seed: 1780604541285913
+  Directory: scan_h10mm_r10mm_t0.85mm_2e9
+  Nodes: 8
+  Param: SourceE=5
+  Param: DeltaSourceE=0.5
+  Param: EI=5
+  Param: A3=0
+  Param: A4=-45
+  Param: SAMPLE=0
+  Param: RV_mono_Bool=1
+  Param: RH_mono_Bool=1
+  Param: Lv=1.872
+  Param: Lh=1.34
+  Param: monoShieldingWidth=0.062
+  Param: monoShieldingHeight=0.14
+  Param: monoShieldingDistance=0.235
+  Param: MonoShielding=1
+  Param: Be_filter=1
+  Param: sampleHeight=0.01
+  Param: sampleRadius=0.01
+  Param: sampleThickness=0.00085
+  Param: samplePosY=0
+  Param: sampleFluxDiagnosticXWidth=0.08
+  Param: sampleFluxDiagnosticYHeight=0.08
+end simulation
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(100, 100)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: StartOfGuideMonitor
+  position: 0 0 0.0001
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: startOfGuide.dat
+  statistics: X0=-8.9768e-05; dX=2.30825; Y0=1.32908e-05; dY=3.89591;
+  signal: Min=0; Max=1.36434e+06; Mean=366539;
+  values: 3.66539e+09 81999.6 2e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -10 10 -10 10
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(100, 100)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: EndOfInsertPSD
+  position: 0 0 6.176
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: EndOfInsertPSD.dat
+  statistics: X0=7.7649e-06; dX=2.1749; Y0=-0.00208964; dY=4.47791;
+  signal: Min=0; Max=785453; Mean=174815;
+  values: 1.74815e+09 52190.6 1.52834e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -10 10 -10 10
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(100, 100)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: E2PSD
+  position: 0 0 17.2917
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: ExitE2.dat
+  statistics: X0=7.74521e-05; dX=1.49695; Y0=-0.0159377; dY=4.52114;
+  signal: Min=0; Max=729682; Mean=139029;
+  values: 1.39029e+09 44632 1.42687e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -10 10 -10 10
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(100, 100)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: C1End
+  position: 0 0 22.3143
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: ExitC1.dat
+  statistics: X0=0.484207; dX=1.39198; Y0=-0.00441976; dY=4.57884;
+  signal: Min=0; Max=664437; Mean=90859.9;
+  values: 9.08599e+08 35963.1 1.4082e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -10 10 -10 10
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(100, 100)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: E3aEnd
+  position: 0 0 25.8341
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: ExitE3a.dat
+  statistics: X0=0.828611; dX=2.07385; Y0=-0.00296731; dY=4.56271;
+  signal: Min=0; Max=443247; Mean=88210.3;
+  values: 8.82103e+08 35165.5 1.40782e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -10 10 -10 10
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(100, 100)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: E3bEnd
+  position: 0 0 35.5704
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: ExitE3b.dat
+  statistics: X0=0.0817165; dX=0.927506; Y0=-9.83828e-05; dY=1.51839;
+  signal: Min=0; Max=1.92668e+06; Mean=62022.6;
+  values: 6.20226e+08 27856 1.0406e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -10 10 -10 10
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(100, 100)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: SlitMonitor
+  position: 1.44281 0 37.5811
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: SlitMonitor.dat
+  statistics: X0=0.0271793; dX=0.833628; Y0=0.000369922; dY=0.841272;
+  signal: Min=0; Max=11911; Mean=5552.33;
+  values: 5.55233e+07 8556.1 6.12943e+07
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -2 2 -2 2
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(64, 64)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: sample_flux_hitting_sample
+  position: 1.52909 0 37.6057
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: sample_flux_hitting_sample.dat
+  statistics: X0=0.0125556; dX=0.569237; Y0=-0.000104442; dY=0.287861;
+  signal: Min=2559.19; Max=3420.64; Mean=3034.7;
+  values: 1.24301e+07 4039.04 1.38391e+07
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -1 1 -0.5 0.5
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(64, 64)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: sample_flux_before
+  position: 1.52918 0 37.6057
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: sample_flux_before.dat
+  statistics: X0=0.0429629; dX=0.910013; Y0=-0.000285616; dY=0.881087;
+  signal: Min=0; Max=57479.4; Mean=13555.5;
+  values: 5.55233e+07 8556.1 6.12943e+07
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -3 3 -3 3
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(64, 64)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: sample_flux_after_unscattered
+  position: 1.54861 0 37.6112
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: sample_flux_after_unscattered.dat
+  statistics: X0=0.0560216; dX=1.00964; Y0=-0.000496114; dY=1.00578;
+  signal: Min=0; Max=53729.7; Mean=10475.1;
+  values: 4.2906e+07 753.096 4.711e+09
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -3 3 -3 3
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(180, 90)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: sample_cylinder_monitor
+  position: 1.5389 0 37.6085
+  title: Cylindrical PSD monitor
+  Ncount: 2000000000
+  filename: sample_cylinder_monitor.dat
+  statistics: X0=-1.81516; dX=16.2843; Y0=-6.88198e-05; dY=0.142189;
+  signal: Min=0; Max=9.26235e+06; Mean=2714.77;
+  values: 4.39792e+07 754.526 6.01962e+09
+  xvar: ra
+  yvar: y 
+  xlabel: radial position [deg]
+  ylabel: y [m]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -2.5 2.5
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:47 2026 (1780608347)
+  type: array_2d(180, 90)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: sample_cylinder_monitor_scattered
+  position: 1.5389 0 37.6085
+  title: Cylindrical PSD monitor
+  Ncount: 2000000000
+  filename: sample_cylinder_monitor_scattered.dat
+  statistics: X0=-0.857425; dX=103.828; Y0=8.0675e-06; dY=0.88836;
+  signal: Min=0; Max=172.916; Mean=66.2528;
+  values: 1.0733e+06 46.4254 1.30862e+09
+  xvar: ra
+  yvar: y 
+  xlabel: radial position [deg]
+  ylabel: y [m]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -2.5 2.5
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:48 2026 (1780608348)
+  type: array_2d(180, 90)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: sample_spherical_monitor
+  position: 1.5389 0 37.6085
+  title: 4PI PSD monitor
+  Ncount: 2000000000
+  filename: sample_spherical_monitor.dat
+  statistics: X0=0.15969; dX=17.0102; Y0=0.99583; dY=6.60655;
+  signal: Min=0.33878; Max=8.68085e+06; Mean=2720.2;
+  values: 4.40672e+07 754.65 6.12943e+09
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:48 2026 (1780608348)
+  type: array_2d(180, 90)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: sample_spherical_monitor_scattered
+  position: 1.5389 0 37.6085
+  title: 4PI PSD monitor
+  Ncount: 2000000000
+  filename: sample_spherical_monitor_scattered.dat
+  statistics: X0=0.115718; dX=104.412; Y0=0.998989; dY=39.4172;
+  signal: Min=0.33878; Max=111.893; Mean=71.682;
+  values: 1.16125e+06 48.4063 1.41843e+09
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data
+
+begin data
+  Date: Thu Jun  4 23:25:48 2026 (1780608348)
+  type: array_2d(100, 100)
+  Source: PSI_CAMEA (FullInstrument_v5_working.instr)
+  component: BackEndMonitor
+  position: 1.78217 0 38.0453
+  title: PSD monitor
+  Ncount: 2000000000
+  filename: BackEndMonitor.dat
+  statistics: X0=-0.194463; dX=20.7687; Y0=0.000363437; dY=2.92644;
+  signal: Min=1.07445; Max=2.82716; Mean=1.97656;
+  values: 19765.6 5.52653 2.80363e+07
+  xvar: X 
+  yvar: Y 
+  xlabel: X position [cm]
+  ylabel: Y position [cm]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -40 40 -5 5
+  variables: I I_err N
+end data
