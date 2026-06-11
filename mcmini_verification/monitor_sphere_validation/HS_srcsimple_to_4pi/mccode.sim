@@ -1,0 +1,47 @@
+mcstas simulation description file for sphere_validate.
+Date:    Mon Jun  8 10:21:45 2026
+Program:  3.6.14, git
+
+begin instrument: sphere_validate
+  File: HS_srcsimple_to_4pi/mccode
+  Source: sphere_monitor.instr
+  Parameters: 
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: HS_srcsimple_to_4pi
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.6.14, git
+  Instrument: sphere_monitor.instr
+  Ncount: 1000000000
+  Trace: no
+  Gravitation: no
+  Seed: 1780906905639111
+  Directory: HS_srcsimple_to_4pi
+  Nodes: 8
+end simulation
+
+begin data
+  Date: Mon Jun  8 10:22:05 2026 (1780906925)
+  type: array_2d(1800, 900)
+  Source: sphere_validate (sphere_monitor.instr)
+  component: mon_4pi
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 1000000000
+  filename: HS_srcsimple_to_4pi.dat
+  statistics: X0=3.16578e-05; dX=8.07159; Y0=0.100197; dY=7.99384;
+  signal: Min=0; Max=0.0114024; Mean=0.00013278;
+  values: 215.104 0.00683915 1e+09
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data

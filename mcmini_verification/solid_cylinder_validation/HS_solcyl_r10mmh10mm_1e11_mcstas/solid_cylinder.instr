@@ -1,0 +1,163 @@
+/*******************************************************************************
+* McStas instrument for validating MCmini solid-cylinder setup.
+*******************************************************************************/
+
+DEFINE INSTRUMENT solid_cylinder_validation(
+  lambda = 4.04,
+  dlambda = 0.25,
+  cylinder_radius = 0.01, //m
+  cylinder_height = 0.01, //m
+  unit_cell_volume = 13.827, // 
+  sigma_inc = 5.08,
+  sigma_abs = 5.08
+)
+
+DECLARE
+%{
+  int    n_reflections;
+%}
+
+TRACE
+
+COMPONENT Origin = Progress_bar()
+AT (0,0,0) ABSOLUTE
+
+/* MCmini SourceSimple center is at z = -0.1 m */
+COMPONENT src = Source_simple(
+  radius = 0.02, // use height as that will always be the largest
+  dist = 1.0,
+  focus_xw = 0.04, // add small margin to ensure full illumination of cylinder
+  focus_yh = 0.04, // add small margin to ensure full illumination of cylinder
+  lambda0 = lambda,
+  dlambda = dlambda,
+  flux = 1,
+  gauss = 0
+)
+AT (0,0,-0.1) ABSOLUTE
+
+COMPONENT init = Union_init()
+AT (0,0,0) ABSOLUTE
+
+COMPONENT sample_inc = Incoherent_process(
+  sigma = sigma_inc,
+  unit_cell_volume = unit_cell_volume
+)
+AT (0,0,0) ABSOLUTE
+
+/* Match MCmini sigma_abs=0.4 barn -> macro abs = sigma*100*pack/Vc */
+COMPONENT sample_mat = Union_make_material(
+  process_string = "sample_inc",
+  my_absorption =  sigma_abs * 1e2 / unit_cell_volume 
+)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT solid_cylinder = Union_cylinder(
+    priority = 10,
+    radius = cylinder_radius,
+    yheight = cylinder_height,
+    material_string = "sample_mat"
+)
+AT (0,0,0) RELATIVE PREVIOUS
+
+
+COMPONENT master = Union_master()
+AT (0,0,0) ABSOLUTE
+EXTEND %{
+n_reflections = SCATTERED - 2;
+%}
+
+COMPONENT stop = Union_stop()
+AT (0,0,0) ABSOLUTE
+
+
+COMPONENT mon_4pi = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_all_scatter.dat"
+)
+WHEN (n_reflections > 0)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi_s1 = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_scatter_1.dat"
+)
+WHEN (n_reflections == 1)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi_s2 = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_scatter_2.dat"
+)
+WHEN (n_reflections == 2)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi_s3 = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_scatter_3.dat"
+)
+WHEN (n_reflections == 3)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi_s4 = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_scatter_4.dat"
+)
+WHEN (n_reflections == 4)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi_s5 = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_scatter_5.dat"
+)
+WHEN (n_reflections == 5)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi_s6 = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_scatter_6.dat"
+)
+WHEN (n_reflections == 6)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi_s7 = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_scatter_7.dat"
+)
+WHEN (n_reflections == 7)
+AT (0,0,0) ABSOLUTE
+
+COMPONENT mon_4pi_s8 = PSD_monitor_4PI(
+  nx = 180,
+  ny = 90,
+  radius = 1.0,
+  restore_neutron = 1,
+  filename = "HS_solcyl_scatter_8.dat"
+)
+WHEN (n_reflections == 8)
+AT (0,0,0) ABSOLUTE
+
+END

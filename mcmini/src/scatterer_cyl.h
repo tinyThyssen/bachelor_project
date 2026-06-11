@@ -45,7 +45,7 @@ void scatterer_cyl_init(ScattererCyl *s);
 
 /*
   Interact a particle with the cylinder.
-  - Computes intersection with hollow cylinder geometry
+  - Computes intersection with cylinder geometry
   - Samples free path + decides scatter vs absorption vs transmit
   - Updates particle in-place (position, direction, weight, alive, etc.)
   - Returns event type
