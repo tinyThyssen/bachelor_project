@@ -9,6 +9,7 @@ SRC = \
   src/source_disk.c \
   src/source_div.c \
   src/source_simple.c \
+  src/source_4pi.c \
   src/monitor_sphere.c \
   src/monitor_cylinder.c \
   src/monitor_flat.c \
