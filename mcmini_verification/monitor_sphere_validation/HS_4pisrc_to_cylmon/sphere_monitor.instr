@@ -66,22 +66,15 @@ ROTATED (0, 0, 0) ABSOLUTE
 // )
 // AT (0,0,0) ABSOLUTE
 
-COMPONENT mon_cyl_PSD = Cyl_monitor_PSD(
+COMPONENT mon_cyl = Cyl_monitor_PSD(
   nr = 180,
   ny = 90,
   radius = 1.0,
-  yheight = 3.0,
+  yheight = 5.0,
   restore_neutron = 1,
-  filename = "HS_srcsimple_to_cylmon_PSD.dat"
+  filename = "HS_srcsimple_to_cylmon.dat"
 )
 AT (0,0,0) ABSOLUTE
-
-COMPONENT cyl_mon = Cyl_monitor(
-    nr = 180,
-    filename = "HS_srcsimple_to_cylmon",
-    yheight = 3,
-    restore_neutron = 1
-) AT (0,0,0) ABSOLUTE
 
 COMPONENT mon_4pi = PSD_monitor_4PI(
   nx = 360,

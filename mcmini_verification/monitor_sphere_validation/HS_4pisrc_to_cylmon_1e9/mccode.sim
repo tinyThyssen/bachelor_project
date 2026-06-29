@@ -1,0 +1,89 @@
+mcstas simulation description file for sphere_validate.
+Date:    Wed Jun 24 13:46:25 2026
+Program:  3.6.14, git
+
+begin instrument: sphere_validate
+  File: HS_4pisrc_to_cylmon_1e9/mccode
+  Source: sphere_monitor.instr
+  Parameters: 
+  Trace_enabled: yes
+  Default_main: yes
+  Embedded_runtime: yes
+end instrument
+
+begin simulation: HS_4pisrc_to_cylmon_1e9
+  Format: McCode with text headers
+  URL: http://www.mccode.org
+  Creator:  3.6.14, git
+  Instrument: sphere_monitor.instr
+  Ncount: 1000000000
+  Trace: no
+  Gravitation: no
+  Seed: 1782301585265921
+  Directory: HS_4pisrc_to_cylmon_1e9
+  Nodes: 8
+end simulation
+
+begin data
+  Date: Wed Jun 24 13:47:00 2026 (1782301620)
+  type: array_2d(180, 90)
+  Source: sphere_validate (sphere_monitor.instr)
+  component: mon_cyl_PSD
+  position: 0 0 0
+  title: Cylindrical PSD monitor
+  Ncount: 1000000000
+  filename: HS_srcsimple_to_cylmon_PSD.dat
+  statistics: X0=-0.996373; dX=103.346; Y0=-3.48594e-05; dY=0.660278;
+  signal: Min=0; Max=9.3353e+09; Mean=5.10759e+09;
+  values: 8.2743e+13 2.87651e+09 8.2743e+08
+  xvar: ra
+  yvar: y 
+  xlabel: radial position [deg]
+  ylabel: y [m]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -1.5 1.5
+  variables: I I_err N
+end data
+
+begin data
+  Date: Wed Jun 24 13:47:00 2026 (1782301620)
+  type: array_1d(180)
+  Source: sphere_validate (sphere_monitor.instr)
+  component: cyl_mon
+  position: 0 0 0
+  title: Cylindrical monitor
+  Ncount: 1000000000
+  filename: HS_srcsimple_to_cylmon.dat
+  statistics: X0=0.00335958; dX=103.924;
+  signal: Min=4.61577e+11; Max=4.62768e+11; Mean=4.62252e+11;
+  values: 8.32054e+13 2.88453e+09 8.32054e+08
+  xvar: Theta
+  yvar: (I,I_err)
+  xlabel: radial position [deg]
+  ylabel: Intensity
+  xlimits: -180 180
+  variables: Theta I I_err N
+end data
+
+begin data
+  Date: Wed Jun 24 13:47:00 2026 (1782301620)
+  type: array_2d(360, 180)
+  Source: sphere_validate (sphere_monitor.instr)
+  component: mon_4pi
+  position: 0 0 0
+  title: 4PI PSD monitor
+  Ncount: 1000000000
+  filename: 4ipsrc_to_4pimon.dat
+  statistics: X0=0.0034683; dX=103.924; Y0=0.49733; dY=39.1722;
+  signal: Min=3.3e+06; Max=2.4759e+09; Mean=1.54321e+09;
+  values: 1e+14 3.16228e+09 1e+09
+  xvar: Lo
+  yvar: La
+  xlabel: Longitude [deg]
+  ylabel: Latitude [deg]
+  zvar: I
+  zlabel: Signal per bin
+  xylimits: -180 180 -90 90
+  variables: I I_err N
+end data

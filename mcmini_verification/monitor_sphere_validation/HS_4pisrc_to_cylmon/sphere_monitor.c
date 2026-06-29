@@ -2,7 +2,7 @@
  * Format:     ANSI C source code
  * Creator:    McStas <http://www.mcstas.org>
  * Instrument: sphere_monitor.instr (sphere_validate)
- * Date:       Wed Jun 24 13:46:23 2026
+ * Date:       Wed Jun 24 13:40:57 2026
  * File:       ./sphere_monitor.c
  * CFLAGS=
  */
@@ -6964,12 +6964,12 @@ typedef struct _struct_instrument_parameters _class_instrument_parameters;
 struct _instrument_struct {
   char   _name[256]; /* the name of this instrument e.g. 'sphere_validate' */
 /* Counters per component instance */
-  double counter_AbsorbProp[7]; /* absorbed events in PROP routines */
-  double counter_N[7], counter_P[7], counter_P2[7]; /* event counters after each component instance */
-  _class_particle _trajectory[7]; /* current trajectory for STORE/RESTORE */
+  double counter_AbsorbProp[6]; /* absorbed events in PROP routines */
+  double counter_N[6], counter_P[6], counter_P2[6]; /* event counters after each component instance */
+  _class_particle _trajectory[6]; /* current trajectory for STORE/RESTORE */
 /* Components position table (absolute and relative coords) */
-  Coords _position_relative[7]; /* positions of all components */
-  Coords _position_absolute[7];
+  Coords _position_relative[6]; /* positions of all components */
+  Coords _position_absolute[6];
   _class_instrument_parameters _parameters; /* instrument parameters */
 } _instrument_var;
 struct _instrument_struct *instrument = & _instrument_var;
@@ -7055,7 +7055,7 @@ typedef struct _struct_Source_4PI _class_Source_4PI;
 _class_Source_4PI _src_var;
 #pragma acc declare create ( _src_var )
 
-/* component mon_cyl_PSD=Cyl_monitor_PSD() [3] DECLARE */
+/* component mon_cyl=Cyl_monitor_PSD() [3] DECLARE */
 /* Parameter definition for component type 'Cyl_monitor_PSD' */
 struct _struct_Cyl_monitor_PSD_parameters {
   /* Component type 'Cyl_monitor_PSD' setting parameters */
@@ -7077,7 +7077,7 @@ typedef struct _struct_Cyl_monitor_PSD_parameters _class_Cyl_monitor_PSD_paramet
 
 /* Parameters for component type 'Cyl_monitor_PSD' */
 struct _struct_Cyl_monitor_PSD {
-  char     _name[256]; /* e.g. mon_cyl_PSD */
+  char     _name[256]; /* e.g. mon_cyl */
   char     _type[256]; /* Cyl_monitor_PSD */
   long     _index; /* e.g. 2 index in TRACE list */
   Coords   _position_absolute;
@@ -7089,46 +7089,10 @@ struct _struct_Cyl_monitor_PSD {
   _class_Cyl_monitor_PSD_parameters _parameters;
 };
 typedef struct _struct_Cyl_monitor_PSD _class_Cyl_monitor_PSD;
-_class_Cyl_monitor_PSD _mon_cyl_PSD_var;
-#pragma acc declare create ( _mon_cyl_PSD_var )
+_class_Cyl_monitor_PSD _mon_cyl_var;
+#pragma acc declare create ( _mon_cyl_var )
 
-/* component cyl_mon=Cyl_monitor() [4] DECLARE */
-/* Parameter definition for component type 'Cyl_monitor' */
-struct _struct_Cyl_monitor_parameters {
-  /* Component type 'Cyl_monitor' setting parameters */
-  int nr;
-  char filename[16384];
-  MCNUM yheight;
-  MCNUM radius;
-  int restore_neutron;
-  MCNUM thmin;
-  MCNUM thmax;
-  int nowritefile;
-  /* Component type 'Cyl_monitor' private parameters */
-  DArray1d  PSD_N;
-  DArray1d  PSD_p;
-  DArray1d  PSD_p2;
-}; /* _struct_Cyl_monitor_parameters */
-typedef struct _struct_Cyl_monitor_parameters _class_Cyl_monitor_parameters;
-
-/* Parameters for component type 'Cyl_monitor' */
-struct _struct_Cyl_monitor {
-  char     _name[256]; /* e.g. cyl_mon */
-  char     _type[256]; /* Cyl_monitor */
-  long     _index; /* e.g. 2 index in TRACE list */
-  Coords   _position_absolute;
-  Coords   _position_relative; /* wrt PREVIOUS */
-  Rotation _rotation_absolute;
-  Rotation _rotation_relative; /* wrt PREVIOUS */
-  int      _rotation_is_identity;
-  int      _position_relative_is_zero;
-  _class_Cyl_monitor_parameters _parameters;
-};
-typedef struct _struct_Cyl_monitor _class_Cyl_monitor;
-_class_Cyl_monitor _cyl_mon_var;
-#pragma acc declare create ( _cyl_mon_var )
-
-/* component mon_4pi=PSD_monitor_4PI() [5] DECLARE */
+/* component mon_4pi=PSD_monitor_4PI() [4] DECLARE */
 /* Parameter definition for component type 'PSD_monitor_4PI' */
 struct _struct_PSD_monitor_4PI_parameters {
   /* Component type 'PSD_monitor_4PI' setting parameters */
@@ -7162,7 +7126,7 @@ typedef struct _struct_PSD_monitor_4PI _class_PSD_monitor_4PI;
 _class_PSD_monitor_4PI _mon_4pi_var;
 #pragma acc declare create ( _mon_4pi_var )
 
-int mcNUMCOMP = 5;
+int mcNUMCOMP = 4;
 
 /* User declarations from instrument definition. Can define functions. */
 
@@ -7323,65 +7287,65 @@ int _src_setpos(void)
   return(0);
 } /* _src_setpos */
 
-/* component mon_cyl_PSD=Cyl_monitor_PSD() SETTING, POSITION/ROTATION */
-int _mon_cyl_PSD_setpos(void)
+/* component mon_cyl=Cyl_monitor_PSD() SETTING, POSITION/ROTATION */
+int _mon_cyl_setpos(void)
 { /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_mon_cyl_PSD_setpos] component mon_cyl_PSD=Cyl_monitor_PSD() SETTING [Cyl_monitor_PSD:0]");
-  stracpy(_mon_cyl_PSD_var._name, "mon_cyl_PSD", 16384);
-  stracpy(_mon_cyl_PSD_var._type, "Cyl_monitor_PSD", 16384);
-  _mon_cyl_PSD_var._index=3;
+  SIG_MESSAGE("[_mon_cyl_setpos] component mon_cyl=Cyl_monitor_PSD() SETTING [Cyl_monitor_PSD:0]");
+  stracpy(_mon_cyl_var._name, "mon_cyl", 16384);
+  stracpy(_mon_cyl_var._type, "Cyl_monitor_PSD", 16384);
+  _mon_cyl_var._index=3;
   int current_setpos_index = 3;
-  _mon_cyl_PSD_var._parameters.nr = 180;
-  if("HS_srcsimple_to_cylmon_PSD.dat" && strlen("HS_srcsimple_to_cylmon_PSD.dat"))
-    stracpy(_mon_cyl_PSD_var._parameters.filename, "HS_srcsimple_to_cylmon_PSD.dat" ? "HS_srcsimple_to_cylmon_PSD.dat" : "", 16384);
+  _mon_cyl_var._parameters.nr = 180;
+  if("HS_srcsimple_to_cylmon.dat" && strlen("HS_srcsimple_to_cylmon.dat"))
+    stracpy(_mon_cyl_var._parameters.filename, "HS_srcsimple_to_cylmon.dat" ? "HS_srcsimple_to_cylmon.dat" : "", 16384);
   else 
-  _mon_cyl_PSD_var._parameters.filename[0]='\0';
-  _mon_cyl_PSD_var._parameters.yheight = 3.0;
-  _mon_cyl_PSD_var._parameters.radius = 1.0;
-  _mon_cyl_PSD_var._parameters.restore_neutron = 1;
-  _mon_cyl_PSD_var._parameters.thmin = -180;
-  _mon_cyl_PSD_var._parameters.thmax = 180;
-  _mon_cyl_PSD_var._parameters.ny = 90;
-  _mon_cyl_PSD_var._parameters.nowritefile = 0;
+  _mon_cyl_var._parameters.filename[0]='\0';
+  _mon_cyl_var._parameters.yheight = 5.0;
+  _mon_cyl_var._parameters.radius = 1.0;
+  _mon_cyl_var._parameters.restore_neutron = 1;
+  _mon_cyl_var._parameters.thmin = -180;
+  _mon_cyl_var._parameters.thmax = 180;
+  _mon_cyl_var._parameters.ny = 90;
+  _mon_cyl_var._parameters.nowritefile = 0;
 
 
-  /* component mon_cyl_PSD=Cyl_monitor_PSD() AT ROTATED */
+  /* component mon_cyl=Cyl_monitor_PSD() AT ROTATED */
   {
     Coords tc1, tc2;
     tc1 = coords_set(0,0,0);
     tc2 = coords_set(0,0,0);
     Rotation tr1;
     rot_set_rotation(tr1,0,0,0);
-    rot_set_rotation(_mon_cyl_PSD_var._rotation_absolute,
+    rot_set_rotation(_mon_cyl_var._rotation_absolute,
       (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
     rot_transpose(_src_var._rotation_absolute, tr1);
-    rot_mul(_mon_cyl_PSD_var._rotation_absolute, tr1, _mon_cyl_PSD_var._rotation_relative);
-    _mon_cyl_PSD_var._rotation_is_identity =  rot_test_identity(_mon_cyl_PSD_var._rotation_relative);
-    _mon_cyl_PSD_var._position_absolute = coords_set(
+    rot_mul(_mon_cyl_var._rotation_absolute, tr1, _mon_cyl_var._rotation_relative);
+    _mon_cyl_var._rotation_is_identity =  rot_test_identity(_mon_cyl_var._rotation_relative);
+    _mon_cyl_var._position_absolute = coords_set(
       0, 0, 0);
-    tc1 = coords_sub(_src_var._position_absolute, _mon_cyl_PSD_var._position_absolute);
-    _mon_cyl_PSD_var._position_relative = rot_apply(_mon_cyl_PSD_var._rotation_absolute, tc1);
-  } /* mon_cyl_PSD=Cyl_monitor_PSD() AT ROTATED */
-  DEBUG_COMPONENT("mon_cyl_PSD", _mon_cyl_PSD_var._position_absolute, _mon_cyl_PSD_var._rotation_absolute);
-  instrument->_position_absolute[3] = _mon_cyl_PSD_var._position_absolute;
-  instrument->_position_relative[3] = _mon_cyl_PSD_var._position_relative;
-    _mon_cyl_PSD_var._position_relative_is_zero =  coords_test_zero(_mon_cyl_PSD_var._position_relative);
+    tc1 = coords_sub(_src_var._position_absolute, _mon_cyl_var._position_absolute);
+    _mon_cyl_var._position_relative = rot_apply(_mon_cyl_var._rotation_absolute, tc1);
+  } /* mon_cyl=Cyl_monitor_PSD() AT ROTATED */
+  DEBUG_COMPONENT("mon_cyl", _mon_cyl_var._position_absolute, _mon_cyl_var._rotation_absolute);
+  instrument->_position_absolute[3] = _mon_cyl_var._position_absolute;
+  instrument->_position_relative[3] = _mon_cyl_var._position_relative;
+    _mon_cyl_var._position_relative_is_zero =  coords_test_zero(_mon_cyl_var._position_relative);
   instrument->counter_N[3]  = instrument->counter_P[3] = instrument->counter_P2[3] = 0;
   instrument->counter_AbsorbProp[3]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0002_mon_cyl_PSD", _mon_cyl_PSD_var._position_absolute, _mon_cyl_PSD_var._rotation_absolute, "Cyl_monitor_PSD");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "nr", "20", "180","int");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "filename", 0, "HS_srcsimple_to_cylmon_PSD.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "yheight", "10", "3.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "restore_neutron", "0", "1","int");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "thmin", "-180", "-180","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "thmax", "180", "180","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "ny", "100", "90","MCNUM");
-        mccomp_param_nexus(nxhandle,"0002_mon_cyl_PSD", "nowritefile", "0", "0","int");
+        mccomp_placement_type_nexus(nxhandle,"0002_mon_cyl", _mon_cyl_var._position_absolute, _mon_cyl_var._rotation_absolute, "Cyl_monitor_PSD");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "nr", "20", "180","int");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "filename", 0, "HS_srcsimple_to_cylmon.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "yheight", "10", "5.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "restore_neutron", "0", "1","int");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "thmin", "-180", "-180","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "thmax", "180", "180","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "ny", "100", "90","MCNUM");
+        mccomp_param_nexus(nxhandle,"0002_mon_cyl", "nowritefile", "0", "0","int");
       );
     }
   } else {
@@ -7389,73 +7353,7 @@ int _mon_cyl_PSD_setpos(void)
   }
   #endif
   return(0);
-} /* _mon_cyl_PSD_setpos */
-
-/* component cyl_mon=Cyl_monitor() SETTING, POSITION/ROTATION */
-int _cyl_mon_setpos(void)
-{ /* sets initial component parameters, position and rotation */
-  SIG_MESSAGE("[_cyl_mon_setpos] component cyl_mon=Cyl_monitor() SETTING [Cyl_monitor:0]");
-  stracpy(_cyl_mon_var._name, "cyl_mon", 16384);
-  stracpy(_cyl_mon_var._type, "Cyl_monitor", 16384);
-  _cyl_mon_var._index=4;
-  int current_setpos_index = 4;
-  _cyl_mon_var._parameters.nr = 180;
-  if("HS_srcsimple_to_cylmon" && strlen("HS_srcsimple_to_cylmon"))
-    stracpy(_cyl_mon_var._parameters.filename, "HS_srcsimple_to_cylmon" ? "HS_srcsimple_to_cylmon" : "", 16384);
-  else 
-  _cyl_mon_var._parameters.filename[0]='\0';
-  _cyl_mon_var._parameters.yheight = 3;
-  _cyl_mon_var._parameters.radius = 1;
-  _cyl_mon_var._parameters.restore_neutron = 1;
-  _cyl_mon_var._parameters.thmin = -180;
-  _cyl_mon_var._parameters.thmax = 180;
-  _cyl_mon_var._parameters.nowritefile = 0;
-
-
-  /* component cyl_mon=Cyl_monitor() AT ROTATED */
-  {
-    Coords tc1, tc2;
-    tc1 = coords_set(0,0,0);
-    tc2 = coords_set(0,0,0);
-    Rotation tr1;
-    rot_set_rotation(tr1,0,0,0);
-    rot_set_rotation(_cyl_mon_var._rotation_absolute,
-      (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
-    rot_transpose(_mon_cyl_PSD_var._rotation_absolute, tr1);
-    rot_mul(_cyl_mon_var._rotation_absolute, tr1, _cyl_mon_var._rotation_relative);
-    _cyl_mon_var._rotation_is_identity =  rot_test_identity(_cyl_mon_var._rotation_relative);
-    _cyl_mon_var._position_absolute = coords_set(
-      0, 0, 0);
-    tc1 = coords_sub(_mon_cyl_PSD_var._position_absolute, _cyl_mon_var._position_absolute);
-    _cyl_mon_var._position_relative = rot_apply(_cyl_mon_var._rotation_absolute, tc1);
-  } /* cyl_mon=Cyl_monitor() AT ROTATED */
-  DEBUG_COMPONENT("cyl_mon", _cyl_mon_var._position_absolute, _cyl_mon_var._rotation_absolute);
-  instrument->_position_absolute[4] = _cyl_mon_var._position_absolute;
-  instrument->_position_relative[4] = _cyl_mon_var._position_relative;
-    _cyl_mon_var._position_relative_is_zero =  coords_test_zero(_cyl_mon_var._position_relative);
-  instrument->counter_N[4]  = instrument->counter_P[4] = instrument->counter_P2[4] = 0;
-  instrument->counter_AbsorbProp[4]= 0;
-  #ifdef USE_NEXUS
-  if(nxhandle) {
-    if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
-    MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0003_cyl_mon", _cyl_mon_var._position_absolute, _cyl_mon_var._rotation_absolute, "Cyl_monitor");
-        mccomp_param_nexus(nxhandle,"0003_cyl_mon", "nr", "20", "180","int");
-        mccomp_param_nexus(nxhandle,"0003_cyl_mon", "filename", 0, "HS_srcsimple_to_cylmon", "char*");
-        mccomp_param_nexus(nxhandle,"0003_cyl_mon", "yheight", "10", "3","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_cyl_mon", "radius", "1", "1","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_cyl_mon", "restore_neutron", "0", "1","int");
-        mccomp_param_nexus(nxhandle,"0003_cyl_mon", "thmin", "-180", "-180","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_cyl_mon", "thmax", "180", "180","MCNUM");
-        mccomp_param_nexus(nxhandle,"0003_cyl_mon", "nowritefile", "0", "0","int");
-      );
-    }
-  } else {
-    // fprintf(stderr,"NO NEXUS FILE");
-  }
-  #endif
-  return(0);
-} /* _cyl_mon_setpos */
+} /* _mon_cyl_setpos */
 
 /* component mon_4pi=PSD_monitor_4PI() SETTING, POSITION/ROTATION */
 int _mon_4pi_setpos(void)
@@ -7463,8 +7361,8 @@ int _mon_4pi_setpos(void)
   SIG_MESSAGE("[_mon_4pi_setpos] component mon_4pi=PSD_monitor_4PI() SETTING [PSD_monitor_4PI:0]");
   stracpy(_mon_4pi_var._name, "mon_4pi", 16384);
   stracpy(_mon_4pi_var._type, "PSD_monitor_4PI", 16384);
-  _mon_4pi_var._index=5;
-  int current_setpos_index = 5;
+  _mon_4pi_var._index=4;
+  int current_setpos_index = 4;
   _mon_4pi_var._parameters.nx = 360;
   _mon_4pi_var._parameters.ny = 180;
   if("4ipsrc_to_4pimon.dat" && strlen("4ipsrc_to_4pimon.dat"))
@@ -7485,31 +7383,31 @@ int _mon_4pi_setpos(void)
     rot_set_rotation(tr1,0,0,0);
     rot_set_rotation(_mon_4pi_var._rotation_absolute,
       (0.0)*DEG2RAD, (0.0)*DEG2RAD, (0.0)*DEG2RAD);
-    rot_transpose(_cyl_mon_var._rotation_absolute, tr1);
+    rot_transpose(_mon_cyl_var._rotation_absolute, tr1);
     rot_mul(_mon_4pi_var._rotation_absolute, tr1, _mon_4pi_var._rotation_relative);
     _mon_4pi_var._rotation_is_identity =  rot_test_identity(_mon_4pi_var._rotation_relative);
     _mon_4pi_var._position_absolute = coords_set(
       0, 0, 0);
-    tc1 = coords_sub(_cyl_mon_var._position_absolute, _mon_4pi_var._position_absolute);
+    tc1 = coords_sub(_mon_cyl_var._position_absolute, _mon_4pi_var._position_absolute);
     _mon_4pi_var._position_relative = rot_apply(_mon_4pi_var._rotation_absolute, tc1);
   } /* mon_4pi=PSD_monitor_4PI() AT ROTATED */
   DEBUG_COMPONENT("mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute);
-  instrument->_position_absolute[5] = _mon_4pi_var._position_absolute;
-  instrument->_position_relative[5] = _mon_4pi_var._position_relative;
+  instrument->_position_absolute[4] = _mon_4pi_var._position_absolute;
+  instrument->_position_relative[4] = _mon_4pi_var._position_relative;
     _mon_4pi_var._position_relative_is_zero =  coords_test_zero(_mon_4pi_var._position_relative);
-  instrument->counter_N[5]  = instrument->counter_P[5] = instrument->counter_P2[5] = 0;
-  instrument->counter_AbsorbProp[5]= 0;
+  instrument->counter_N[4]  = instrument->counter_P[4] = instrument->counter_P2[4] = 0;
+  instrument->counter_AbsorbProp[4]= 0;
   #ifdef USE_NEXUS
   if(nxhandle) {
     if ((!mcdotrace) && mcformat && strcasestr(mcformat, "NeXus")) {
     MPI_MASTER(
-        mccomp_placement_type_nexus(nxhandle,"0004_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
-        mccomp_param_nexus(nxhandle,"0004_mon_4pi", "nx", "90", "360","int");
-        mccomp_param_nexus(nxhandle,"0004_mon_4pi", "ny", "90", "180","int");
-        mccomp_param_nexus(nxhandle,"0004_mon_4pi", "filename", 0, "4ipsrc_to_4pimon.dat", "char*");
-        mccomp_param_nexus(nxhandle,"0004_mon_4pi", "nowritefile", "0", "0","int");
-        mccomp_param_nexus(nxhandle,"0004_mon_4pi", "radius", "1", "1.0","MCNUM");
-        mccomp_param_nexus(nxhandle,"0004_mon_4pi", "restore_neutron", "0", "1","int");
+        mccomp_placement_type_nexus(nxhandle,"0003_mon_4pi", _mon_4pi_var._position_absolute, _mon_4pi_var._rotation_absolute, "PSD_monitor_4PI");
+        mccomp_param_nexus(nxhandle,"0003_mon_4pi", "nx", "90", "360","int");
+        mccomp_param_nexus(nxhandle,"0003_mon_4pi", "ny", "90", "180","int");
+        mccomp_param_nexus(nxhandle,"0003_mon_4pi", "filename", 0, "4ipsrc_to_4pimon.dat", "char*");
+        mccomp_param_nexus(nxhandle,"0003_mon_4pi", "nowritefile", "0", "0","int");
+        mccomp_param_nexus(nxhandle,"0003_mon_4pi", "radius", "1", "1.0","MCNUM");
+        mccomp_param_nexus(nxhandle,"0003_mon_4pi", "restore_neutron", "0", "1","int");
       );
     }
   } else {
@@ -7612,7 +7510,7 @@ _class_Cyl_monitor_PSD *class_Cyl_monitor_PSD_init(_class_Cyl_monitor_PSD *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_cyl_PSD_init] component mon_cyl_PSD=Cyl_monitor_PSD() INITIALISE [Cyl_monitor_PSD:0]");
+  SIG_MESSAGE("[_mon_cyl_init] component mon_cyl=Cyl_monitor_PSD() INITIALISE [Cyl_monitor_PSD:0]");
 
   PSD_N = create_darr2d (nr, ny);
   PSD_p = create_darr2d (nr, ny);
@@ -7635,42 +7533,6 @@ _class_Cyl_monitor_PSD *class_Cyl_monitor_PSD_init(_class_Cyl_monitor_PSD *_comp
   #undef PSD_p2
   return(_comp);
 } /* class_Cyl_monitor_PSD_init */
-
-_class_Cyl_monitor *class_Cyl_monitor_init(_class_Cyl_monitor *_comp
-) {
-  #define nr (_comp->_parameters.nr)
-  #define filename (_comp->_parameters.filename)
-  #define yheight (_comp->_parameters.yheight)
-  #define radius (_comp->_parameters.radius)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define thmin (_comp->_parameters.thmin)
-  #define thmax (_comp->_parameters.thmax)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define PSD_N (_comp->_parameters.PSD_N)
-  #define PSD_p (_comp->_parameters.PSD_p)
-  #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_cyl_mon_init] component cyl_mon=Cyl_monitor() INITIALISE [Cyl_monitor:0]");
-
-  PSD_N = create_darr1d (nr);
-  PSD_p = create_darr1d (nr);
-  PSD_p2 = create_darr1d (nr);
-
-  // Use instance name for monitor output if no input was given
-  if (!strcmp (filename, "\0"))
-    sprintf (filename, "%s", NAME_CURRENT_COMP);
-  #undef nr
-  #undef filename
-  #undef yheight
-  #undef radius
-  #undef restore_neutron
-  #undef thmin
-  #undef thmax
-  #undef nowritefile
-  #undef PSD_N
-  #undef PSD_p
-  #undef PSD_p2
-  return(_comp);
-} /* class_Cyl_monitor_init */
 
 _class_PSD_monitor_4PI *class_PSD_monitor_4PI_init(_class_PSD_monitor_4PI *_comp
 ) {
@@ -7716,8 +7578,7 @@ int init(void) { /* called by mccode_main for sphere_validate:INITIALISE */
 
   _Origin_setpos(); /* type Progress_bar */
   _src_setpos(); /* type Source_4PI */
-  _mon_cyl_PSD_setpos(); /* type Cyl_monitor_PSD */
-  _cyl_mon_setpos(); /* type Cyl_monitor */
+  _mon_cyl_setpos(); /* type Cyl_monitor_PSD */
   _mon_4pi_setpos(); /* type PSD_monitor_4PI */
 
   /* call iteratively all components INITIALISE */
@@ -7725,9 +7586,7 @@ int init(void) { /* called by mccode_main for sphere_validate:INITIALISE */
 
   class_Source_4PI_init(&_src_var);
 
-  class_Cyl_monitor_PSD_init(&_mon_cyl_PSD_var);
-
-  class_Cyl_monitor_init(&_cyl_mon_var);
+  class_Cyl_monitor_PSD_init(&_mon_cyl_var);
 
   class_PSD_monitor_4PI_init(&_mon_4pi_var);
 
@@ -7738,8 +7597,7 @@ int init(void) { /* called by mccode_main for sphere_validate:INITIALISE */
 #include <openacc.h>
 #pragma acc update device(_Origin_var)
 #pragma acc update device(_src_var)
-#pragma acc update device(_mon_cyl_PSD_var)
-#pragma acc update device(_cyl_mon_var)
+#pragma acc update device(_mon_cyl_var)
 #pragma acc update device(_mon_4pi_var)
 #pragma acc update device(_instrument_var)
 #endif
@@ -7951,7 +7809,7 @@ void class_Cyl_monitor_PSD_trace(_class_Cyl_monitor_PSD *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_cyl_PSD_trace] component mon_cyl_PSD=Cyl_monitor_PSD() TRACE [Cyl_monitor_PSD:0]");
+  SIG_MESSAGE("[_mon_cyl_trace] component mon_cyl=Cyl_monitor_PSD() TRACE [Cyl_monitor_PSD:0]");
 
   int i, j;
   double t0, t1, phi;
@@ -8013,82 +7871,6 @@ void class_Cyl_monitor_PSD_trace(_class_Cyl_monitor_PSD *_comp
   #undef PSD_p2
   return;
 } /* class_Cyl_monitor_PSD_trace */
-
-#pragma acc routine
-void class_Cyl_monitor_trace(_class_Cyl_monitor *_comp
-  , _class_particle *_particle) {
-  ABSORBED=SCATTERED=RESTORE=0;
-  #define nr (_comp->_parameters.nr)
-  #define filename (_comp->_parameters.filename)
-  #define yheight (_comp->_parameters.yheight)
-  #define radius (_comp->_parameters.radius)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define thmin (_comp->_parameters.thmin)
-  #define thmax (_comp->_parameters.thmax)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define PSD_N (_comp->_parameters.PSD_N)
-  #define PSD_p (_comp->_parameters.PSD_p)
-  #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_cyl_mon_trace] component cyl_mon=Cyl_monitor() TRACE [Cyl_monitor:0]");
-
-  int i, j;
-  double t0, t1, phi;
-
-  if (cylinder_intersect (&t0, &t1, x, y, z, vx, vy, vz, radius, yheight) == 1) {
-    if (t0 < 0) {
-      if (t1 > 0) {
-        PROP_DT (t1);
-        /* Calculate pixel */
-        if (fabs (y) <= yheight / 2.0) {
-          phi = atan2 (x, z) * RAD2DEG;
-
-          if (phi >= thmin && phi <= thmax) {
-            i = floor ((nr) * (phi - thmin) / (thmax - thmin));
-
-            double p2 = p * p;
-            #pragma acc atomic
-            PSD_N[i] = PSD_N[i] + 1;
-
-            #pragma acc atomic
-            PSD_p[i] = PSD_p[i] + p;
-
-            #pragma acc atomic
-            PSD_p2[i] = PSD_p2[i] + p2;
-          }
-        }
-      }
-    }
-  }
-  if (restore_neutron) {
-    RESTORE_NEUTRON (INDEX_CURRENT_COMP, x, y, z, vx, vy, vz, t, sx, sy, sz, p);
-  }
-#ifndef NOABSORB_INF_NAN
-  /* Check for nan or inf particle parms */ 
-  if(isnan(p + t + vx + vy + vz + x + y + z)) ABSORB;
-  if(isinf(fabs(p) + fabs(t) + fabs(vx) + fabs(vy) + fabs(vz) + fabs(x) + fabs(y) + fabs(z))) ABSORB;
-#else
-  if(isnan(p)  ||  isinf(p)) printf("NAN or INF found in p,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(t)  ||  isinf(t)) printf("NAN or INF found in t,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vx) || isinf(vx)) printf("NAN or INF found in vx, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vy) || isinf(vy)) printf("NAN or INF found in vy, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(vz) || isinf(vz)) printf("NAN or INF found in vz, %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(x)  ||  isinf(x)) printf("NAN or INF found in x,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(y)  ||  isinf(y)) printf("NAN or INF found in y,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-  if(isnan(z)  ||  isinf(z)) printf("NAN or INF found in z,  %s (particle %lld)\n",_comp->_name,_particle->_uid);
-#endif
-  #undef nr
-  #undef filename
-  #undef yheight
-  #undef radius
-  #undef restore_neutron
-  #undef thmin
-  #undef thmax
-  #undef nowritefile
-  #undef PSD_N
-  #undef PSD_p
-  #undef PSD_p2
-  return;
-} /* class_Cyl_monitor_trace */
 
 #pragma acc routine
 void class_PSD_monitor_4PI_trace(_class_PSD_monitor_4PI *_comp
@@ -8229,49 +8011,28 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
     } /* end component src [2] */
-    /* begin component mon_cyl_PSD=Cyl_monitor_PSD() [3] */
+    /* begin component mon_cyl=Cyl_monitor_PSD() [3] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
-      if (_mon_cyl_PSD_var._rotation_is_identity) {
-        if(!_mon_cyl_PSD_var._position_relative_is_zero) {
-          coords_get(coords_add(coords_set(x,y,z), _mon_cyl_PSD_var._position_relative),&x, &y, &z);
+      if (_mon_cyl_var._rotation_is_identity) {
+        if(!_mon_cyl_var._position_relative_is_zero) {
+          coords_get(coords_add(coords_set(x,y,z), _mon_cyl_var._position_relative),&x, &y, &z);
         }
       } else {
-          mccoordschange(_mon_cyl_PSD_var._position_relative, _mon_cyl_PSD_var._rotation_relative, _particle);
+          mccoordschange(_mon_cyl_var._position_relative, _mon_cyl_var._rotation_relative, _particle);
       }
     }
     if (!ABSORBED && _particle->_index == 3) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
-      DEBUG_COMP(_mon_cyl_PSD_var._name);
+      DEBUG_COMP(_mon_cyl_var._name);
       DEBUG_STATE();
-      class_Cyl_monitor_PSD_trace(&_mon_cyl_PSD_var, _particle);
+      class_Cyl_monitor_PSD_trace(&_mon_cyl_var, _particle);
       if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_cyl_PSD [3] */
-    /* begin component cyl_mon=Cyl_monitor() [4] */
-    if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
-      if (_cyl_mon_var._rotation_is_identity) {
-        if(!_cyl_mon_var._position_relative_is_zero) {
-          coords_get(coords_add(coords_set(x,y,z), _cyl_mon_var._position_relative),&x, &y, &z);
-        }
-      } else {
-          mccoordschange(_cyl_mon_var._position_relative, _cyl_mon_var._rotation_relative, _particle);
-      }
-    }
-    if (!ABSORBED && _particle->_index == 4) {
-      _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
-      _particle_save = *_particle;
-      DEBUG_COMP(_cyl_mon_var._name);
-      DEBUG_STATE();
-      class_Cyl_monitor_trace(&_cyl_mon_var, _particle);
-      if (_particle->_restore)
-        particle_restore(_particle, &_particle_save);
-      _particle->_index++;
-      if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component cyl_mon [4] */
-    /* begin component mon_4pi=PSD_monitor_4PI() [5] */
+    } /* end component mon_cyl [3] */
+    /* begin component mon_4pi=PSD_monitor_4PI() [4] */
     if (!_particle->flag_nocoordschange) { // flag activated by JUMP to pass coords change
       if (_mon_4pi_var._rotation_is_identity) {
         if(!_mon_4pi_var._position_relative_is_zero) {
@@ -8281,7 +8042,7 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
           mccoordschange(_mon_4pi_var._position_relative, _mon_4pi_var._rotation_relative, _particle);
       }
     }
-    if (!ABSORBED && _particle->_index == 5) {
+    if (!ABSORBED && _particle->_index == 4) {
       _particle->flag_nocoordschange=0; /* Reset if we came here from a JUMP */
       _particle_save = *_particle;
       DEBUG_COMP(_mon_4pi_var._name);
@@ -8291,8 +8052,8 @@ int raytrace(_class_particle* _particle) { /* single event propagation, called b
         particle_restore(_particle, &_particle_save);
       _particle->_index++;
       if (!ABSORBED) { DEBUG_STATE(); }
-    } /* end component mon_4pi [5] */
-    if (_particle->_index > 5)
+    } /* end component mon_4pi [4] */
+    if (_particle->_index > 4)
       ABSORBED++; /* absorbed when passed all components */
   } /* while !ABSORBED */
 
@@ -8471,38 +8232,23 @@ void raytrace_all_funnel(unsigned long long ncount, unsigned long seed) {
         _particle->_index++;
       }
 
-      // mon_cyl_PSD
+      // mon_cyl
     if (!ABSORBED && _particle->_index == 3) {
 #ifndef MULTICORE
-        if (_mon_cyl_PSD_var._rotation_is_identity)
-          coords_get(coords_add(coords_set(x,y,z), _mon_cyl_PSD_var._position_relative),&x, &y, &z);
+        if (_mon_cyl_var._rotation_is_identity)
+          coords_get(coords_add(coords_set(x,y,z), _mon_cyl_var._position_relative),&x, &y, &z);
         else
 #endif
-          mccoordschange(_mon_cyl_PSD_var._position_relative, _mon_cyl_PSD_var._rotation_relative, _particle);
+          mccoordschange(_mon_cyl_var._position_relative, _mon_cyl_var._rotation_relative, _particle);
         _particle_save = *_particle;
-        class_Cyl_monitor_PSD_trace(&_mon_cyl_PSD_var, _particle);
-        if (_particle->_restore)
-        particle_restore(_particle, &_particle_save);
-        _particle->_index++;
-      }
-
-      // cyl_mon
-    if (!ABSORBED && _particle->_index == 4) {
-#ifndef MULTICORE
-        if (_cyl_mon_var._rotation_is_identity)
-          coords_get(coords_add(coords_set(x,y,z), _cyl_mon_var._position_relative),&x, &y, &z);
-        else
-#endif
-          mccoordschange(_cyl_mon_var._position_relative, _cyl_mon_var._rotation_relative, _particle);
-        _particle_save = *_particle;
-        class_Cyl_monitor_trace(&_cyl_mon_var, _particle);
+        class_Cyl_monitor_PSD_trace(&_mon_cyl_var, _particle);
         if (_particle->_restore)
         particle_restore(_particle, &_particle_save);
         _particle->_index++;
       }
 
       // mon_4pi
-    if (!ABSORBED && _particle->_index == 5) {
+    if (!ABSORBED && _particle->_index == 4) {
 #ifndef MULTICORE
         if (_mon_4pi_var._rotation_is_identity)
           coords_get(coords_add(coords_set(x,y,z), _mon_4pi_var._position_relative),&x, &y, &z);
@@ -8614,7 +8360,7 @@ _class_Cyl_monitor_PSD *class_Cyl_monitor_PSD_save(_class_Cyl_monitor_PSD *_comp
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_cyl_PSD_save] component mon_cyl_PSD=Cyl_monitor_PSD() SAVE [Cyl_monitor_PSD:0]");
+  SIG_MESSAGE("[_mon_cyl_save] component mon_cyl=Cyl_monitor_PSD() SAVE [Cyl_monitor_PSD:0]");
 
   if (!nowritefile) {
     DETECTOR_OUT_2D ("Cylindrical PSD monitor", "radial position [deg]", "y [m]", thmin, thmax, -yheight / 2.0, yheight / 2.0, nr, ny, &PSD_N[0][0], &PSD_p[0][0],
@@ -8634,38 +8380,6 @@ _class_Cyl_monitor_PSD *class_Cyl_monitor_PSD_save(_class_Cyl_monitor_PSD *_comp
   #undef PSD_p2
   return(_comp);
 } /* class_Cyl_monitor_PSD_save */
-
-_class_Cyl_monitor *class_Cyl_monitor_save(_class_Cyl_monitor *_comp
-) {
-  #define nr (_comp->_parameters.nr)
-  #define filename (_comp->_parameters.filename)
-  #define yheight (_comp->_parameters.yheight)
-  #define radius (_comp->_parameters.radius)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define thmin (_comp->_parameters.thmin)
-  #define thmax (_comp->_parameters.thmax)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define PSD_N (_comp->_parameters.PSD_N)
-  #define PSD_p (_comp->_parameters.PSD_p)
-  #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_cyl_mon_save] component cyl_mon=Cyl_monitor() SAVE [Cyl_monitor:0]");
-
-  if (!nowritefile) {
-    DETECTOR_OUT_1D ("Cylindrical monitor", "radial position [deg]", "Intensity", "Theta", thmin, thmax, nr, &PSD_N[0], &PSD_p[0], &PSD_p2[0], filename);
-  }
-  #undef nr
-  #undef filename
-  #undef yheight
-  #undef radius
-  #undef restore_neutron
-  #undef thmin
-  #undef thmax
-  #undef nowritefile
-  #undef PSD_N
-  #undef PSD_p
-  #undef PSD_p2
-  return(_comp);
-} /* class_Cyl_monitor_save */
 
 _class_PSD_monitor_4PI *class_PSD_monitor_4PI_save(_class_PSD_monitor_4PI *_comp
 ) {
@@ -8704,9 +8418,7 @@ int save(FILE *handle) { /* called by mccode_main for sphere_validate:SAVE */
   class_Progress_bar_save(&_Origin_var);
 
 
-  class_Cyl_monitor_PSD_save(&_mon_cyl_PSD_var);
-
-  class_Cyl_monitor_save(&_cyl_mon_var);
+  class_Cyl_monitor_PSD_save(&_mon_cyl_var);
 
   class_PSD_monitor_4PI_save(&_mon_4pi_var);
 
@@ -8768,7 +8480,7 @@ _class_Cyl_monitor_PSD *class_Cyl_monitor_PSD_finally(_class_Cyl_monitor_PSD *_c
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_cyl_PSD_finally] component mon_cyl_PSD=Cyl_monitor_PSD() FINALLY [Cyl_monitor_PSD:0]");
+  SIG_MESSAGE("[_mon_cyl_finally] component mon_cyl=Cyl_monitor_PSD() FINALLY [Cyl_monitor_PSD:0]");
 
   destroy_darr2d (PSD_N);
   destroy_darr2d (PSD_p);
@@ -8787,38 +8499,6 @@ _class_Cyl_monitor_PSD *class_Cyl_monitor_PSD_finally(_class_Cyl_monitor_PSD *_c
   #undef PSD_p2
   return(_comp);
 } /* class_Cyl_monitor_PSD_finally */
-
-_class_Cyl_monitor *class_Cyl_monitor_finally(_class_Cyl_monitor *_comp
-) {
-  #define nr (_comp->_parameters.nr)
-  #define filename (_comp->_parameters.filename)
-  #define yheight (_comp->_parameters.yheight)
-  #define radius (_comp->_parameters.radius)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define thmin (_comp->_parameters.thmin)
-  #define thmax (_comp->_parameters.thmax)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define PSD_N (_comp->_parameters.PSD_N)
-  #define PSD_p (_comp->_parameters.PSD_p)
-  #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_cyl_mon_finally] component cyl_mon=Cyl_monitor() FINALLY [Cyl_monitor:0]");
-
-  destroy_darr1d (PSD_N);
-  destroy_darr1d (PSD_p);
-  destroy_darr1d (PSD_p2);
-  #undef nr
-  #undef filename
-  #undef yheight
-  #undef radius
-  #undef restore_neutron
-  #undef thmin
-  #undef thmax
-  #undef nowritefile
-  #undef PSD_N
-  #undef PSD_p
-  #undef PSD_p2
-  return(_comp);
-} /* class_Cyl_monitor_finally */
 
 _class_PSD_monitor_4PI *class_PSD_monitor_4PI_finally(_class_PSD_monitor_4PI *_comp
 ) {
@@ -8853,8 +8533,7 @@ _class_PSD_monitor_4PI *class_PSD_monitor_4PI_finally(_class_PSD_monitor_4PI *_c
 int finally(void) { /* called by mccode_main for sphere_validate:FINALLY */
 #pragma acc update host(_Origin_var)
 #pragma acc update host(_src_var)
-#pragma acc update host(_mon_cyl_PSD_var)
-#pragma acc update host(_cyl_mon_var)
+#pragma acc update host(_mon_cyl_var)
 #pragma acc update host(_mon_4pi_var)
 #pragma acc update host(_instrument_var)
 
@@ -8865,9 +8544,7 @@ int finally(void) { /* called by mccode_main for sphere_validate:FINALLY */
   class_Progress_bar_finally(&_Origin_var);
 
 
-  class_Cyl_monitor_PSD_finally(&_mon_cyl_PSD_var);
-
-  class_Cyl_monitor_finally(&_cyl_mon_var);
+  class_Cyl_monitor_PSD_finally(&_mon_cyl_var);
 
   class_PSD_monitor_4PI_finally(&_mon_4pi_var);
 
@@ -8960,7 +8637,7 @@ _class_Cyl_monitor_PSD *class_Cyl_monitor_PSD_display(_class_Cyl_monitor_PSD *_c
   #define PSD_N (_comp->_parameters.PSD_N)
   #define PSD_p (_comp->_parameters.PSD_p)
   #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_mon_cyl_PSD_display] component mon_cyl_PSD=Cyl_monitor_PSD() DISPLAY [Cyl_monitor_PSD:0]");
+  SIG_MESSAGE("[_mon_cyl_display] component mon_cyl=Cyl_monitor_PSD() DISPLAY [Cyl_monitor_PSD:0]");
 
   printf("MCDISPLAY: component %s\n", _comp->_name);
   circle ("xz", 0, 0, 0, radius);
@@ -8978,37 +8655,6 @@ _class_Cyl_monitor_PSD *class_Cyl_monitor_PSD_display(_class_Cyl_monitor_PSD *_c
   #undef PSD_p2
   return(_comp);
 } /* class_Cyl_monitor_PSD_display */
-
-_class_Cyl_monitor *class_Cyl_monitor_display(_class_Cyl_monitor *_comp
-) {
-  #define nr (_comp->_parameters.nr)
-  #define filename (_comp->_parameters.filename)
-  #define yheight (_comp->_parameters.yheight)
-  #define radius (_comp->_parameters.radius)
-  #define restore_neutron (_comp->_parameters.restore_neutron)
-  #define thmin (_comp->_parameters.thmin)
-  #define thmax (_comp->_parameters.thmax)
-  #define nowritefile (_comp->_parameters.nowritefile)
-  #define PSD_N (_comp->_parameters.PSD_N)
-  #define PSD_p (_comp->_parameters.PSD_p)
-  #define PSD_p2 (_comp->_parameters.PSD_p2)
-  SIG_MESSAGE("[_cyl_mon_display] component cyl_mon=Cyl_monitor() DISPLAY [Cyl_monitor:0]");
-
-  printf("MCDISPLAY: component %s\n", _comp->_name);
-  circle ("xz", 0, 0, 0, radius);
-  #undef nr
-  #undef filename
-  #undef yheight
-  #undef radius
-  #undef restore_neutron
-  #undef thmin
-  #undef thmax
-  #undef nowritefile
-  #undef PSD_N
-  #undef PSD_p
-  #undef PSD_p2
-  return(_comp);
-} /* class_Cyl_monitor_display */
 
 _class_PSD_monitor_4PI *class_PSD_monitor_4PI_display(_class_PSD_monitor_4PI *_comp
 ) {
@@ -9058,9 +8704,7 @@ int display(void) { /* called by mccode_main for sphere_validate:DISPLAY */
 
   class_Source_4PI_display(&_src_var);
 
-  class_Cyl_monitor_PSD_display(&_mon_cyl_PSD_var);
-
-  class_Cyl_monitor_display(&_cyl_mon_var);
+  class_Cyl_monitor_PSD_display(&_mon_cyl_var);
 
   class_PSD_monitor_4PI_display(&_mon_4pi_var);
 
@@ -9077,8 +8721,7 @@ void* _getvar_parameters(char* compname)
   #endif
   if (!strcmp(compname, "Origin")) return (void *) &(_Origin_var._parameters);
   if (!strcmp(compname, "src")) return (void *) &(_src_var._parameters);
-  if (!strcmp(compname, "mon_cyl_PSD")) return (void *) &(_mon_cyl_PSD_var._parameters);
-  if (!strcmp(compname, "cyl_mon")) return (void *) &(_cyl_mon_var._parameters);
+  if (!strcmp(compname, "mon_cyl")) return (void *) &(_mon_cyl_var._parameters);
   if (!strcmp(compname, "mon_4pi")) return (void *) &(_mon_4pi_var._parameters);
   return 0;
 }
@@ -9095,9 +8738,8 @@ int _getcomp_index(char* compname)
 {
   if (!strcmp(compname, "Origin")) return 1;
   if (!strcmp(compname, "src")) return 2;
-  if (!strcmp(compname, "mon_cyl_PSD")) return 3;
-  if (!strcmp(compname, "cyl_mon")) return 4;
-  if (!strcmp(compname, "mon_4pi")) return 5;
+  if (!strcmp(compname, "mon_cyl")) return 3;
+  if (!strcmp(compname, "mon_4pi")) return 4;
   return -1;
 }
 
